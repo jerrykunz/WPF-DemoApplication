@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--new-->
+
+    <!--general-->
+    <sys:String x:Key="Lang_Ok" xml:space="preserve">Ok</sys:String>
+    <sys:String x:Key="Lang_CloseApp" xml:space="preserve">Stäng programmet</sys:String>
+    <sys:String x:Key="Lang_More" xml:space="preserve">Mer</sys:String>
+    <sys:String x:Key="Lang_Back" xml:space="preserve">Tillbaka</sys:String>
+    <sys:String x:Key="Lang_Exit" xml:space="preserve">Avsluta</sys:String>
+    <sys:String x:Key="Lang_Locker" xml:space="preserve">Skåp</sys:String>
+    <sys:String x:Key="Lang_Print_Receipt" xml:space="preserve">Skriva ut kvitto</sys:String>
+
+    <sys:String x:Key="Lang_HelpNotFound" xml:space="preserve">Fel - Hjälpfilen kunde inte hittas</sys:String>
+
+
+
+    <!--waitforuserview-->
+    <sys:String x:Key="Lang_Choose_Language" xml:space="preserve">Välj ett språk</sys:String>
+    <sys:String x:Key="Lang_Identify_Yourself" xml:space="preserve">Identifiera dig själv</sys:String>
+    <sys:String x:Key="Lang_ScanBarcode" xml:space="preserve">Scan barcode</sys:String>
+    <sys:String x:Key="Lang_ReadRfid" xml:space="preserve">Read rfid</sys:String>
+    <sys:String x:Key="Lang_ReadSmartCard" xml:space="preserve">Read smart card</sys:String>
+    <sys:String x:Key="Lang_EnterPin" xml:space="preserve">Input PIN</sys:String>
+
+    <sys:String x:Key="Lang_OrScanBarcode" xml:space="preserve">Or scan barcode</sys:String>
+    <sys:String x:Key="Lang_OrReadRfid" xml:space="preserve">Or read Rfid</sys:String>
+    <sys:String x:Key="Lang_OrReadSmartCard" xml:space="preserve">Or read smart card</sys:String>
+    <sys:String x:Key="Lang_OrEnterPin" xml:space="preserve">Or Input PIN</sys:String>
+
+    <!--waitforadminview-->
+    <sys:String x:Key="Lang_Enter_Admin_Pin" xml:space="preserve">Ingångsstift</sys:String>
+
+    <!--checkedoutview-->
+    <sys:String x:Key="Lang_Retrieve_Items" xml:space="preserve">Hämta dina föremål</sys:String>
+    <sys:String x:Key="Lang_Your_Items" xml:space="preserve">Dina föremål</sys:String>
+    <sys:String x:Key="Lang_Book_Id" xml:space="preserve">Id</sys:String>
+    <sys:String x:Key="Lang_Book_Title" xml:space="preserve">Titel</sys:String>
+    <sys:String x:Key="Lang_Book_Author" xml:space="preserve">Författare</sys:String>
+    <sys:String x:Key="Lang_Book_LastPickup" xml:space="preserve">Sista hämtningsdatum</sys:String>
+
+    <sys:String x:Key="Lang_Close_Locker_Door" xml:space="preserve">Stäng dörren till skåpet för att komma ut</sys:String>
+    <sys:String x:Key="Lang_Close_Locker_Door1" xml:space="preserve">Stäng dörren till skåpet</sys:String>
+    <sys:String x:Key="Lang_Close_Locker_Door2" xml:space="preserve">för att komma ut</sys:String>
+
+    <!--waitforadminview-->
+    <sys:String x:Key="Lang_Time_Remaining" xml:space="preserve">Tid kvar:</sys:String>
+
+    <!--admin menu-->
+    <sys:String x:Key="Lang_Admin_Menu" xml:space="preserve">Admin-meny</sys:String>
+    <sys:String x:Key="Lang_Choose_Function" xml:space="preserve">Välj en åtgärd:</sys:String>
+
+    <sys:String x:Key="Lang_Check_In" xml:space="preserve">Incheckning</sys:String>
+    <sys:String x:Key="Lang_Locker_Control" xml:space="preserve">Skåpkontroll</sys:String>
+    <sys:String x:Key="Lang_Invalid_Items" xml:space="preserve">Utgångna artiklar</sys:String>
+    <sys:String x:Key="Lang_Settings" xml:space="preserve">Inställningar</sys:String>
+
+
+    <!--checkin view-->
+    <sys:String x:Key="Lang_Patron_Id" xml:space="preserve">Kundnummer:</sys:String>
+    <sys:String x:Key="Lang_Patron_Name" xml:space="preserve">Kundnamn:</sys:String>
+
+    <sys:String x:Key="Lang_Items_In_Locker" xml:space="preserve">Föremål i skåpet</sys:String>
+    <sys:String x:Key="Lang_Other_Reservations" xml:space="preserve">Andra reservationer för användaren</sys:String>
+    <sys:String x:Key="Lang_Close_Door_Check_In" xml:space="preserve">Stäng dörren till skåpet för att slutföra incheckningen</sys:String>
+
+    <sys:String x:Key="Lang_Print_Slip" xml:space="preserve">Skriv ut kvitto</sys:String>
+    <sys:String x:Key="Lang_Cancel" xml:space="preserve">Avbryt</sys:String>
+
+    <!--waitforcheckinview-->
+    <sys:String x:Key="Lang_Additional_Information" xml:space="preserve">Ytterligare information:</sys:String>
+
+    <sys:String x:Key="Lang_Scan_New_Item" xml:space="preserve">Skanna ett nytt objekt</sys:String>
+    <sys:String x:Key="Lang_Rescan_Item" xml:space="preserve">Skanna objektet på nytt för att slutföra processen</sys:String>
+    <sys:String x:Key="Lang_Wrong_Uid" xml:space="preserve">Föregående artikel UID matchade inte den första skanningen</sys:String>
+    <sys:String x:Key="Lang_Sip_Checkin_Failed" xml:space="preserve">Föregående objekt kan inte checka in på SIP</sys:String>
+    <sys:String x:Key="Lang_No_Reservation" xml:space="preserve">Föregående punkt har ingen reservation</sys:String>
+    <sys:String x:Key="Lang_Invalid_Patron" xml:space="preserve">Föregående artikel var reserverad för en ogiltig kund</sys:String>
+    <sys:String x:Key="Lang_Patron_No_Reservations" xml:space="preserve">Kunden för föregående post har inga reserverade poster enligt SIP.</sys:String>
+    <sys:String x:Key="Lang_No_Free_Lockers" xml:space="preserve">Inga gratis skåp och den tidigare sponsorn har inget skåp i samband med detta.</sys:String>
+    <sys:String x:Key="Lang_Already_In_Locker" xml:space="preserve">Det skannade föremålet ska redan finnas i skåpet</sys:String>
+    <sys:String x:Key="Lang_Not_In_Patron_Reservations" xml:space="preserve">Föregående artikel inte i kundreservationerna enligt SIP</sys:String>
+    <sys:String x:Key="Lang_Locker_Was_Null" xml:space="preserve">Det aktuella skåpet är inställt på noll, det gick inte att lägga till föregående objekt i det.</sys:String>
+
+    <!--checkoutstaffview-->
+    <sys:String x:Key="Lang_Checkout_Staff" xml:space="preserve">Utcheckningspersonal</sys:String>
+    <sys:String x:Key="Lang_Item_Checked_Out" xml:space="preserve">Utcheckat objekt</sys:String>
+
+    <!--reconnectview-->
+    <sys:String x:Key="Lang_Reconnect_Devices" xml:space="preserve">Återanslut enheter</sys:String>
+    <sys:String x:Key="Lang_Reconnecting_In" xml:space="preserve">Återuppkoppling i</sys:String>
+    <sys:String x:Key="Lang_Seconds" xml:space="preserve">sekunder</sys:String>
+    <sys:String x:Key="Lang_Unresponsive" xml:space="preserve">Enheter som inte svarar:</sys:String>
+    <sys:String x:Key="Lang_Printer_Status" xml:space="preserve">Status för skrivaren:</sys:String>
+    <sys:String x:Key="Lang_Reconnect" xml:space="preserve">Återanslut</sys:String>
+
+    <!--expired itemsview-->
+    <sys:String x:Key="Lang_Locker_Items" xml:space="preserve">Skåpsartiklar</sys:String>
+    <sys:String x:Key="Lang_Show_All" xml:space="preserve">Visa alla</sys:String>
+    <sys:String x:Key="Lang_Open_Locker" xml:space="preserve">Öppna skåpet</sys:String>
+    <sys:String x:Key="Lang_Open_Lockers" xml:space="preserve">Öppna skåp</sys:String>
+    <sys:String x:Key="Lang_Update" xml:space="preserve">Uppdatera</sys:String>
+    <sys:String x:Key="Lang_Clear_Invalid_Items" xml:space="preserve">Rensa utgångna artiklar</sys:String>
+
+    <!--locker admin view-->
+    <sys:String x:Key="Lang_Locker_Administration" xml:space="preserve">Skåpkontroll</sys:String>
+    <sys:String x:Key="Lang_Id" xml:space="preserve">Id: </sys:String>
+    <sys:String x:Key="Lang_Customer" xml:space="preserve">Kund: </sys:String>
+    <sys:String x:Key="Lang_Locker_From" xml:space="preserve">Skåp Från: </sys:String>
+    <sys:String x:Key="Lang_Check_Out" xml:space="preserve">Checka ut</sys:String>
+    <sys:String x:Key="Lang_Clear_Locker" xml:space="preserve">Klart skåp</sys:String>
+    <sys:String x:Key="Lang_CustomerCheckedOut" xml:space="preserve">Kunden checkade ut</sys:String>
+
+    <!--printer errors-->
+    <sys:String x:Key="Lang_PrinterError_Lowtoner" xml:space="preserve">Låg nivå på tonern</sys:String>
+    <sys:String x:Key="Lang_PrinterError_Offline" xml:space="preserve">Skrivaren är offline</sys:String>
+    <sys:String x:Key="Lang_PrinterError_OpenDoor" xml:space="preserve">Dörren är öppen</sys:String>
+    <sys:String x:Key="Lang_PrinterError_OutOfMemory" xml:space="preserve">Inget minne kvar</sys:String>
+    <sys:String x:Key="Lang_PrinterError_UnableToPrint" xml:space="preserve">Det går inte att skriva ut</sys:String>
+    <sys:String x:Key="Lang_PrinterError_OutOfToner" xml:space="preserve">Slut på toner</sys:String>
+    <sys:String x:Key="Lang_PrinterError_OutOfPaper" xml:space="preserve">Slut på papper</sys:String>
+    <sys:String x:Key="Lang_PrinterError_PaperJam" xml:space="preserve">Pappersstopp</sys:String>
+    <sys:String x:Key="Lang_PrinterError_OutputbinFull" xml:space="preserve">Utgångsbehållaren är full</sys:String>
+    <sys:String x:Key="Lang_PrinterError_PaperProblem" xml:space="preserve">Problem med papper</sys:String>
+    <sys:String x:Key="Lang_PrinterError_ErrorCondition" xml:space="preserve">Feltillstånd</sys:String>
+
+    <!--dialogs-->
+    <sys:String x:Key="Lang_Dialog_Help" xml:space="preserve">Hjälp</sys:String>
+    <sys:String x:Key="Lang_Dialog_Error" xml:space="preserve">Fel</sys:String>
+    <sys:String x:Key="Lang_Dialog_Notice" xml:space="preserve">Meddelande</sys:String>
+    <sys:String x:Key="Lang_Dialog_Confirm" xml:space="preserve">Bekräfta</sys:String>
+
+    <sys:String x:Key="Lang_UnableToPrint" xml:space="preserve">Det går inte att skriva ut:</sys:String>
+    <sys:String x:Key="Lang_CouldNotOpenLocker1" xml:space="preserve">Kunde inte öppna skåpet </sys:String>
+    <sys:String x:Key="Lang_CouldNotOpenLocker2" xml:space="preserve"> - Kontakta personalen</sys:String>
+    <sys:String x:Key="Lang_LockerWasNullShort" xml:space="preserve">Låset var noll</sys:String>
+    <sys:String x:Key="Lang_UnableToCheckOut" xml:space="preserve">Det går inte att checka ut en eller flera artiklar. Vänligen kontakta personalen.</sys:String>
+
+    <sys:String x:Key="Lang_Dialog_ClearInvalid" xml:space="preserve">Är det verkligen möjligt att rensa ut utgångna produkter?</sys:String>
+    <sys:String x:Key="Lang_Dialog_ClearInvalidOk" xml:space="preserve">Rensning slutförd med framgång!</sys:String>
+    <sys:String x:Key="Lang_Dialog_CheckOutPatron" xml:space="preserve">Kolla verkligen upp patronen?</sys:String>
+
+    <sys:String x:Key="Lang_PatronCheckedOut" xml:space="preserve">Patron Checkade ut</sys:String>
+    <sys:String x:Key="Lang_PatronCheckoutFailed" xml:space="preserve">Kolla in misslyckade!</sys:String>
+    <sys:String x:Key="Lang_ReallyClearLocker" xml:space="preserve">Ett riktigt tydligt skåp?</sys:String>
+
+    <sys:String x:Key="Lang_CouldNotOpenLockers" xml:space="preserve">Kunde inte öppna numrerade skåp: </sys:String>
+
+  
+
+    <sys:String x:Key="Lang_LockerCleared" xml:space="preserve">Locker Cleared</sys:String>
+   
+
+    <sys:String x:Key="Lang_Width" xml:space="preserve">Width</sys:String>
+    <sys:String x:Key="Lang_Height" xml:space="preserve">Height</sys:String>
+
+    <sys:String x:Key="Lang_Dialog_CloseProgram" xml:space="preserve">Really close program?</sys:String>
+
+  
+    <sys:String x:Key="Lang_ReservationArrived" xml:space="preserve">Your reservation has arrived</sys:String>
+
+   
+
+    <sys:String x:Key="Lang_Email_CheckoutSubject" xml:space="preserve">Your Checkout Receipt</sys:String>
+    <sys:String x:Key="Lang_UnableToCheckOut2" xml:space="preserve">Please contact staff, as the following items were not checked out:</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckOut" xml:space="preserve">No valid email address, checkout receipt will not be sent.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckIn" xml:space="preserve">No valid email address for patron, arrival notification not sent.</sys:String>
+     <sys:String x:Key="Lang_ReservationArrivedInternal" xml:space="preserve">New Reservation</sys:String>
+    <sys:String x:Key="Lang_Email_CheckoutSubjectInternal" xml:space="preserve">New Checkout</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckOutInternal" xml:space="preserve">Library internal email address not valid, checkout receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckinInternal" xml:space="preserve">Library internal email address not valid, checkin receipt will not be sent to archives.</sys:String>
+
+
+    <sys:String x:Key="Lang_EmailInvalidCheckOutNull" xml:space="preserve">No valid email address (null), checkout receipt will not be sent.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckInNull" xml:space="preserve">No valid email address (null) for patron, arrival notification not sent.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckOutInternalNull" xml:space="preserve">Library internal email address (null) not valid, checkout receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckinInternalNull" xml:space="preserve">Library internal email address (null) not valid, checkin receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_FinishCheckIn" xml:space="preserve">Finish Check In</sys:String>
+
+    <sys:String x:Key="Lang_SipSierraReservationPeriodOverride" xml:space="preserve">Override Sip/Sierra Reservation Period</sys:String>
+    <sys:String x:Key="Lang_SipCustomReservationPeriod" xml:space="preserve">Custom Reservation Period</sys:String>
+    <sys:String x:Key="Lang_SipCustomReservationPeriodDays" xml:space="preserve">Days</sys:String>
+   <sys:String x:Key="Lang_Dialog_ItemAlreadyInLocker1" xml:space="preserve">Item </sys:String>
+    <sys:String x:Key="Lang_Dialog_ItemAlreadyInLocker2" xml:space="preserve"> already in Locker #</sys:String>
+    <sys:String x:Key="Lang_Dialog_ItemAlreadyInLocker3" xml:space="preserve">, relocate it? </sys:String>
+    <sys:String x:Key="Lang_Error_CouldntSetAfi" xml:space="preserve">Unable to set AFI to RFID reader</sys:String>
+
+
+
+
+    <sys:String x:Key="Lang_PatronReservationError" xml:space="preserve">Couldn't retrieve reserved items for patron</sys:String>
+    <sys:String x:Key="Lang_NotBatchPatron" xml:space="preserve">Reserved for another patron </sys:String>
+
+    <sys:String x:Key="Lang_CheckInTypes" xml:space="preserve">Select Check In Type:</sys:String>
+    <sys:String x:Key="Lang_CheckInSimple" xml:space="preserve">One Item Per Locker</sys:String>
+    <sys:String x:Key="Lang_CheckInMulti" xml:space="preserve">Multiple Items Per Locker</sys:String>
+    <sys:String x:Key="Lang_CheckInBatch" xml:space="preserve">Single Patron Batch</sys:String>
+    <sys:String x:Key="Lang_CheckInFinish" xml:space="preserve">Finish Check In</sys:String>
+    <sys:String x:Key="Lang_CheckInNextItem" xml:space="preserve">Next Item</sys:String>
+
+
+    <sys:String x:Key="Lang_ManualCheckoutFailed1" xml:space="preserve">Check out failed for locker #</sys:String>
+    <sys:String x:Key="Lang_CheckedOut" xml:space="preserve">Checked Out</sys:String>
+
+    <sys:String x:Key="Lang_CheckOutErrorNoLockers" xml:space="preserve">Error Checking out multiple lockers: No lockers in list - Please contact staff</sys:String>
+    <sys:String x:Key="Lang_CheckOutErrorLockersNull" xml:space="preserve">Error Checking out multiple lockers: Locker list was null - Please contact staff</sys:String>
+    <sys:String x:Key="Lang_CheckOutErrorNoCheckOut" xml:space="preserve">Error Checking out - Couldn't check out items in any of the lockers</sys:String>
+    <sys:String x:Key="Lang_CheckOutErrorNoCheckOutOrOpen" xml:space="preserve">Error Checking out - Couldn't open any of the lockers or check out their contents</sys:String>
+
+    <sys:String x:Key="Lang_CheckOutErrorSomeLockers" xml:space="preserve">Please contact staff, as the items couldn't be checked out in lockers: </sys:String>
+    <sys:String x:Key="Lang_CheckOutErrorSomeLockersUnOpened" xml:space="preserve">Please contact staff, as the following lockers could not be checked out or opened: </sys:String>
+
+    <sys:String x:Key="Lang_CheckIn_Menu" xml:space="preserve">Check In Menu</sys:String>
+    <sys:String x:Key="Lang_CancelItem" xml:space="preserve">Cancel Item</sys:String>
+    <sys:String x:Key="Lang_CancelCheckIn" xml:space="preserve">Cancel Check In</sys:String>
+
+    <sys:String x:Key="Lang_CheckInSingleHeader" xml:space="preserve">Check In Empty Lockers</sys:String>
+    <sys:String x:Key="Lang_CheckInAnyHeader" xml:space="preserve">Check In Any Locker</sys:String>
+    <sys:String x:Key="Lang_CheckInBatchHeader" xml:space="preserve">Check In Batch</sys:String>
+
+    <sys:String x:Key="Lang_CheckInOutStaff" xml:space="preserve">Items</sys:String>
+    <sys:String x:Key="Lang_CancelCheckOut" xml:space="preserve">Cancel Check Out</sys:String>
+    <sys:String x:Key="Lang_CheckOutFinish" xml:space="preserve">Finish Check Out</sys:String>
+
+
+    <sys:String x:Key="Lang_CheckOut_All" xml:space="preserve">Check Out All</sys:String>
+
+    <sys:String x:Key="Lang_EmailInvalidCheckOutFailed" xml:space="preserve">No valid email address, failed checkout receipt will not be sent.</sys:String>
+    <sys:String x:Key="Lang_Email_CheckoutFailedSubject" xml:space="preserve">Your Unsuccesful Checkout Receipt</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidCheckOutFailedInternal" xml:space="preserve">Library internal email address not valid, failed checkout receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_Email_CheckoutFailedSubjectInternal" xml:space="preserve">New Unsuccesful Checkout</sys:String>
+
+
+    <sys:String x:Key="Lang_CheckOutErrorPatronNull" xml:space="preserve">Error Checking out: Patron was null - Please contact staff</sys:String>
+    <sys:String x:Key="Lang_CheckOutErrorLockerNull" xml:space="preserve">Error Checking out locker: Locker was null - Please contact staff</sys:String>
+
+    <sys:String x:Key="Lang_Yes" xml:space="preserve">Yes</sys:String>
+    <sys:String x:Key="Lang_No" xml:space="preserve">No</sys:String>
+
+    <sys:String x:Key="Lang_SelectAll" xml:space="preserve">Select All</sys:String>
+
+
+    <sys:String x:Key="Lang_CheckOutFailExpiredItems" xml:space="preserve">Unable to check out - Reservation expired for one or more items</sys:String>
+
+    <sys:String x:Key="Lang_EmailInvalidItemsExpInternalNull" xml:space="preserve">Library internal email address (null) not valid, expired items receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidItemsExpInternal" xml:space="preserve">Library internal email address not valid, expired items receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_Email_ItemsExpiredSubjectInternal" xml:space="preserve">New Items Expired</sys:String>
+
+    <sys:String x:Key="Lang_EmailInvalidItemsExpNull" xml:space="preserve">Patron email address (null) not valid, expired items receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_EmailInvalidItemsExp" xml:space="preserve">Patron email address not valid, expired items receipt will not be sent to archives.</sys:String>
+    <sys:String x:Key="Lang_Email_ItemsExpiredSubject" xml:space="preserve">Your Reserved Items Have Expired</sys:String>
+
+    <sys:String x:Key="Lang_PatronLanguage" xml:space="preserve">Patron Language:</sys:String>
+    <sys:String x:Key="Lang_Code_en-GB" xml:space="preserve">English</sys:String>
+    <sys:String x:Key="Lang_Code_fi-FI" xml:space="preserve">Finnish</sys:String>
+    <sys:String x:Key="Lang_Code_hu-HU" xml:space="preserve">Hungarian</sys:String>
+    <sys:String x:Key="Lang_Code_de-DE" xml:space="preserve">German</sys:String>
+    <sys:String x:Key="Lang_Code_et-EE" xml:space="preserve">Estonian</sys:String>
+    <sys:String x:Key="Lang_Code_se-FI" xml:space="preserve">Swedish</sys:String>
+    <sys:String x:Key="Lang_Code_sv-SE" xml:space="preserve">Swedish</sys:String>
+    <sys:String x:Key="Lang_Code_sl-SL" xml:space="preserve">Slovenian</sys:String>
+
+
+    <sys:String x:Key="Lang_CheckOutFailExpiredItemsLockers" xml:space="preserve">The following lockers can't be checked out as they have expired items:</sys:String>
+    <sys:String x:Key="Lang_CheckOutFailExpiredItemsLockersAll" xml:space="preserve">Unable to check out, all lockers have expired items</sys:String>
+
+    <sys:String x:Key="Lang_Dialog_ExpiredItems" xml:space="preserve">Patron has expired items</sys:String>
+
+    <sys:String x:Key="Lang_Dialog_GeneralError" xml:space="preserve">General Error</sys:String>
+
+
+    <sys:String x:Key="Lang_SecondsCapitalized" xml:space="preserve">Seconds</sys:String>
+    <sys:String x:Key="Lang_OutOfOrderMessage" xml:space="preserve">Out Of Order</sys:String>
+
+    <!--more new-->
+    <sys:String x:Key="Lang_CheckoutErrorInvalidPatron" xml:space="preserve">Patron was Invalid</sys:String>
+    <sys:String x:Key="Lang_CheckoutErrorNoPatronData" xml:space="preserve">Unable to retrieve patron information</sys:String>
+
+    <!--newest-->
+    <sys:String x:Key="Lang_No_ReservationData" xml:space="preserve">Previous item has no reservation data</sys:String>
+    <sys:String x:Key="Lang_ItemNotOk" xml:space="preserve">Previous item was invalid</sys:String>
+    <sys:String x:Key="Lang_No_Free_LockersExpired" xml:space="preserve">No free lockers and previous patron locker has expired items</sys:String>
+    <sys:String x:Key="Lang_Locker_Was_NullRemove" xml:space="preserve">Current locker is set to null, couldn't remove previous item from it</sys:String>
+
+    <sys:String x:Key="Lang_Book_Error" xml:space="preserve">Error</sys:String>
+    <sys:String x:Key="Lang_Book_ErrorText" xml:space="preserve">Error Text</sys:String>
+
+    <sys:String x:Key="Lang_CheckoutErrorText_Expired" xml:space="preserve">Item Expired</sys:String>
+    <sys:String x:Key="Lang_CheckoutErrorText_CheckOutFail" xml:space="preserve">Check out failed</sys:String>
+
+    <!--new views-->
+    <sys:String x:Key="Lang_NoReservations" xml:space="preserve">No Reservations for User In Locker</sys:String>
+    <sys:String x:Key="Lang_ReadError" xml:space="preserve">Read Error</sys:String>
+    <sys:String x:Key="Lang_RemoveCard" xml:space="preserve">Remove Card</sys:String>
+
+    <sys:String x:Key="Lang_TakeItemsCloseLocker" xml:space="preserve">Please take your items and close the locker</sys:String>
+    <sys:String x:Key="Lang_InvalidPatronView" xml:space="preserve">Invalid Patron</sys:String>
+
+    <sys:String x:Key="Lang_Book_CheckInDate" xml:space="preserve">Checked In</sys:String>
+
+    <!--browse mode added-->
+    <sys:String x:Key="Lang_ItemInfoFailed" xml:space="preserve">Couldn't retrieve item information</sys:String>
+
+    <sys:String x:Key="Lang_CheckInReservation" xml:space="preserve">Reservations</sys:String>
+    <sys:String x:Key="Lang_CheckInBrowse" xml:space="preserve">Browsables</sys:String>
+    <sys:String x:Key="Lang_CheckInMixed" xml:space="preserve">Mixed</sys:String>
+
+
+
+    <sys:String x:Key="Lang_BrowseCheckInSingle" xml:space="preserve">Single Item per Locker</sys:String>
+    <sys:String x:Key="Lang_BrowseCheckInMultiple" xml:space="preserve">Multiple Items per Locker</sys:String>
+
+    <sys:String x:Key="Lang_CheckInResSingleBrowseSingle" xml:space="preserve">R + B Single</sys:String>
+    <sys:String x:Key="Lang_CheckInResSingleBrowseMultiple" xml:space="preserve">R Single + B Multi</sys:String>
+    <sys:String x:Key="Lang_CheckInResMultipleBrowseSingle" xml:space="preserve">R Multi + B Single</sys:String>
+    <sys:String x:Key="Lang_CheckInResMultipleBrowseMultiple" xml:space="preserve">R + B Multi</sys:String>
+
+
+    <sys:String x:Key="Lang_BrowseNoFreeLockers" xml:space="preserve">No free lockers available</sys:String>
+    <sys:String x:Key="Lang_BrowseNoFreeOrBrowseLockers" xml:space="preserve">No free or browse lockers available</sys:String>
+    <sys:String x:Key="Lang_BrowseHasReservation" xml:space="preserve">Unable to continue - Item has a reservation</sys:String>
+
+
+    <sys:String x:Key="Lang_ReservationCheckInTypes" xml:space="preserve">Select Reservation Check In Type:</sys:String>
+    <sys:String x:Key="Lang_BrowseCheckInTypes" xml:space="preserve">Select Browse Check In Type:</sys:String>
+    <sys:String x:Key="Lang_MixedCheckInTypes" xml:space="preserve">Select Mixed Check In Type:</sys:String>
+
+    <sys:String x:Key="Lang_TermsAndConditions" xml:space="preserve">Terms and Conditions</sys:String>
+    <sys:String x:Key="Lang_DoYouAccept" xml:space="preserve">Do you accept?</sys:String>
+
+    <sys:String x:Key="Lang_Menu" xml:space="preserve">Menu</sys:String>
+    <sys:String x:Key="Lang_SelectAction" xml:space="preserve">Select Action:</sys:String>
+    <sys:String x:Key="Lang_Reservations" xml:space="preserve">Reservations</sys:String>
+    <sys:String x:Key="Lang_Browse" xml:space="preserve">Browse</sys:String>
+
+    <sys:String x:Key="Lang_PinWrong" xml:space="preserve">PIN was incorrect - Try again</sys:String>
+    <sys:String x:Key="Lang_InputCardPin" xml:space="preserve">Input Card PIN</sys:String>
+
+    <sys:String x:Key="Lang_Settings_Email" xml:space="preserve">Email</sys:String>
+    <sys:String x:Key="Lang_Settings_TestSuccess" xml:space="preserve">Success!</sys:String>
+    <sys:String x:Key="Lang_Settings_TestFail" xml:space="preserve">Test Failed, result: </sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailLsu" xml:space="preserve">Test Failed for Lsu Ids: </sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailSip1" xml:space="preserve">Couldn't connect.</sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailSip2" xml:space="preserve">SIP Server returned an error.</sys:String>
+    <sys:String x:Key="Lang_Settings_NoConnection" xml:space="preserve">No Connection</sys:String>
+    <sys:String x:Key="Lang_Settings_SierraConnection" xml:space="preserve">Sierra Connection</sys:String>
+    <sys:String x:Key="Lang_Settings_SipConnection" xml:space="preserve">Sip Connection</sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailedConnFailed" xml:space="preserve">Test Failed, unable to connect to server.</sys:String>
+    <sys:String x:Key="Lang_Settings_BmaConnection" xml:space="preserve">Bma Connection</sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailBma1" xml:space="preserve">Servmanager returned an error.</sys:String>
+    <sys:String x:Key="Lang_Settings_TestFailBma2" xml:space="preserve">Wrong device id or API key.</sys:String>
+
+    <sys:String x:Key="Lang_Settings_Input" xml:space="preserve">Input</sys:String>
+    <sys:String x:Key="Lang_Settings_Locker" xml:space="preserve">Locker</sys:String>
+
+    <sys:String x:Key="Lang_OfflineAdmin" xml:space="preserve">Offline Admin</sys:String>
+    <sys:String x:Key="Lang_OfflineProcessing" xml:space="preserve">Offline Transactions</sys:String>
+    <sys:String x:Key="Lang_OfflineProcessingInfo" xml:space="preserve">Processing offline transactions...</sys:String>
+
+    <sys:String x:Key="Button_Continue" xml:space="preserve">Accept</sys:String>
+    <sys:String x:Key="Button_Return" xml:space="preserve">Decline</sys:String>
+
+    <sys:String x:Key="ConfirmOfflineCheckInsNotification_Text" xml:space="preserve">Process all offline check ins?</sys:String>
+    <sys:String x:Key="ConfirmOfflineCheckOutsNotification_Text" xml:space="preserve">Process all offline check outs?</sys:String>
+    <sys:String x:Key="ConfirmOfflineCheckInErrorsNotification_Text" xml:space="preserve">Clear all offline check in errors?</sys:String>
+    <sys:String x:Key="ConfirmOfflineCheckOutErrorsNotification_Text" xml:space="preserve">Clear all offline check out errors?</sys:String>
+
+    <sys:String x:Key="OfflineResult1_Text" xml:space="preserve">Sent: </sys:String>
+    <sys:String x:Key="OfflineResult2_Text" xml:space="preserve">Failed: </sys:String>
+    <sys:String x:Key="OfflineSendError1_Text" xml:space="preserve">Error: </sys:String>
+    <sys:String x:Key="OfflineSendError2_Text" xml:space="preserve">Offline</sys:String>
+
+    <sys:String x:Key="OfflineErrorClear_Text" xml:space="preserve">Clear succeeded</sys:String>
+
+    <sys:String x:Key="Lang_CheckOutFailedRes" xml:space="preserve">Check out failed: Item(s) were reserved</sys:String>
+
+    <sys:String x:Key="Lang_MixedCheckIn" xml:space="preserve">Mixed Check In</sys:String>
+    <sys:String x:Key="Lang_Dialog_Shutdown" xml:space="preserve">Really shut down Windows?</sys:String>
+    <sys:String x:Key="Lang_ShutdownPc" xml:space="preserve">Shutdown PC</sys:String>
+
+    <sys:String x:Key="Lang_DialogExpiredItem" xml:space="preserve">Reservation already expired - continue check in?</sys:String>
+
+    <sys:String x:Key="Lang_CheckedOutTrue" xml:space="preserve">Yes</sys:String>
+    <sys:String x:Key="Lang_CheckedOutFalse" xml:space="preserve">No</sys:String>
+
+
+    <sys:String x:Key="Lang_AfiWriteError" xml:space="preserve">Error writing AFI</sys:String>
+
+    <sys:String x:Key="Lang_Reboot" xml:space="preserve">Restart PC</sys:String>
+    <sys:String x:Key="Lang_Dialog_Reboot" xml:space="preserve">Really restart PC?</sys:String>
+    <sys:String x:Key="Lang_Enter_Card_Pin" xml:space="preserve">Input PIN</sys:String>
+    <sys:String x:Key="Lang_TakeItemsCloseLockerOffline" xml:space="preserve">Please take your items and close the locker</sys:String>
+    <sys:String x:Key="Lang_ReaderTaskWasNull" xml:space="preserve">Reader error - couldn't change mode</sys:String>
+    <sys:String x:Key="Lang_Check_Out_Button" xml:space="preserve">Check Out</sys:String>
+
+    <sys:String x:Key="Lang_OfflineAdmin_Type" xml:space="preserve">Type:</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_CheckIns" xml:space="preserve">CheckIns</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_CheckOuts" xml:space="preserve">CheckOuts</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_CheckInErrors" xml:space="preserve">CheckInErrors</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_CheckOutErrors" xml:space="preserve">CheckOutErrors</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_Send" xml:space="preserve">Send</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_Clear" xml:space="preserve">Clear</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_Close" xml:space="preserve">Close</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_Choose" xml:space="preserve">Choose...</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_ItemId" xml:space="preserve">ItemId</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_ReturnDate" xml:space="preserve">ReturnData</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_PatronId" xml:space="preserve">PatronId</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_PatronPass" xml:space="preserve">PatronPass.</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_DueDate" xml:space="preserve">DueDate</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_CheckOutTime" xml:space="preserve">CheckOutTime</sys:String>
+    <sys:String x:Key="Lang_OfflineAdmin_Message" xml:space="preserve">Message</sys:String>
+
+    <sys:String x:Key="Lang_CheckoutErrorTooManyBorrowedItems" xml:space="preserve">Unable to check out - too many borrowed items</sys:String>
+    <sys:String x:Key="Lang_Wrong_ItemId" xml:space="preserve">Previous item id did not match initial scan</sys:String>
+</ResourceDictionary>

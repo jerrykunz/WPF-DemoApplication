@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib">
+    <!-- The name of this ResourceDictionary. Should not be localized. -->
+    <!--<s:String x:Key="ResourceDictionaryName">Locex</s:String>-->
+    <s:String x:Key="ResourceDictionaryName">Loc-en-GB</s:String>
+    <!-- Localized strings -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="LocalizationDictionary_default.en-GB.xaml" />
+        <ResourceDictionary Source="LocalizationDictionary.en-GB.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

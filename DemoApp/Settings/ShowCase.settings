@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DemoApp.Settings" GeneratedClassName="ShowCase">
+  <Profiles />
+  <Settings>
+    <Setting Name="RoamingNonPortable" Roaming="true" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestValue1</Value>
+    </Setting>
+    <Setting Name="NonPortable" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestValue2</Value>
+    </Setting>
+    <Setting Name="RoamingPortable" Provider="Bluegrams.Application.PortableSettingsProvider" Roaming="true" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestValue3</Value>
+    </Setting>
+    <Setting Name="Portable" Provider="Bluegrams.Application.PortableSettingsProvider" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TestValue4</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
