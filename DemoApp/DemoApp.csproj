@@ -84,6 +84,9 @@
     </ApplicationDefinition>
     <Compile Include="Config\Enum.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="FlatUIWindow.xaml.cs">
+      <DependentUpon>FlatUIWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logging\Log4NetConfigurator.cs" />
     <Compile Include="Model\Settings\LanguageCollectionSettings.cs" />
     <Compile Include="Model\Settings\LanguageSettings.cs" />
@@ -118,12 +121,18 @@
     <Compile Include="ViewModels\TestFirstViewModel.cs" />
     <Compile Include="ViewModels\TimeOutViewModelBase.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\Embedded\FlatUIMainView.xaml.cs">
+      <DependentUpon>FlatUIMainView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Embedded\InitView.xaml.cs">
       <DependentUpon>InitView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Embedded\TestFirstView.xaml.cs">
       <DependentUpon>TestFirstView.xaml</DependentUpon>
     </Compile>
+    <Content Include="Images\corpo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Languages\en-GB\LocalizationDictionary.en-GB.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -169,6 +178,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Page Include="FlatUIWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -236,6 +249,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Page Include="Views\Embedded\FlatUIMainView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Embedded\InitView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -298,7 +315,6 @@
     <Folder Include="Databases\" />
     <Folder Include="Factories\" />
     <Folder Include="Helpers\" />
-    <Folder Include="Images\" />
     <Folder Include="Sounds\" />
     <Folder Include="Themes\" />
   </ItemGroup>

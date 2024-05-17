@@ -8,7 +8,7 @@
         <ResourceDictionary>
 
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Styles/default/ZoomLevel1/StyleResourceDictionary_ex.xaml" />
+                <ResourceDictionary Source="/Styles/default/ZoomLevel0/StyleResourceDictionary_ex.xaml" />
 
                 <!--Put here to avoid errors in xaml (This is the language shown in designer)-->
                 <ResourceDictionary Source="/Languages/en-GB/LocalizationDictionary_ex.en-GB.xaml" />

@@ -83,4 +83,90 @@
     <!--determines default button style-->
     <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
     </Style>
+    
+    <!--Flat UI Window-->
+
+    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="{x:Type RadioButton}"
+           x:Key="MenuButtonTheme">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"
+                              Background="{TemplateBinding Background}">
+
+                            <TextBlock Text="{TemplateBinding Property=Content}"
+                                       VerticalAlignment="Center"
+                                       Margin="50,0,0,0"/>
+
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>                
+            </Setter>
+            <Setter Property="Background" Value="Transparent"/>            
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#22202f"/>
+            </Trigger>            
+        </Style.Triggers>        
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}"
+           x:Key="ModernTextbox">
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border CornerRadius="10"
+                            Background="#353340"
+                            Width="200"
+                            Height="40">
+
+                        <Grid>
+                            <Rectangle StrokeThickness="1"/>
+                            <TextBox Margin="1"
+                                     Text="{TemplateBinding Text}"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                     Padding="5"
+                                     Foreground="#cfcfcf"
+                                     x:Name="Searchbox"/>
+                            <TextBlock IsHitTestVisible="False"
+                                       Text="Search"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       Margin="10,0,0,0"
+                                       Foreground="DarkGray"
+                                       Grid.Column="1">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=Searchbox}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                    </Style>
+                                </TextBlock.Style>
+                                
+                            </TextBlock>
+                        </Grid>
+                        
+                    </Border>
+                    
+                    
+                </ControlTemplate>
+                
+            </Setter.Value>
+        </Setter>
+        
+    </Style>
+    
 </ResourceDictionary>    
