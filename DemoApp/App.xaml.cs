@@ -195,7 +195,7 @@ namespace DemoApp
             SetDictionaries(languageCode);
 
             //Custom changes per vm
-            var vms = AppServices.Instance.GetService<INavigationStore>().ViewModels; //Container.Instance.GetViewModels().ToList();
+            var vms = AppServices.Instance.GetService<INavigationStore>().ViewModelByType; //Container.Instance.GetViewModels().ToList();
             foreach (var vm in vms.Values)
             {
                 vm.OnLanguageChange();

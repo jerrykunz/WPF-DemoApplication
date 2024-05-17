@@ -62,14 +62,17 @@ namespace DemoApp
 
         public bool CanExecute(object parameter)
         {
-            if (parameter != null)
-            {
-                return _canExecute == null ? true : _canExecute();
-            }
-            else
-            {
-                return _canExecute == null ? true : false;
-            }
+            return _canExecute == null ? true : _canExecute();
+
+            //eh?
+            //if (parameter != null)
+            //{
+            //    return _canExecute == null ? true : _canExecute();
+            //}
+            //else
+            //{
+            //    return _canExecute == null ? true : false;
+            //}
         }
 
         public DelegateCommand(Action<T> execute) : this(execute, null)

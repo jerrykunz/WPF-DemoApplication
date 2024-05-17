@@ -52,6 +52,7 @@ namespace DemoApp.ViewModels
         INavigator _navigator;
         INavigationStore _navigationStore;
 
+        #region ViewModels
         public IViewModel PreviousViewModel
         {
             get { return _navigationStore.PreviousViewModel; }
@@ -70,12 +71,6 @@ namespace DemoApp.ViewModels
             private set { _navigationStore.CurrentViewModel = value; OnPropertyChanged(nameof(CurrentViewModel)); }
         }
 
-        public UserControl CurrentView
-        {
-            get { return _navigationStore.CurrentView; }
-            private set { _navigationStore.CurrentView = value; OnPropertyChanged(nameof(CurrentView)); }
-        }
-
         public IReadOnlyCollection<IViewModel> PreviousViewModels
         {
             get { return _navigationStore.PreviousViewModels; }
@@ -85,6 +80,62 @@ namespace DemoApp.ViewModels
         {
             get { return _navigationStore.PreviousViewModelTypes; }
         }
+        #endregion
+
+        #region Views
+
+        public UserControl CurrentView
+        {
+            get { return _navigationStore.CurrentView; }
+            private set { _navigationStore.CurrentView = value; OnPropertyChanged(nameof(CurrentView)); }
+        }
+
+        public Type CurrentViewType
+        {
+            get { return _navigationStore.CurrentViewType; }
+            private set { _navigationStore.CurrentViewType = value; OnPropertyChanged(nameof(CurrentViewType)); }
+        }
+
+        public string CurrentViewName
+        {
+            get { return _navigationStore.CurrentViewName; }
+            private set { _navigationStore.CurrentViewName = value; OnPropertyChanged(nameof(CurrentViewName)); }
+        }
+
+        public UserControl PreviousView
+        {
+            get { return _navigationStore.PreviousView; }
+            private set { _navigationStore.PreviousView = value; OnPropertyChanged(nameof(PreviousView)); }
+        }
+
+        public Type PreviousViewType
+        {
+            get { return _navigationStore.PreviousViewType; }
+            private set { _navigationStore.PreviousViewType = value; OnPropertyChanged(nameof(PreviousViewType)); }
+        }
+
+        public string PreviousViewName
+        {
+            get { return _navigationStore.PreviousViewName; }
+            private set { _navigationStore.PreviousViewName = value; OnPropertyChanged(nameof(PreviousViewName)); }
+        }
+
+        public IReadOnlyCollection<UserControl> PreviousViews
+        {
+            get { return _navigationStore.PreviousViews; }
+        }
+
+        public IReadOnlyCollection<Type> PreviousViewTypes
+        {
+            get { return _navigationStore.PreviousViewTypes; }
+        }
+
+        public IReadOnlyCollection<string> PreviousViewNames
+        {
+            get { return _navigationStore.PreviousViewNames; }
+        }
+
+        #endregion
 
         #endregion
 

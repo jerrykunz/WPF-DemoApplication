@@ -123,6 +123,7 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
             //if not the initial view/vm
             if (previousViewModel != null)
@@ -144,6 +145,7 @@ namespace DemoApp.Services
 
                 _navigationStore.PreviousViewType = previousViewType;
                 _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+                _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
                 //vm exit script
                 //if navigator is used in onexits, there'll be trouble most likely
@@ -174,7 +176,13 @@ namespace DemoApp.Services
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
-            _navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+
+            //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+            Type currentViewType = null;
+            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.CurrentViewType = currentViewType;
+
+            _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -213,6 +221,7 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
             if (previousViewModel != null)
             {
@@ -233,6 +242,7 @@ namespace DemoApp.Services
 
                 _navigationStore.PreviousViewType = previousViewType;
                 _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+                _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
                 //vm exit script
                 if (onExit)
@@ -259,7 +269,12 @@ namespace DemoApp.Services
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
-            _navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+
+            //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+            Type currentViewType = null;
+            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.CurrentViewType = currentViewType;
+            _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -303,6 +318,7 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
             if (!dispose)
             {
@@ -319,6 +335,7 @@ namespace DemoApp.Services
 
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+            _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
             //vm exit script
             if (onExit)
@@ -348,7 +365,13 @@ namespace DemoApp.Services
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
-            _navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+
+            //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
+            Type currentViewType = null;
+            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.CurrentViewType = currentViewType;
+
+            _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -391,6 +414,7 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
 
             if (!dispose)
@@ -401,6 +425,7 @@ namespace DemoApp.Services
 
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+            _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
             if (previousViewModel != null &&
                 !viewHasSameViewModel)
@@ -440,11 +465,12 @@ namespace DemoApp.Services
             }
 
             //get new view and set datacontext to new vm
-            UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelsByView[viewType]);
+            UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelTypeByViewType[viewType]);
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
             _navigationStore.CurrentViewType = viewType;
+            _navigationStore.CurrentViewName = viewType?.Name;
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -491,6 +517,8 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
+
 
             if (!dispose)
             {
@@ -500,6 +528,7 @@ namespace DemoApp.Services
 
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+            _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
             if (previousViewModel != null &&
                 !viewHasSameViewModel)
@@ -538,11 +567,13 @@ namespace DemoApp.Services
             }
 
             //get new view and set datacontext to new vm
-            UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelsByView[typeof(T)]);
+            UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelTypeByViewType[typeof(T)]);
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
             _navigationStore.CurrentViewType = typeof(T);
+
+            _navigationStore.CurrentViewName = typeof(T).Name;
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -587,6 +618,7 @@ namespace DemoApp.Services
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
             if (!dispose)
             {
@@ -596,6 +628,7 @@ namespace DemoApp.Services
 
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+            _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
             if (previousViewModel != null &&
                 !viewHasSameViewModel)
@@ -634,11 +667,17 @@ namespace DemoApp.Services
             }
 
             //get new view and set datacontext to new vm
-            UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelsByViewName[viewName]);
+            //UserControl newView = _navigationStore.GetViewByVm(_navigationStore.ViewModelsByViewName[viewName]);
+            UserControl newView = _navigationStore.GetViewByName(viewName);
+
 
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
-            _navigationStore.CurrentViewType = _navigationStore.ViewTypesByViewName[viewName];
+            //_navigationStore.CurrentViewType = _navigationStore.ViewTypesByViewName[viewName];
+            Type currentViewType = null;
+            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.CurrentViewType = currentViewType;
+            _navigationStore.CurrentViewName = viewName;
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
@@ -683,6 +722,7 @@ namespace DemoApp.Services
             //set previous view & vm
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
+            var previousViewName = _navigationStore.CurrentViewName;
 
             var previousViewModel = _navigationStore.CurrentViewModel;
             var previousViewModelType = _navigationStore.CurrentViewModel.GetType();
@@ -702,6 +742,7 @@ namespace DemoApp.Services
 
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
+            _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
             if (previousViewModel != null &&
                 !viewHasSameViewModel)
@@ -738,6 +779,7 @@ namespace DemoApp.Services
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
             _navigationStore.CurrentViewType = newViewType;
+            _navigationStore.CurrentViewName = newViewType?.Name;
 
             //loads new view to screen
             _navigationStore.RaiseChanged();

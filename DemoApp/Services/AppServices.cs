@@ -56,6 +56,7 @@ namespace DemoApp.Services
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<InitViewModel>();
             services.AddTransient<TestFirstViewModel>();
+            services.AddTransient<NavTest1ViewModel>();
 
             //Stores
             services.AddSingleton<IActivityStore, ActivityStore>();

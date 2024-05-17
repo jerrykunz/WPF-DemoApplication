@@ -27,21 +27,24 @@ namespace DemoApp.Stores
         public LooseViews LooseViews;
         private string _looseViewSubFolder;
 
-        public Dictionary<Type, UserControl> Views { get; private set; }
-        public Dictionary<Type, ViewModelBase> ViewModels { get; private set; }
+        //all views and viewmodels by type
+        public Dictionary<Type, UserControl> ViewByVM { get; private set; }
+        public Dictionary<string, UserControl> ViewByName { get; private set; }
+        public Dictionary<Type, ViewModelBase> ViewModelByType { get; private set; }
 
-        //new test
-        public Dictionary<Type, Type> ViewModelsByView { get; private set; }
-        public Dictionary<string, Type> ViewModelsByViewName { get; private set; }
+        //viewmodels by view type or name
+        public Dictionary<Type, Type> ViewModelTypeByViewType { get; private set; }
+        public Dictionary<string, Type> ViewModelTypeByViewName { get; private set; }
 
-        //test these later
+        //whether to use loose or builtin xamls, by view type or name
         public HashSet<string> ViewPrefersLooseByName { get; private set; }
-        public HashSet<Type> ViewPrefersLoose { get; private set; }
+        public HashSet<Type> ViewPrefersLooseByType { get; private set; }
 
+        //get the view or view names by vm
         public Dictionary<Type, Type> ViewsByVM { get; set; }
-        //Not used anywhere for now, could be used to fetch custom xamls from harddrive
         public Dictionary<Type, string> ViewNamesByVM { get; set; }
 
+        //get view type by name
         public Dictionary<string, Type> ViewTypesByViewName { get; set; }
 
         public Type PreviousViewModelType { get; set; }
@@ -50,9 +53,10 @@ namespace DemoApp.Stores
        
         public UserControl CurrentView { get; set; }
         public Type CurrentViewType { get; set; }
+        public string CurrentViewName { get; set; }
         public UserControl PreviousView { get; set; }
         public Type PreviousViewType { get; set; }
-
+        public string PreviousViewName { get; set; }
 
         #region Previous View Queue (Non-disposable views/vms)
         private readonly List<UserControl> _previousViews;
@@ -85,6 +89,24 @@ namespace DemoApp.Stores
             if (_previousViewTypes.Count > _previousViewTypesMaxSize)
             {
                 _previousViewTypes.RemoveAt(0);
+            }
+        }
+
+        #endregion
+
+        #region Previous View Name Queue (Disposable views/vms)
+        private readonly List<string> _previousViewNames;
+        private readonly int _previousViewNamesMaxSize;
+        public IReadOnlyCollection<string> PreviousViewNames => _previousViewNames;
+
+        public void AddToPreviousViewNameQueue(string name)
+        {
+            _previousViewNames.Add(name);
+
+            // If the queue exceeds the maximum size, remove the oldest item
+            if (_previousViewNames.Count > _previousViewNamesMaxSize)
+            {
+                _previousViewNames.RemoveAt(0);
             }
         }
 
@@ -129,23 +151,23 @@ namespace DemoApp.Stores
         public NavigationStore()
         {
             MultiUseViewsAndVms = true;
-            LooseViews = LooseViews.All; //true;
+            LooseViews = LooseViews.PerView; //true;
             _looseViewSubFolder = "default";
 
             //Used to get views/vm
-            Views = new Dictionary<Type, UserControl>();
-            ViewModels = new Dictionary<Type, ViewModelBase>();
+            ViewByVM = new Dictionary<Type, UserControl>();
+            ViewModelByType = new Dictionary<Type, ViewModelBase>();
 
             //Used to bind views to vms
             ViewsByVM = new Dictionary<Type, Type>();
             ViewNamesByVM = new Dictionary<Type, string>();
 
             //Used to bind vms to views
-            ViewModelsByView = new Dictionary<Type, Type>();
-            ViewModelsByViewName = new Dictionary<string, Type>();
+            ViewModelTypeByViewType = new Dictionary<Type, Type>();
+            ViewModelTypeByViewName = new Dictionary<string, Type>();
 
             //for per view loose status checking
-            ViewPrefersLoose = new HashSet<Type>();
+            ViewPrefersLooseByType = new HashSet<Type>();
             ViewPrefersLooseByName = new HashSet<string>();
 
             ViewTypesByViewName = new Dictionary<string, Type>();
@@ -161,6 +183,11 @@ namespace DemoApp.Stores
             _previousViewsMaxSize = 5; //TODO: replace with settings
             _previousViewTypesMaxSize = 5; //TODO: replace with settings
 
+            _previousViewNames = new List<string>();
+            _previousViewNamesMaxSize = 5; //TODO: replace with settings
+
+            ViewByName = new Dictionary<string, UserControl>();
+
             PopulateDictionaries();
         }
 
@@ -171,15 +198,15 @@ namespace DemoApp.Stores
 
         public UserControl GetView(Type t)
         {
-            if (Views.ContainsKey(t))
+            if (ViewByVM.ContainsKey(t))
             {
-                return Views[t];
+                return ViewByVM[t];
             }
 
             UserControl view = null;
 
             if (LooseViews == LooseViews.All ||
-                (LooseViews == LooseViews.PerView && ViewPrefersLoose.Contains(t)))
+                (LooseViews == LooseViews.PerView && ViewPrefersLooseByType.Contains(t)))
             {
                 if (!ViewNamesByVM.ContainsKey(t))
                 {
@@ -200,7 +227,46 @@ namespace DemoApp.Stores
             {
                 if (MultiUseViewsAndVms)
                 {
-                    Views.Add(t, view);
+                    ViewByVM.Add(t, view);
+                }
+                return view;
+            }
+
+            return null;
+        }
+
+        public UserControl GetViewByName(string name)
+        {
+            Type t = null;
+            ViewTypesByViewName.TryGetValue(name, out t);
+
+            if (ViewByName.ContainsKey(name))
+            {
+                return ViewByName[name];
+            }
+
+            UserControl view = null;
+
+            if (LooseViews == LooseViews.All ||
+                (LooseViews == LooseViews.PerView && 
+                ViewPrefersLooseByName.Contains(name)))
+            {
+                FileStream s = new FileStream(App.MainDirectoryPath + "\\Views\\Loose\\" + _looseViewSubFolder + "\\" + name + ".xaml", FileMode.Open);
+                view = XamlReader.Load(s) as UserControl;
+                s.Close();
+            }
+
+            if (t != null &&
+                ViewModelTypeByViewType.ContainsKey(t))
+            {
+                view = ViewByVM[ViewModelTypeByViewType[t]];
+            }
+
+            if (view != null)
+            {
+                if (MultiUseViewsAndVms)
+                {
+                    ViewByName.Add(name, view);
                 }
                 return view;
             }
@@ -223,7 +289,7 @@ namespace DemoApp.Stores
                 if (builtInFound)
                 {
                     Type viewType = ViewsByVM[t];
-                    preferLoose = ViewPrefersLoose.Contains(viewType);
+                    preferLoose = ViewPrefersLooseByType.Contains(viewType);
                 }
                 else if (looseFound)
                 {
@@ -246,9 +312,9 @@ namespace DemoApp.Stores
 
                 Type viewType = ViewsByVM[t];
 
-                if (Views.ContainsKey(viewType))
+                if (ViewByVM.ContainsKey(viewType))
                 {
-                    return Views[viewType];
+                    return ViewByVM[viewType];
                 }
 
                 //Views not present in AppServices, and don't need to be
@@ -273,12 +339,12 @@ namespace DemoApp.Stores
             if (view != null)
             {
                 //Don't know the exact reason for this, but let's not touch it for now
-                if (Views.ContainsKey(t))
-                    Views.Remove(t);
+                if (ViewByVM.ContainsKey(t))
+                    ViewByVM.Remove(t);
 
                 if (MultiUseViewsAndVms)
                 {
-                    Views.Add(t, view as UserControl);
+                    ViewByVM.Add(t, view as UserControl);
                 }
                 return view as UserControl;
             }
@@ -288,9 +354,9 @@ namespace DemoApp.Stores
 
         public ViewModelBase GetViewModel(Type t)
         {
-            if (ViewModels.ContainsKey(t))
+            if (ViewModelByType.ContainsKey(t))
             {
-                return ViewModels[t];
+                return ViewModelByType[t];
             }
 
             ViewModelBase vm = AppServices.Instance.GetService(t) as ViewModelBase;
@@ -299,7 +365,7 @@ namespace DemoApp.Stores
             {
                 if (MultiUseViewsAndVms)
                 {
-                    ViewModels.Add(t, vm);
+                    ViewModelByType.Add(t, vm);
                 }
                 return vm;
             }
@@ -310,18 +376,18 @@ namespace DemoApp.Stores
 
         public ViewModelBase GetViewModelByView(Type t)
         {
-            if (!ViewModelsByView.ContainsKey(t))
+            if (!ViewModelTypeByViewType.ContainsKey(t))
                 return null;
 
-            return GetViewModel(ViewModelsByView[t]);
+            return GetViewModel(ViewModelTypeByViewType[t]);
         }
 
         public ViewModelBase GetViewModelByViewName(string name)
         {
-            if (!ViewModelsByViewName.ContainsKey(name))
+            if (!ViewModelTypeByViewName.ContainsKey(name))
                 return null;
 
-            return GetViewModel(ViewModelsByViewName[name]);
+            return GetViewModel(ViewModelTypeByViewName[name]);
         }
 
         public UserControl LoadDialogView(string viewName, Type viewType)
@@ -365,7 +431,7 @@ namespace DemoApp.Stores
                 FileStream s = null;
                 UserControl view = null;
 
-                Views.Clear();
+                ViewByVM.Clear();
 
                 //alternate way of getting behaviour assembly working in xaml
                 //Assembly assembly = Assembly.LoadFrom("Microsoft.Xaml.Behaviors.dll");
@@ -527,13 +593,13 @@ namespace DemoApp.Stores
 
             //get vm by view
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on view, all of these views should be set here
-            ViewModelsByView.Add(typeof(InitView), typeof(InitViewModel));
-            ViewModelsByView.Add(typeof(TestFirstView), typeof(TestFirstViewModel));
+            ViewModelTypeByViewType.Add(typeof(InitView), typeof(InitViewModel));
+            ViewModelTypeByViewType.Add(typeof(TestFirstView), typeof(TestFirstViewModel));
 
             //whether to load as embedded or loose (LooseViews property in this class)
             //should match with ViewPrefersLooseByName
-            ViewPrefersLoose.Add(typeof(InitView));
-            ViewPrefersLoose.Add(typeof(TestFirstView));
+            ViewPrefersLooseByType.Add(typeof(InitView));
+            ViewPrefersLooseByType.Add(typeof(TestFirstView));
 
 
 
@@ -542,16 +608,21 @@ namespace DemoApp.Stores
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on vm, only one can be chosen. that should be set here.
             ViewNamesByVM.Add(typeof(InitViewModel), "InitView");
             ViewNamesByVM.Add(typeof(TestFirstViewModel), "TestFirstView");
+            ViewNamesByVM.Add(typeof(NavTest1ViewModel), "NavTest1View");
 
             //get vm by view name
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on view, all of these views should be set here
-            ViewModelsByViewName.Add("InitView", typeof(InitViewModel));
-            ViewModelsByViewName.Add("TestFirstView", typeof(TestFirstViewModel));
+            ViewModelTypeByViewName.Add("InitView", typeof(InitViewModel));
+            ViewModelTypeByViewName.Add("TestFirstView", typeof(TestFirstViewModel));
+            ViewModelTypeByViewName.Add("NavTest1View", typeof(NavTest1ViewModel));
+            ViewModelTypeByViewName.Add("NavTest2View", typeof(NavTest1ViewModel));
 
             //whether to load as embedded or loose (LooseViews property in this class)
             //should match with ViewPrefersLoose
             ViewPrefersLooseByName.Add("InitView");
             ViewPrefersLooseByName.Add("TestFirstView");
+            ViewPrefersLooseByName.Add("NavTest1View");
+            ViewPrefersLooseByName.Add("NavTest2View");
 
 
             //Used in view-based navigation

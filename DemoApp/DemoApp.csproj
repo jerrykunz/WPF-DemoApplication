@@ -114,6 +114,7 @@
     <Compile Include="ViewModels\InitViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\NavTest1ViewModel.cs" />
     <Compile Include="ViewModels\TestFirstViewModel.cs" />
     <Compile Include="ViewModels\TimeOutViewModelBase.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
@@ -243,6 +244,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Content Include="Views\Loose\default\NavTest2View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\Loose\default\NavTest1View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -10,15 +10,12 @@ using System.Windows.Input;
 
 namespace DemoApp.ViewModels
 {
-    public class TestFirstViewModel : ActivityViewModelBase
+    public class NavTest1ViewModel : ActivityViewModelBase
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         INavigator _navigator;
 
-        private bool _test;
-
-        public string TestText { get { return "TEST_TEXT1"; } }
 
         #region ICommand
 
@@ -54,7 +51,7 @@ namespace DemoApp.ViewModels
 
         #endregion
 
-        public TestFirstViewModel(INavigator navigator,
+        public NavTest1ViewModel(INavigator navigator,
                                   IActivityStore activityStore) :
             base(activityStore)
         {
@@ -65,38 +62,40 @@ namespace DemoApp.ViewModels
 
         private void Test(string text)
         {
-            App.Instance.ZoomStyle();
-            _test = true;
-
-            //does CanTest2Empty(), changes availability of button in UI
-            _testCommand2.RaiseCanExecuteChanged();
+            switch (App.Instance.MainVm.CurrentViewName)
+            {
+                case "NavTest1View":
+                    _navigator.ChangeView("NavTest2View", false, false);
+                    break;
+                case "NavTest2View":
+                    _navigator.ChangeView("NavTest1View", false, false);
+                    break;
+            }           
         }
 
         private void EmptyTest2()
         {
-            int a = 3;
+
         }
 
         private void Test2(object text)
         {
-            int a = 3;
-
-            _navigator.ChangeViewModel<NavTest1ViewModel>(true, true);
+            _navigator.PreviousView(true, true);
         }
 
         private bool CanTest2Empty()
         {
-            return _test;
+            return true;
         }
 
         private bool CanTest2(object o)
         {
-            return _test;
+            return true;
         }
 
         public override void OnEnterSoft()
         {
-
+            _testCommand2.RaiseCanExecuteChanged();
         }
 
         public override void OnExitSoft()
@@ -106,7 +105,8 @@ namespace DemoApp.ViewModels
 
         public override void OnEnter()
         {
-            int ahj = 3;
+            int a = 3;
+            //_testCommand2.RaiseCanExecuteChanged();
         }
 
         public override void OnExit()
