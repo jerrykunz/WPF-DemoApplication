@@ -22,6 +22,10 @@ namespace DemoApp.ViewModels
 
         #region ICommand
 
+        //RelayCommands work like in Locker AFAIK
+        //DelegateCommand is similar, but doesn't test command availabiltiy automatically.
+        //Also easy usage of types with <T>
+
         private ICommand _testCommand;
         public ICommand TestCommand
         {
@@ -63,6 +67,8 @@ namespace DemoApp.ViewModels
         {
             App.Instance.ZoomStyle();
             _test = true;
+
+            //does CanTest2Empty(), changes availability of button in UI
             _testCommand2.RaiseCanExecuteChanged();
         }
 

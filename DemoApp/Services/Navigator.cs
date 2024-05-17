@@ -380,13 +380,13 @@ namespace DemoApp.Services
 
             //Actual function
 
-
             //get new vm
             var newViewModel = _navigationStore.GetViewModelByView(viewType);
 
             //set previous vm
             var previousViewModel = _navigationStore.CurrentViewModel;
 
+            bool viewHasSameViewModel = previousViewModel == newViewModel;
 
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
@@ -403,7 +403,7 @@ namespace DemoApp.Services
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
 
             if (previousViewModel != null &&
-                previousViewModel != newViewModel)
+                !viewHasSameViewModel)
             {
                 if (!dispose)
                 {
@@ -415,19 +415,23 @@ namespace DemoApp.Services
                 //old and new vm can be same
                 Type type = previousViewModel.GetType();
                 _navigationStore.PreviousViewModelType = type;
-                _navigationStore.AddToPreviousVmTypeQueue(type);               
+                _navigationStore.AddToPreviousVmTypeQueue(type);
+            }
 
-                //vm exit script
-                //if navigator is used in onexits, there'll be trouble most likely
-                if (onExit)
-                {
-                    previousViewModel.OnExit();
-                }
-                else
-                {
-                    previousViewModel.OnExitSoft();
-                }
+            //vm exit script
+            //if navigator is used in onexits, there'll be trouble most likely
+            if (onExit)
+            {
+                previousViewModel.OnExit();
+            }
+            else
+            {
+                previousViewModel.OnExitSoft();
+            }
 
+            if (previousViewModel != null &&
+                !viewHasSameViewModel)
+            {
                 //dispose previous vm if applicable
                 if (dispose)
                 {
@@ -447,17 +451,16 @@ namespace DemoApp.Services
 
             //vm entry script (only if vm change)
             //I think you could use navigator in these and not be in trouble
-            if (previousViewModel != newViewModel)
+            
+            if (onEnter)
             {
-                if (onEnter)
-                {
-                    _navigationStore.CurrentViewModel.OnEnter();
-                }
-                else
-                {
-                    _navigationStore.CurrentViewModel.OnEnterSoft();
-                }
+                _navigationStore.CurrentViewModel.OnEnter();
             }
+            else
+            {
+                _navigationStore.CurrentViewModel.OnEnterSoft();
+            }
+            
         }
 
         private void ChangeViewInternal<T>(bool onEnter, bool onExit, bool dispose)
@@ -483,6 +486,8 @@ namespace DemoApp.Services
             //set previous vm
             var previousViewModel = _navigationStore.CurrentViewModel;
 
+            bool viewHasSameViewModel = previousViewModel == newViewModel;
+
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
@@ -497,7 +502,7 @@ namespace DemoApp.Services
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
 
             if (previousViewModel != null &&
-                previousViewModel != newViewModel)
+                !viewHasSameViewModel)
             {
                 if (!dispose)
                 {
@@ -509,18 +514,22 @@ namespace DemoApp.Services
                 Type type = previousViewModel.GetType();
                 _navigationStore.PreviousViewModelType = type;
                 _navigationStore.AddToPreviousVmTypeQueue(type);
+            }
 
-                //vm exit script
-                //if navigator is used in onexits, there'll be trouble most likely
-                if (onExit)
-                {
-                    previousViewModel.OnExit();
-                }
-                else
-                {
-                    previousViewModel.OnExitSoft();
-                }
+            //vm exit script
+            //if navigator is used in onexits, there'll be trouble most likely
+            if (onExit)
+            {
+                previousViewModel.OnExit();
+            }
+            else
+            {
+                previousViewModel.OnExitSoft();
+            }
 
+            if (previousViewModel != null &&
+                !viewHasSameViewModel)
+            {
                 //dispose previous vm if applicable
                 if (dispose)
                 {
@@ -539,18 +548,15 @@ namespace DemoApp.Services
             _navigationStore.RaiseChanged();
 
             //vm entry script (only if vm change)
-            //I think you could use navigator in these and not be in trouble
-            if (previousViewModel != newViewModel)
+            //I think you could use navigator in these and not be in trouble          
+            if (onEnter)
             {
-                if (onEnter)
-                {
-                    _navigationStore.CurrentViewModel.OnEnter();
-                }
-                else
-                {
-                    _navigationStore.CurrentViewModel.OnEnterSoft();
-                }
+                _navigationStore.CurrentViewModel.OnEnter();
             }
+            else
+            {
+                _navigationStore.CurrentViewModel.OnEnterSoft();
+            }            
         }
 
         private void ChangeViewInternal(string viewName, bool onEnter, bool onExit, bool dispose)
@@ -576,6 +582,8 @@ namespace DemoApp.Services
             //set previous vm
             var previousViewModel = _navigationStore.CurrentViewModel;
 
+            bool viewHasSameViewModel = previousViewModel == newViewModel;
+
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
@@ -590,7 +598,7 @@ namespace DemoApp.Services
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
 
             if (previousViewModel != null &&
-                previousViewModel != newViewModel)
+                !viewHasSameViewModel)
             {
                 if (!dispose)
                 {
@@ -602,18 +610,22 @@ namespace DemoApp.Services
                 Type type = previousViewModel.GetType();
                 _navigationStore.PreviousViewModelType = type;
                 _navigationStore.AddToPreviousVmTypeQueue(type);
+            }
 
-                //vm exit script
-                //if navigator is used in onexits, there'll be trouble most likely
-                if (onExit)
-                {
-                    previousViewModel.OnExit();
-                }
-                else
-                {
-                    previousViewModel.OnExitSoft();
-                }
+            //vm exit script
+            //if navigator is used in onexits, there'll be trouble most likely
+            if (onExit)
+            {
+                previousViewModel.OnExit();
+            }
+            else
+            {
+                previousViewModel.OnExitSoft();
+            }
 
+            if (previousViewModel != null &&
+                !viewHasSameViewModel)
+            {
                 //dispose previous vm if applicable
                 if (dispose)
                 {
@@ -633,17 +645,14 @@ namespace DemoApp.Services
 
             //vm entry script (only if vm change)
             //I think you could use navigator in these and not be in trouble
-            if (previousViewModel != newViewModel)
+            if (onEnter)
             {
-                if (onEnter)
-                {
-                    _navigationStore.CurrentViewModel.OnEnter();
-                }
-                else
-                {
-                    _navigationStore.CurrentViewModel.OnEnterSoft();
-                }
+                _navigationStore.CurrentViewModel.OnEnter();
             }
+            else
+            {
+                _navigationStore.CurrentViewModel.OnEnterSoft();
+            }            
         }
 
         private void PreviousViewInternal(bool onEnter, bool onExit, bool dispose)
@@ -678,9 +687,10 @@ namespace DemoApp.Services
             var previousViewModel = _navigationStore.CurrentViewModel;
             var previousViewModelType = _navigationStore.CurrentViewModel.GetType();
 
+            bool viewHasSameViewModel = previousViewModelType == newViewModelType;
+
             if (!dispose)
             {
-                _navigationStore.PreviousView = previousView;
                 _navigationStore.PreviousView = previousView;
                 _navigationStore.AddToPreviousViewQueue(previousView);
 
@@ -690,18 +700,16 @@ namespace DemoApp.Services
                 }
             }
 
-            
-
             _navigationStore.PreviousViewType = previousViewType;
             _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
 
-            //vm exit script
-            if (newViewModelType != previousViewModelType)
+            if (previousViewModel != null &&
+                !viewHasSameViewModel)
             {
                 Type type = previousView.GetType();
                 _navigationStore.PreviousViewModelType = type;
                 _navigationStore.AddToPreviousVmTypeQueue(type);
-
+            }
                 if (onExit)
                 {
                     previousViewModel.OnExit();
@@ -711,6 +719,9 @@ namespace DemoApp.Services
                     previousViewModel.OnExitSoft();
                 }
 
+            if (previousViewModel != null &&
+                !viewHasSameViewModel)
+            {
                 //dispose previous vm if applicable
                 if (dispose)
                 {
@@ -732,17 +743,14 @@ namespace DemoApp.Services
             _navigationStore.RaiseChanged();
 
             //vm entry script
-            if (newViewModelType != previousViewModelType)
+            if (onEnter)
             {
-                if (onEnter)
-                {
-                    _navigationStore.CurrentViewModel.OnEnter();
-                }
-                else
-                {
-                    _navigationStore.CurrentViewModel.OnEnterSoft();
-                }
+                _navigationStore.CurrentViewModel.OnEnter();
             }
+            else
+            {
+                _navigationStore.CurrentViewModel.OnEnterSoft();
+            }            
         }
         #endregion
     }

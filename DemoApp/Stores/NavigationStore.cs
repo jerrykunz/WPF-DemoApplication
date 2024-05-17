@@ -554,9 +554,13 @@ namespace DemoApp.Stores
             ViewPrefersLooseByName.Add("TestFirstView");
 
 
-
+            //Used in view-based navigation
             ViewTypesByViewName.Add("InitView", typeof(InitView));
             ViewTypesByViewName.Add("TestFirstView", typeof(TestFirstView));
+
+
+
+
 
             //ViewsByVM.Add(typeof(AdminMenuViewModel), typeof(AdminMenuView));
             //ViewsByVM.Add(typeof(CheckedOutStaffViewModel), typeof(CheckedOutStaffView));
