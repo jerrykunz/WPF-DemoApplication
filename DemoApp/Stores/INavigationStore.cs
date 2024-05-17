@@ -12,7 +12,7 @@ namespace DemoApp.Stores
     {
         Dictionary<Type, UserControl> ViewByVM { get; }
         Dictionary<Type, ViewModelBase> ViewModelByType { get; }
-        Dictionary<Type, Type> ViewsByVM { get; }
+        Dictionary<Type, Type> ViewTypeByViewModelType { get; }
         Dictionary<Type, string> ViewNamesByVM { get; }
         Dictionary<Type, Type> ViewModelTypeByViewType { get; }
         Dictionary<string, Type> ViewModelTypeByViewName { get; }

@@ -96,6 +96,7 @@ namespace DemoApp.ViewModels
             private set { _navigationStore.CurrentViewType = value; OnPropertyChanged(nameof(CurrentViewType)); }
         }
 
+        //NOTE: Usercontrols have x:Name, that can be used instead. Doesn't seem useful for now though.
         public string CurrentViewName
         {
             get { return _navigationStore.CurrentViewName; }

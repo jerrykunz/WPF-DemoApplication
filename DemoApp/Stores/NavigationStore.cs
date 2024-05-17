@@ -41,7 +41,7 @@ namespace DemoApp.Stores
         public HashSet<Type> ViewPrefersLooseByType { get; private set; }
 
         //get the view or view names by vm
-        public Dictionary<Type, Type> ViewsByVM { get; set; }
+        public Dictionary<Type, Type> ViewTypeByViewModelType { get; set; }
         public Dictionary<Type, string> ViewNamesByVM { get; set; }
 
         //get view type by name
@@ -159,7 +159,7 @@ namespace DemoApp.Stores
             ViewModelByType = new Dictionary<Type, ViewModelBase>();
 
             //Used to bind views to vms
-            ViewsByVM = new Dictionary<Type, Type>();
+            ViewTypeByViewModelType = new Dictionary<Type, Type>();
             ViewNamesByVM = new Dictionary<Type, string>();
 
             //Used to bind vms to views
@@ -196,6 +196,7 @@ namespace DemoApp.Stores
             Changed?.Invoke();
         }
 
+        //this seems outdated...
         public UserControl GetView(Type t)
         {
             if (ViewByVM.ContainsKey(t))
@@ -252,7 +253,7 @@ namespace DemoApp.Stores
                 ViewPrefersLooseByName.Contains(name)))
             {
                 FileStream s = new FileStream(App.MainDirectoryPath + "\\Views\\Loose\\" + _looseViewSubFolder + "\\" + name + ".xaml", FileMode.Open);
-                view = XamlReader.Load(s) as UserControl;
+                view = XamlReader.Load(s) as UserControl;                
                 s.Close();
             }
 
@@ -284,11 +285,11 @@ namespace DemoApp.Stores
             if (LooseViews == LooseViews.PerView)
             {
                 bool looseFound = ViewNamesByVM.ContainsKey(t);
-                bool builtInFound = ViewsByVM.ContainsKey(t);
+                bool builtInFound = ViewTypeByViewModelType.ContainsKey(t);
 
                 if (builtInFound)
                 {
-                    Type viewType = ViewsByVM[t];
+                    Type viewType = ViewTypeByViewModelType[t];
                     preferLoose = ViewPrefersLooseByType.Contains(viewType);
                 }
                 else if (looseFound)
@@ -305,12 +306,12 @@ namespace DemoApp.Stores
             if (LooseViews == LooseViews.None ||
                 (LooseViews == LooseViews.PerView && !preferLoose))
             {
-                if (!ViewsByVM.ContainsKey(t))
+                if (!ViewTypeByViewModelType.ContainsKey(t))
                 {
                     return null;
                 }
 
-                Type viewType = ViewsByVM[t];
+                Type viewType = ViewTypeByViewModelType[t];
 
                 if (ViewByVM.ContainsKey(viewType))
                 {
@@ -588,8 +589,8 @@ namespace DemoApp.Stores
             //BUILT IN
             //get view by vm
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on vm, only one can be chosen. that should be set here.
-            ViewsByVM.Add(typeof(InitViewModel), typeof(InitView));
-            ViewsByVM.Add(typeof(TestFirstViewModel), typeof(TestFirstView));
+            ViewTypeByViewModelType.Add(typeof(InitViewModel), typeof(InitView));
+            ViewTypeByViewModelType.Add(typeof(TestFirstViewModel), typeof(TestFirstView));
 
             //get vm by view
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on view, all of these views should be set here
@@ -619,6 +620,7 @@ namespace DemoApp.Stores
 
             //whether to load as embedded or loose (LooseViews property in this class)
             //should match with ViewPrefersLoose
+            //could remove ViewPrefersLoose completely, and just add them here with Type.Name instead.
             ViewPrefersLooseByName.Add("InitView");
             ViewPrefersLooseByName.Add("TestFirstView");
             ViewPrefersLooseByName.Add("NavTest1View");
@@ -628,73 +630,6 @@ namespace DemoApp.Stores
             //Used in view-based navigation
             ViewTypesByViewName.Add("InitView", typeof(InitView));
             ViewTypesByViewName.Add("TestFirstView", typeof(TestFirstView));
-
-
-
-
-
-            //ViewsByVM.Add(typeof(AdminMenuViewModel), typeof(AdminMenuView));
-            //ViewsByVM.Add(typeof(CheckedOutStaffViewModel), typeof(CheckedOutStaffView));
-            ////ViewsByVM.Add(typeof(CheckedOutViewModel), typeof(CheckedOutStaffView));
-            //ViewsByVM.Add(typeof(CheckInMenuViewModel), typeof(CheckInMenuView));
-            //ViewsByVM.Add(typeof(CheckInViewModel), typeof(CheckInView));
-            //ViewsByVM.Add(typeof(ExpiredItemsViewModel), typeof(ExpiredItemsView));
-            //ViewsByVM.Add(typeof(HelpViewModel), typeof(HelpView));
-            //ViewsByVM.Add(typeof(InitViewModel), typeof(InitView));
-            //ViewsByVM.Add(typeof(LanguageSelectionViewModel), typeof(LanguageSelectionView));
-            //ViewsByVM.Add(typeof(LoadingViewModel), typeof(LoadingView));
-            //ViewsByVM.Add(typeof(LockerAdminViewModel), typeof(LockerAdminView));
-            //ViewsByVM.Add(typeof(ManualCheckOutViewModel), typeof(ManualCheckOutView));
-            //ViewsByVM.Add(typeof(ReconnectDevicesViewModel), typeof(ReconnectDevicesView));
-            //ViewsByVM.Add(typeof(WaitForAdminViewModel), typeof(WaitForAdminView));
-            //ViewsByVM.Add(typeof(WaitForCheckInViewModel), typeof(WaitForCheckInView));
-            //ViewsByVM.Add(typeof(WaitForUserViewModel), typeof(WaitForUserView));
-            //ViewsByVM.Add(typeof(OutOfOrderViewModel), typeof(OutOfOrderView));
-            //ViewsByVM.Add(typeof(NoReservationsViewModel), typeof(NoReservationsView));
-            //ViewsByVM.Add(typeof(RemoveCardViewModel), typeof(RemoveCardView));
-            //ViewsByVM.Add(typeof(ReadErrorViewModel), typeof(ReadErrorView));
-            //ViewsByVM.Add(typeof(InvalidPatronViewModel), typeof(InvalidPatronView));
-            //ViewsByVM.Add(typeof(ReservationCheckInMenuViewModel), typeof(ReservationCheckInMenuView));
-            //ViewsByVM.Add(typeof(BrowseCheckInMenuViewModel), typeof(BrowseCheckInMenuView));
-            //ViewsByVM.Add(typeof(MixedCheckInMenuViewModel), typeof(MixedCheckInMenuView));
-            //ViewsByVM.Add(typeof(AcceptTermsViewModel), typeof(AcceptTermsView));
-            //ViewsByVM.Add(typeof(MainMenuViewModel), typeof(MainMenuView));
-            //ViewsByVM.Add(typeof(BrowseViewModel), typeof(BrowseView));
-            //ViewsByVM.Add(typeof(ReadPatronCardPinViewModel), typeof(ReadPatronCardPinView));
-            //ViewsByVM.Add(typeof(OfflineTransactionsProcessingViewModel), typeof(OfflineTransactionsProcessingView));
-            //ViewsByVM.Add(typeof(DesignationSetViewModel), typeof(DesignationSetView));
-            //ViewsByVM.Add(typeof(DesignationLockerViewModel), typeof(DesignationLockerView));
-            //ViewsByVM.Add(typeof(DesignationLockerSelectViewModel), typeof(DesignationLockerSelectView));
-
-            ////Very cool but not used anywhere for now, could be used to fetch custom xamls from harddrive
-            //CustomViewsByVM.Add(typeof(AdminMenuViewModel), "AdminMenuView");
-            //CustomViewsByVM.Add(typeof(CheckedOutStaffViewModel), "CheckedOutStaffView");
-            ////CustomViewsByVM.Add(typeof(CheckedOutViewModel), "CheckedOutStaffView");
-            //CustomViewsByVM.Add(typeof(CheckInMenuViewModel), "CheckInMenuView");
-            //CustomViewsByVM.Add(typeof(CheckInViewModel), "CheckInView");
-            //CustomViewsByVM.Add(typeof(ExpiredItemsViewModel), "ExpiredItemsView");
-            //CustomViewsByVM.Add(typeof(HelpViewModel), "HelpView");
-            //CustomViewsByVM.Add(typeof(InitViewModel), "InitView");
-            //CustomViewsByVM.Add(typeof(LanguageSelectionViewModel), "LanguageSelectionView");
-            //CustomViewsByVM.Add(typeof(LoadingViewModel), "LoadingView");
-            //CustomViewsByVM.Add(typeof(LockerAdminViewModel), "LockerAdminView");
-            //CustomViewsByVM.Add(typeof(ManualCheckOutViewModel), "ManualCheckOutView");
-            //CustomViewsByVM.Add(typeof(ReconnectDevicesViewModel), "ReconnectDevicesView");
-            //CustomViewsByVM.Add(typeof(WaitForAdminViewModel), "WaitForAdminView");
-            //CustomViewsByVM.Add(typeof(WaitForCheckInViewModel), "WaitForCheckInView");
-            //CustomViewsByVM.Add(typeof(WaitForUserViewModel), "WaitForUserView");
-            //CustomViewsByVM.Add(typeof(OutOfOrderViewModel), "OutOfOrderView");
-            //CustomViewsByVM.Add(typeof(NoReservationsViewModel), "NoReservationsView");
-            //CustomViewsByVM.Add(typeof(RemoveCardViewModel), "RemoveCardView");
-            //CustomViewsByVM.Add(typeof(ReadErrorViewModel), "ReadErrorView");
-            //CustomViewsByVM.Add(typeof(InvalidPatronViewModel), "InvalidPatronView");
-            //CustomViewsByVM.Add(typeof(ReservationCheckInMenuViewModel), "ReservationCheckInMenuView");
-            //CustomViewsByVM.Add(typeof(BrowseCheckInMenuViewModel), "BrowseCheckInMenuView");
-            //CustomViewsByVM.Add(typeof(MixedCheckInMenuViewModel), "MixedCheckInMenuView");
-            //CustomViewsByVM.Add(typeof(AcceptTermsViewModel), "AcceptTermsView");
-            //CustomViewsByVM.Add(typeof(MainMenuViewModel), "MainMenuView");
-            //CustomViewsByVM.Add(typeof(BrowseViewModel), "BrowseView");
-            //CustomViewsByVM.Add(typeof(ReadPatronCardPinViewModel), "ReadPatronCardPinView");
         }
     }
     

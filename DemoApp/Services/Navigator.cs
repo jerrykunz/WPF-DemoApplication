@@ -179,7 +179,7 @@ namespace DemoApp.Services
 
             //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
             Type currentViewType = null;
-            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
 
             _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
@@ -272,7 +272,7 @@ namespace DemoApp.Services
 
             //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
             Type currentViewType = null;
-            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
             _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
 
@@ -368,7 +368,7 @@ namespace DemoApp.Services
 
             //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
             Type currentViewType = null;
-            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
 
             _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
@@ -675,7 +675,7 @@ namespace DemoApp.Services
             _navigationStore.CurrentView = newView;
             //_navigationStore.CurrentViewType = _navigationStore.ViewTypesByViewName[viewName];
             Type currentViewType = null;
-            _navigationStore.ViewsByVM.TryGetValue(newViewModel.GetType(), out currentViewType);
+            _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
             _navigationStore.CurrentViewName = viewName;
 
