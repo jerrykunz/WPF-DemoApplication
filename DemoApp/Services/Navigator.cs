@@ -10,6 +10,7 @@ using System.Windows.Controls;
 
 namespace DemoApp.Services
 {
+    //TODO: view navigation does not work well at all
     public class Navigator : INavigator
     {
         private INavigationStore _navigationStore;

@@ -2,10 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DemoApp"
-              StartupUri="MainWindow.xaml">
+             xmlns:conv="clr-namespace:DemoApp.Converters"
+             StartupUri="MainWindow.xaml">
     <!--Have to use StartupUri to get immediate access to MergedDictionaries-->
     <Application.Resources>
         <ResourceDictionary>
+
+            <conv:VisibilityBooleanConverter TrueVisibility="Visible" FalseVisibility="Hidden" x:Key="BoolVisibleHiddenConverter"/>
+            <conv:VisibilityBooleanConverter TrueVisibility="Visible" FalseVisibility="Collapsed" x:Key="BoolVisibleCollapsedConverter"/>
+
+            <conv:VisibilityBooleanConverter TrueVisibility="Hidden" FalseVisibility="Visible" x:Key="BoolHiddenVisibleConverter"/>
+            <conv:VisibilityBooleanConverter TrueVisibility="Collapsed" FalseVisibility="Visible" x:Key="BoolCollapsedVisibleConverter"/>
+
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/default/ZoomLevel0/StyleResourceDictionary_ex.xaml" />

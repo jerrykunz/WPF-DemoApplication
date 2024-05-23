@@ -12,7 +12,7 @@
       <Value Profile="(Default)">Normal</Value>
     </Setting>
     <Setting Name="WindowStyle" Type="System.Windows.WindowStyle" Scope="User">
-      <Value Profile="(Default)">SingleBorderWindow</Value>
+      <Value Profile="(Default)">None</Value>
     </Setting>
     <Setting Name="WindowTopMost" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

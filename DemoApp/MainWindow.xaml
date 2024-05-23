@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:local="clr-namespace:DemoApp"
         mc:Ignorable="d"
-        Topmost="{Binding Path=WinTopmost, Mode=OneWay}"
-        WindowState="{Binding Path=WinState, Mode=OneWay}"
-        WindowStyle="{Binding Path=WinStyle, Mode=OneWay}"  
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStyle="None"
         Title="DemoApp" Height="450" Width="800">
 
     <Window.InputBindings>
@@ -16,6 +17,8 @@
         <KeyBinding Modifiers="Alt" Key="Enter" Command="{Binding FullScreenCommand}" />
     </Window.InputBindings>
 
+    
+    
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="PreviewTouchDown">
             <i:InvokeCommandAction Command="{Binding MouseDownCommand}" />
@@ -45,11 +48,148 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Viewbox SnapsToDevicePixels="True" Stretch="Fill" StretchDirection="Both">
+    <Border CornerRadius="25" Padding="10" Background="#f7f6f4">
+        <!--Double click to maximize/normalize-->
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseDown">
+                <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseLeftButtonDown">
+                <i:InvokeCommandAction Command="{Binding BorderMouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <!--Double click to maximize/normalize end-->
+
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!--Main menu-->
+            <Menu Grid.Row="0"
+                  Background="#f7f6f4" 
+                  BorderThickness="0"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top">
+                <MenuItem Header="File" BorderThickness="0">
+                    <MenuItem Header="New.." BorderThickness="0" Icon="{x:Null}">
+                    </MenuItem>
+                    <MenuItem Header="Save"  BorderThickness="0" Icon="{x:Null}"/>
+                    <MenuItem Header="Load"  BorderThickness="0" Icon="{x:Null}"/>
+                    <MenuItem Header="Exit"  BorderThickness="0" Icon="{x:Null}"/>
+                </MenuItem>
+                <MenuItem Header="Edit"/>
+                <MenuItem Header="View"/>
+                <MenuItem Header="Help"/>
+            </Menu>
+            <!--Main menu end-->
+
+            <!--Window controls-->
+            <Grid Grid.Row="0"
+                  HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Command="{Binding MinimizeCommand}"
+                        Style="{DynamicResource InvisibleButton}"
+                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                        IsHitTestVisible="True"
+                        Margin="5, 0">
+                    <Icon:PackIconMaterial
+                                       Foreground="{DynamicResource MainwindowIconColor}" 
+                                       Kind="Minus"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Right"/>
+                </Button>
+
+                <Button Grid.Column="1"
+                        Command="{Binding MaximizeCommand}"
+                        Style="{DynamicResource InvisibleButton}"
+                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                        IsHitTestVisible="True"
+                         Margin="5, 0">
+                    
+                    <Grid>
+
+                        <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
+                                               Kind="SquareOutline"
+                                               VerticalAlignment="Top"
+                                               HorizontalAlignment="Right"
+                                               Visibility="{Binding Maximized, Converter={StaticResource BoolCollapsedVisibleConverter}}"/>
+
+                        
+                        <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
+                                               Kind="SquareRootBox"
+                                               VerticalAlignment="Top"
+                                               HorizontalAlignment="Right"
+                                               Visibility="{Binding Maximized, Converter={StaticResource BoolVisibleCollapsedConverter}}"/>
+                    </Grid>
+                </Button>
+
+                <Button Grid.Column="2"
+                        Command="{Binding CloseCommand}"
+                        Style="{DynamicResource InvisibleButton}"
+                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                        IsHitTestVisible="True"
+                        Margin="5, 0">
+
+                    <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
+                                           Kind="Close"
+                                           VerticalAlignment="Top"
+                                           HorizontalAlignment="Right"/>
+                </Button>
+            </Grid>
+            <!--Window controls end-->
+
+            
+            <!--Content-->
+            <Grid Grid.Row="1">
+                <!--needs this to block some of the clicks going to first border-->
+                <Border BorderThickness="1" Background="#f7f6f4">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Border>
+
+                <ContentControl Content="{Binding CurrentView}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ContentControl>
+                <!--Content end-->
+
+
+            </Grid>
+                
+
+        </Grid>
+
+
+    </Border>
+    
+    
+    
+    <!--<Viewbox SnapsToDevicePixels="True" Stretch="Fill" StretchDirection="Both">
         <DockPanel Width="{Binding Width}" 
                    Height="{Binding Height}"
                    SnapsToDevicePixels="True">
             <ContentControl Content="{Binding CurrentView}" />
         </DockPanel>
-    </Viewbox>
+    </Viewbox>-->
 </Window>
