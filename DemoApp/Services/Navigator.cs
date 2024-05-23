@@ -779,7 +779,7 @@ namespace DemoApp.Services
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
             _navigationStore.CurrentViewType = newViewType;
-            _navigationStore.CurrentViewName = newViewType?.Name;
+            _navigationStore.CurrentViewName = newViewType?.Name ?? _navigationStore?.PreviousViewNames?.Last() ?? null;
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
