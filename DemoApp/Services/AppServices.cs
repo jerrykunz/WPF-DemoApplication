@@ -51,6 +51,7 @@ namespace DemoApp.Services
 
             //Main Window
             services.AddTransient<MainWindow>();
+            services.AddTransient<FlatUIWindow>();
 
             //Viewmodels
             services.AddTransient<MainWindowViewModel>();

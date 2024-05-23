@@ -81,6 +81,10 @@ namespace DemoApp
             //MainWindow = AppServices.Instance.GetService<MainWindow>();
             //MainWindow.DataContext = MainVm;
             //MainWindow.Show();
+
+            //add flat window
+            //var flatUiWindow = AppServices.Instance.GetService<FlatUIWindow>();
+            //flatUiWindow.Show();
         }
 
         bool CheckIfRunning()
