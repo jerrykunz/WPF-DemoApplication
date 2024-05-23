@@ -122,10 +122,8 @@
                                                VerticalAlignment="Top"
                                                HorizontalAlignment="Right"
                                                Visibility="{Binding Maximized, Converter={StaticResource BoolCollapsedVisibleConverter}}"/>
-
-                        
-                        <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
-                                               Kind="SquareRootBox"
+                        <Icon:PackIconBoxIcons Foreground="{DynamicResource MainwindowIconColor}"
+                                               Kind="RegularCopy"
                                                VerticalAlignment="Top"
                                                HorizontalAlignment="Right"
                                                Visibility="{Binding Maximized, Converter={StaticResource BoolVisibleCollapsedConverter}}"/>
