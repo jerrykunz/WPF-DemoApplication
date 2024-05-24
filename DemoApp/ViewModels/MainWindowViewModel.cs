@@ -340,8 +340,8 @@ namespace DemoApp.ViewModels
                                    IActivityStore activityStore,
                                    INavigationStore navigationStore)
         {
-            Width = Application.Current.MainWindow.Width;
-            Height = Application.Current.MainWindow.Height;
+            //Width = Application.Current.MainWindow.Width;
+            //Height = Application.Current.MainWindow.Height;
 
             _windowMinHeight = 30.0;
             _windowMinWidth = 250.0;
@@ -537,11 +537,6 @@ namespace DemoApp.ViewModels
             }
             ;
         }
-
-        //public void Resize(MouseButtonEventArgs e)
-        //{
-        //    e.Handled = true;
-        //}
 
         private void Resize(MouseEventArgs e)
         {
@@ -778,14 +773,24 @@ namespace DemoApp.ViewModels
             {
                 if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
                 {
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;
-                    Application.Current.MainWindow.Width = Width;
-                    Application.Current.MainWindow.Height = Height;
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;                    
+                    //Application.Current.MainWindow.Width = Width;
+                    //Application.Current.MainWindow.Height = Height;
+
+                    Application.Current.MainWindow.Top = _windowTop;
+                    Application.Current.MainWindow.Left = _windowLeft;
+                    Application.Current.MainWindow.Width = _windowWidth;
+                    Application.Current.MainWindow.Height = _windowHeight;
 
                     Application.Current.MainWindow.WindowState = WindowState.Normal;
                 }
                 else
                 {
+                    _windowTop = Application.Current.MainWindow.Top;
+                    _windowLeft = Application.Current.MainWindow.Left;
+                    _windowWidth = Application.Current.MainWindow.Width;
+                    _windowHeight = Application.Current.MainWindow.Height;
+
                     Application.Current.MainWindow.WindowState = WindowState.Maximized;
                 }
             }
