@@ -19,6 +19,13 @@ namespace DemoApp.ViewModels
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public class ResizeInfo
+        {
+            public Point StartPoint { get; set; }
+            public Size StartSize { get; set; }
+            public Cursor Cursor { get; set; }
+        }
+
         #region Activity
         private IActivityStore _activityStore;
         private bool _mouseDown;
@@ -117,6 +124,17 @@ namespace DemoApp.ViewModels
 
         #endregion
 
+        #region Window size
+
+        private double _windowTop;
+        private double _windowLeft;
+        private double _windowWidth;
+        private double _windowHeight;
+
+        private double _windowMinWidth;
+        private double _windowMinHeight;
+
+        #endregion
 
         //private IResourceManager _resourceManager;
         //private LogSender _logSender;
@@ -302,6 +320,19 @@ namespace DemoApp.ViewModels
             }
         }
 
+        private ICommand _resizeCommand;
+        public ICommand ResizeCommand
+        {
+            get
+            {
+                if (_resizeCommand == null)
+                {
+                    _resizeCommand = new DelegateCommand<MouseButtonEventArgs>(Resize);
+                }
+                return _resizeCommand;
+            }
+        }
+
 
         #endregion
 
@@ -311,6 +342,9 @@ namespace DemoApp.ViewModels
         {
             Width = Application.Current.MainWindow.Width;
             Height = Application.Current.MainWindow.Height;
+
+            _windowMinHeight = 30.0;
+            _windowMinWidth = 250.0;
 
             _navigator = navigator;
             _navigationStore = navigationStore;
@@ -502,6 +536,239 @@ namespace DemoApp.ViewModels
                 Application.Current.MainWindow.DragMove();
             }
             ;
+        }
+
+        //public void Resize(MouseButtonEventArgs e)
+        //{
+        //    e.Handled = true;
+        //}
+
+        private void Resize(MouseEventArgs e)
+        {
+            var element = e.Source as FrameworkElement;            
+            if (element == null) return;
+
+            Window window = Window.GetWindow(element);
+            if (window == null) return;
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                element.CaptureMouse();
+                var cursor = element.Cursor;
+                var mousePoint = e.GetPosition(window);
+
+                if (cursor == Cursors.SizeNWSE || cursor == Cursors.SizeNESW ||
+                    cursor == Cursors.SizeWE || cursor == Cursors.SizeNS)
+                {
+                    _windowTop = window.Top;
+                    _windowLeft = window.Left;
+                    _windowWidth = window.Width;
+                    _windowHeight = window.Height;
+
+                    window.Tag = new ResizeInfo { StartPoint = mousePoint, StartSize = new Size(window.Width, window.Height), Cursor = cursor };
+                    element.MouseMove += ResizeWindow_MouseMove;
+                    element.MouseLeftButtonUp += ResizeWindow_MouseLeftButtonUp;
+                }
+            }
+
+            e.Handled = true;
+        }
+
+        private void ResizeWindow_MouseMove(object sender, MouseEventArgs e)
+        {
+            var element = sender as FrameworkElement;
+            if (element == null) return;
+
+            //if (element.Name == "TopLeft")
+
+
+            var window = Window.GetWindow(element);
+            if (window == null) return;
+
+            if (window.Tag is ResizeInfo info)
+            {
+                var mousePoint = e.GetPosition(window);
+                var deltaX = mousePoint.X - info.StartPoint.X;
+                var deltaY = mousePoint.Y - info.StartPoint.Y;
+
+                switch (element.Name)
+                {
+                    case "TopLeft":
+                        {
+
+                            double left = window.Left + deltaX;
+
+                            if (left > _windowLeft + _windowWidth - _windowMinWidth)
+                            {
+                                left = _windowLeft + _windowWidth - _windowMinWidth;
+                                window.Left = left;
+                                window.Width = _windowMinWidth;
+                            }
+                            else
+                            {
+                                window.Left = left;
+                                window.Width -= deltaX;
+                            }
+
+                            
+
+                            double top = window.Top + deltaY;
+
+                            if (top > _windowTop + _windowHeight - _windowMinHeight)
+                            {
+                                top = _windowTop + _windowHeight - _windowMinHeight;
+                                window.Top = top;
+                                window.Height = _windowMinHeight;
+                            }
+                            else
+                            {
+                                window.Top = top;
+                                window.Height -= deltaY;
+                            }
+
+                           
+                        }
+                        break;
+                    case "Top":
+                        {
+                            double top = window.Top + deltaY;
+
+                            if (top > _windowTop + _windowHeight - _windowMinHeight)
+                            {
+                                top = _windowTop + _windowHeight - _windowMinHeight;
+                                window.Top = top;
+                                window.Height = _windowMinHeight;
+                                break;
+                            }
+
+                            window.Top = top;
+                            window.Height -= deltaY;
+                        }
+                        break;
+                    case "TopRight":
+                        {
+                            double width = info.StartSize.Width + deltaX; ;
+
+                            if (width < _windowMinWidth)
+                            {
+                                width = _windowMinWidth;
+                            }
+
+                            window.Width = width;
+
+                            double top = window.Top + deltaY;
+
+                            if (top > _windowTop + _windowHeight - _windowMinHeight)
+                            {
+                                top = _windowTop + _windowHeight - _windowMinHeight;
+                                window.Top = top;
+                                window.Height = _windowMinHeight;
+                                break;
+                            }
+
+                            window.Top = top;
+                            window.Height -= deltaY;
+                        }
+                        break;
+                    case "Left":
+                        {
+                            double left = window.Left + deltaX;
+
+                            if (left > _windowLeft + _windowWidth - _windowMinWidth)
+                            {
+                                left = _windowLeft + _windowWidth - _windowMinWidth;
+                                window.Left = left;
+                                window.Width = _windowMinWidth;
+                                break;
+                            }
+
+                            window.Left = left;
+                            window.Width -= deltaX;
+                        }
+                        break;
+                    case "Right":
+                        {
+                            double width = info.StartSize.Width + deltaX; ;
+
+                            if (width < _windowMinWidth)
+                            {
+                                width = _windowMinWidth;
+                            }
+
+                            window.Width = width;
+                        }
+                        break;
+                    case "BottomLeft":
+                        {
+                            double left = window.Left + deltaX;
+
+                            if (left > _windowLeft + _windowWidth - _windowMinWidth)
+                            {
+                                left = _windowLeft + _windowWidth - _windowMinWidth;
+                                window.Left = left;
+                                window.Width = _windowMinWidth;
+                            }
+                            else
+                            {
+                                window.Left = left;
+                                window.Width -= deltaX;
+                            }
+
+                            double height = info.StartSize.Height + deltaY; ;
+
+                            if (height < _windowMinHeight)
+                            {
+                                height = _windowMinHeight;
+                            }
+
+                            window.Height = height;
+                        }
+                        break;
+                    case "Bottom":
+                        {
+                            double height = info.StartSize.Height + deltaY; ;
+
+                            if (height < _windowMinHeight)
+                            {
+                                height = _windowMinHeight;
+                            }
+
+                            window.Height = height;
+                        }
+                        break;
+                    case "BottomRight":
+                        {
+                            double width = info.StartSize.Width + deltaX; ;
+
+                            if (width < _windowMinWidth)
+                            {
+                                width = _windowMinWidth;
+                            }
+
+                            window.Width = width;
+
+                            double height = info.StartSize.Height + deltaY; ;
+
+                            if (height < _windowMinHeight)
+                            {
+                                height = _windowMinHeight;
+                            }
+
+                            window.Height = height;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void ResizeWindow_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var element = sender as FrameworkElement;
+            if (element == null) return;
+
+            element.ReleaseMouseCapture();
+            element.MouseMove -= ResizeWindow_MouseMove;
+            element.MouseLeftButtonUp -= ResizeWindow_MouseLeftButtonUp;
         }
 
         public void BorderMouseLeftButtonDown(MouseButtonEventArgs e)
