@@ -17,7 +17,7 @@
             Margin="0 10 0 0"
          Grid.Row="0"
          Padding="20"
-            CornerRadius="25"
+            CornerRadius="25 25 25 0"
          Background="#1976d2">
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -102,7 +102,7 @@
                 <custom:NavigationPanel.Content>
                     <StackPanel Margin="0 10">
                         <custom:NavigationPanelItem>
-                            <TextBlock Text="Introduction" />
+                            <TextBlock Text="Introduction"/>
                         </custom:NavigationPanelItem>
                         <custom:NavigationPanelItem>
                             <TextBlock Text="Getting Started" />

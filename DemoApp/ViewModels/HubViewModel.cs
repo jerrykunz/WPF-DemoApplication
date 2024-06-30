@@ -106,7 +106,7 @@ namespace DemoApp.ViewModels
 
         public override void OnEnter()
         {
-            int ahj = 3;
+
         }
 
         public override void OnExit()
