@@ -37,7 +37,7 @@ namespace DemoApp.ViewModels
             ////Set style test
             //App.Instance.SwitchStyle("default");
 
-            _navigator.ChangeViewModel<TestFirstViewModel>(true, true);
+            _navigator.ChangeViewModel<HubViewModel>(true, true);
         }
 
         public override void OnExit()

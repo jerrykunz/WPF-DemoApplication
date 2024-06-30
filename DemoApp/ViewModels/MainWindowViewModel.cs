@@ -19,13 +19,6 @@ namespace DemoApp.ViewModels
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public class ResizeInfo
-        {
-            public Point StartPoint { get; set; }
-            public Size StartSize { get; set; }
-            public Cursor Cursor { get; set; }
-        }
-
         #region Activity
         private IActivityStore _activityStore;
         private bool _mouseDown;
@@ -124,7 +117,15 @@ namespace DemoApp.ViewModels
 
         #endregion
 
-        #region Window size
+        #region Window
+        public class ResizeInfo
+        {
+            public Point StartPoint { get; set; }
+            public Size StartSize { get; set; }
+            public Cursor Cursor { get; set; }
+        }
+
+        public Window Window;
 
         private double _windowTop;
         private double _windowLeft;
@@ -134,10 +135,14 @@ namespace DemoApp.ViewModels
         private double _windowMinWidth;
         private double _windowMinHeight;
 
-        #endregion
-
-        //private IResourceManager _resourceManager;
-        //private LogSender _logSender;
+        private double _maximizedCornerRadius;
+        private double _normalCornerRadius;
+        private double _cornerRadius;
+        public double CornerRadius
+        {
+            get { return _cornerRadius; }
+            set { _cornerRadius = value; OnPropertyChanged(nameof(CornerRadius)); }
+        }
 
         private bool _maximized;
         public bool Maximized
@@ -148,6 +153,11 @@ namespace DemoApp.ViewModels
 
         public double Width { get; private set; }
         public double Height { get; private set; }
+
+        #endregion
+
+        //private IResourceManager _resourceManager;
+        //private LogSender _logSender;
 
         #region ICommand
 
@@ -262,7 +272,7 @@ namespace DemoApp.ViewModels
             {
                 if (_maximizeCommand == null)
                 {
-                    _maximizeCommand = new DelegateCommand(Maximize);
+                    _maximizeCommand = new DelegateCommand(ToggleMaximize);
                 }
                 return _maximizeCommand;
             }
@@ -345,6 +355,10 @@ namespace DemoApp.ViewModels
 
             _windowMinHeight = 30.0;
             _windowMinWidth = 250.0;
+
+            _maximizedCornerRadius = 0;
+            _normalCornerRadius = 25;
+            CornerRadius = _normalCornerRadius;
 
             _navigator = navigator;
             _navigationStore = navigationStore;
@@ -484,16 +498,13 @@ namespace DemoApp.ViewModels
                 case WindowState.Minimized:
                 case WindowState.Normal:
                     log.Info("Alt+Enter pressed, switching to fullscreen");
-                    Application.Current.MainWindow.WindowState = WindowState.Maximized;
-                    Application.Current.MainWindow.WindowStyle = WindowStyle.None;
+                    ToggleMaximize();
                     Application.Current.MainWindow.Topmost = true;
                     break;
 
                 case WindowState.Maximized:
                     log.Info("Alt+Enter pressed, switching to normal size");
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;
-                    Application.Current.MainWindow.WindowStyle = WindowStyle.SingleBorderWindow;
-                    Application.Current.MainWindow.Topmost = false;
+                    ToggleMaximize();
                     break;
             }
         }
@@ -501,20 +512,39 @@ namespace DemoApp.ViewModels
         public void Minimize()
         {
             Application.Current.MainWindow.WindowState = WindowState.Minimized;
+            Application.Current.MainWindow.Topmost = false;
         }
 
-        public void Maximize()
+        public void ToggleMaximize()
         {           
             switch(Application.Current.MainWindow.WindowState)
             {              
                 case WindowState.Maximized:
+                    Application.Current.MainWindow.Top = _windowTop;
+                    Application.Current.MainWindow.Left = _windowLeft;
+                    Application.Current.MainWindow.Width = _windowWidth;
+                    Application.Current.MainWindow.Height = _windowHeight;
+
+                    Window.BorderThickness = new Thickness(0);
                     Application.Current.MainWindow.WindowState = WindowState.Normal;
+
+                    CornerRadius = _normalCornerRadius;
                     break;
                 default:
+                    _windowTop = Application.Current.MainWindow.Top;
+                    _windowLeft = Application.Current.MainWindow.Left;
+                    _windowWidth = Application.Current.MainWindow.Width;
+                    _windowHeight = Application.Current.MainWindow.Height;
+
+                    Window.BorderThickness = new Thickness(8);
                     Application.Current.MainWindow.WindowState = WindowState.Maximized;
+
+                    CornerRadius = _maximizedCornerRadius;
                     break;
             }
+
             Maximized = Application.Current.MainWindow.WindowState == WindowState.Maximized;
+            Application.Current.MainWindow.Topmost = false;
         }
 
         public void Close()
@@ -534,12 +564,14 @@ namespace DemoApp.ViewModels
             if (e.ChangedButton == MouseButton.Left)
             {
                 Application.Current.MainWindow.DragMove();
-            }
-            ;
+            }            
         }
 
         private void Resize(MouseEventArgs e)
         {
+            if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+                return;
+
             var element = e.Source as FrameworkElement;            
             if (element == null) return;
 
@@ -768,34 +800,10 @@ namespace DemoApp.ViewModels
 
         public void BorderMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-
             if (e.ClickCount == 2)
             {
-                if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
-                {
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;                    
-                    //Application.Current.MainWindow.Width = Width;
-                    //Application.Current.MainWindow.Height = Height;
-
-                    Application.Current.MainWindow.Top = _windowTop;
-                    Application.Current.MainWindow.Left = _windowLeft;
-                    Application.Current.MainWindow.Width = _windowWidth;
-                    Application.Current.MainWindow.Height = _windowHeight;
-
-                    Application.Current.MainWindow.WindowState = WindowState.Normal;
-                }
-                else
-                {
-                    _windowTop = Application.Current.MainWindow.Top;
-                    _windowLeft = Application.Current.MainWindow.Left;
-                    _windowWidth = Application.Current.MainWindow.Width;
-                    _windowHeight = Application.Current.MainWindow.Height;
-
-                    Application.Current.MainWindow.WindowState = WindowState.Maximized;
-                }
+                ToggleMaximize();
             }
-
-            Maximized = Application.Current.MainWindow.WindowState == WindowState.Maximized;
         }
         #endregion
     }

@@ -28,6 +28,7 @@ namespace DemoApp
         {
             //If using StartupURI, I guess it does not hurt otherwise either
             vm = AppServices.Instance.GetService<MainWindowViewModel>();
+            vm.Window = this;
             DataContext = vm;
 
             InitializeComponent();

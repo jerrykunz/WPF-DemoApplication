@@ -54,7 +54,7 @@
 
         <Border BorderThickness="0"
                 Grid.RowSpan="2"
-                CornerRadius="25 25 25 25"
+                CornerRadius="{Binding CornerRadius}"
                 Background="#f7f6f4">
             <!--Double click to maximize/normalize-->
             <i:Interaction.Triggers>

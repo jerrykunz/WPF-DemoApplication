@@ -610,6 +610,7 @@ namespace DemoApp.Stores
             ViewNamesByVM.Add(typeof(InitViewModel), "InitView");
             ViewNamesByVM.Add(typeof(TestFirstViewModel), "TestFirstView");
             ViewNamesByVM.Add(typeof(NavTest1ViewModel), "NavTest1View");
+            ViewNamesByVM.Add(typeof(HubViewModel), "HubView");
 
             //get vm by view name
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on view, all of these views should be set here
@@ -617,6 +618,7 @@ namespace DemoApp.Stores
             ViewModelTypeByViewName.Add("TestFirstView", typeof(TestFirstViewModel));
             ViewModelTypeByViewName.Add("NavTest1View", typeof(NavTest1ViewModel));
             ViewModelTypeByViewName.Add("NavTest2View", typeof(NavTest1ViewModel));
+            ViewModelTypeByViewName.Add("HubView", typeof(HubViewModel));
 
             //whether to load as embedded or loose (LooseViews property in this class)
             //should match with ViewPrefersLoose
@@ -625,12 +627,14 @@ namespace DemoApp.Stores
             ViewPrefersLooseByName.Add("TestFirstView");
             ViewPrefersLooseByName.Add("NavTest1View");
             ViewPrefersLooseByName.Add("NavTest2View");
+            ViewPrefersLooseByName.Add("HubView");
 
 
             //Used in view-based navigation
             ViewTypesByViewName.Add("InitView", typeof(InitView));
             ViewTypesByViewName.Add("TestFirstView", typeof(TestFirstView));
         }
+    
     }
     
 }
