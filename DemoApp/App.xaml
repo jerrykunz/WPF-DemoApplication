@@ -6,8 +6,11 @@
              StartupUri="MainWindow.xaml">
     <!--Have to use StartupUri to get immediate access to MergedDictionaries-->
     <Application.Resources>
+        
         <ResourceDictionary>
-
+            <Style TargetType="Control">
+                <Setter Property="TextElement.FontFamily" Value="Times New Roman"/>
+            </Style>
             <conv:VisibilityBooleanConverter TrueVisibility="Visible" FalseVisibility="Hidden" x:Key="BoolVisibleHiddenConverter"/>
             <conv:VisibilityBooleanConverter TrueVisibility="Visible" FalseVisibility="Collapsed" x:Key="BoolVisibleCollapsedConverter"/>
 

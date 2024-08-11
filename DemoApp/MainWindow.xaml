@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:custom="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI"
         xmlns:local="clr-namespace:DemoApp"
         mc:Ignorable="d"
         AllowsTransparency="True"
         Background="Transparent"
         WindowStyle="None"
+        Style="{StaticResource WindowStyle}"
         Title="DemoApp" Height="450" Width="800">
 
     <Window.InputBindings>
@@ -55,7 +57,7 @@
         <Border BorderThickness="0"
                 Grid.RowSpan="2"
                 CornerRadius="{Binding CornerRadius}"
-                Background="#f7f6f4">
+                 Background="{DynamicResource WindowBackGround}" >
             <!--Double click to maximize/normalize-->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDown">
@@ -189,7 +191,7 @@
                        
                         <!--Main menu-->
                         <Menu Margin="10 10 0 0"
-                          Background="#f7f6f4" 
+                          Background="{DynamicResource WindowBackGround}" 
                           BorderThickness="0"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top">
@@ -274,7 +276,7 @@
                     <Grid Grid.Row="1"
                           Margin="10 0 10 10">
                         <!--needs this to block some of the clicks going to first border-->
-                        <Border BorderThickness="1" Background="#f7f6f4">
+                        <Border BorderThickness="1"  Background="{DynamicResource WindowBackGround}" >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDown">
                                     <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
@@ -285,7 +287,7 @@
                             </i:Interaction.Triggers>
                         </Border>
 
-                        <ContentControl Content="{Binding CurrentView}">
+                        <!--<ContentControl Content="{Binding CurrentView}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDown">
                                     <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
@@ -294,7 +296,142 @@
                                     <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
-                        </ContentControl>
+                        </ContentControl>-->
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border Margin="0 10 0 0"
+                                    Grid.Row="0"
+                                    Padding="20"
+                                    CornerRadius="25 25 25 0">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#1976ff" Offset="0"/>
+                                        <GradientStop Color="#1976d2" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox x:Name="cbToggleMenu" Grid.Column="0" IsChecked="True">
+                                        <CheckBox.Template>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <Grid Background="Transparent">
+                                                    <Viewbox Width="25" Height="25">
+                                                        <Path
+                                     Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                                     Fill="White"
+                                     Stretch="Fill" />
+                                                    </Viewbox>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </CheckBox.Template>
+                                    </CheckBox>
+
+                                    <TextBlock Grid.Column="1"
+                                               Margin="20 0 0 0"
+                                               FontSize="18"
+                                               Foreground="White"
+                                               Text="Demo Application" />
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <custom:NavigationPanel Grid.Column="0"                                                        
+                                                        BorderBrush="#dbdbdb"
+                                                        BorderThickness="0 0 1 0"
+                                                        FallbackOpenWidth="165"
+                                                        IsOpen="{Binding IsChecked, ElementName=cbToggleMenu}"
+                                                        OpenCloseDuration="0:0:0.25">
+                                    <custom:NavigationPanel.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#f2f2f2" Offset="0"/>
+                                            <GradientStop Color="#e2e2e2" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </custom:NavigationPanel.Background>
+
+                                    <custom:NavigationPanel.Resources>
+                                        <Style TargetType="custom:NavigationPanelItem">
+                                            <Setter Property="Padding" Value="20 10" />
+                                            <Setter Property="FontSize" Value="16" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Foreground" Value="#444" />
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="MouseEnter">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                                            To="#dbdbdb"
+                                                                            Duration="0:0:0.1" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                                <EventTrigger RoutedEvent="MouseLeave">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Background).(SolidColorBrush.Color)"
+                                                                            To="Transparent"
+                                                                            Duration="0:0:0.1" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Foreground" Value="#1669bb" />
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Foreground" Value="#1669bb" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </custom:NavigationPanel.Resources>
+                                    <custom:NavigationPanel.Content>
+                                        <StackPanel Margin="0 10">
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="0">
+                                                <TextBlock Text="Introduction"/>
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="1">
+                                                <TextBlock Text="Charts" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem>
+                                                <TextBlock Text="Developer Guides" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem>
+                                                <TextBlock Text="Tutorials" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem>
+                                                <TextBlock Text="Reference" />
+                                            </custom:NavigationPanelItem>
+                                        </StackPanel>
+                                    </custom:NavigationPanel.Content>
+                                </custom:NavigationPanel>
+                                
+                                <ContentControl Grid.Column="1"
+                                                Content="{Binding CurrentView}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown">
+                                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ContentControl>
+                                
+                            </Grid>
+                        </Grid>
+
                     </Grid>
                     <!--Content End-->
                     

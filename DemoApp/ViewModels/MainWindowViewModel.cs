@@ -343,6 +343,18 @@ namespace DemoApp.ViewModels
             }
         }
 
+        private ICommand _navigationCommand;
+        public ICommand NavigationCommand
+        {
+            get
+            {
+                if (_navigationCommand == null)
+                {
+                    _navigationCommand = new DelegateCommand<string>(Navigate);
+                }
+                return _navigationCommand;
+            }
+        }
 
         #endregion
 
@@ -436,6 +448,21 @@ namespace DemoApp.ViewModels
         }
 
         #region ICommand Functions
+
+        private void Navigate(string index)
+        {
+            switch(index)
+            {
+                case "0":
+                    _navigator.ChangeViewModel<TestFirstViewModel>(true, true);
+                    break;
+                case "1":
+                    _navigator.ChangeViewModel<ChartViewModel>(true, true);
+                    break;
+
+            }
+        }
+
         private void MouseDown()
         {
             if (_mouseDown)

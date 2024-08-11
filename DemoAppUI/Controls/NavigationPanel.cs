@@ -67,6 +67,12 @@ namespace DemoAppUI.Controls
         public NavigationPanel()
         {
             Width = 0;
+            Loaded += NavigationPanel_Loaded;           
+        }
+
+        private void NavigationPanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            Width = GetDesiredContentWidth();
         }
 
         private static void OnIsOpenPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
