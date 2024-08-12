@@ -23,6 +23,7 @@ namespace DemoApp.ViewModels
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         INavigator _navigator;
+        IDatabaseService _databaseService;
 
         private DateTime _currentDate;
         public string CurrentDate
@@ -34,33 +35,39 @@ namespace DemoApp.ViewModels
         }
 
 
-        private double _minY;
-        private double _maxY;
-
-        public double MinY
+        private double _liveChartMinY;      
+        public double LiveChartMinY
         {
-            get => _minY;
+            get => _liveChartMinY;
             set
             {
-                _minY = value;
-                OnPropertyChanged(nameof(MinY));
+                _liveChartMinY = value;
+                OnPropertyChanged(nameof(LiveChartMinY));
             }
         }
 
-        public double MaxY
+        private double _liveChartMaxY;
+        public double LiveChartMaxY
         {
-            get => _maxY;
+            get => _liveChartMaxY;
             set
             {
-                _maxY = value;
-                OnPropertyChanged(nameof(MaxY));
+                _liveChartMaxY = value;
+                OnPropertyChanged(nameof(LiveChartMaxY));
             }
         }
 
 
         private double _lastLecture;
-        private double _trend;
-        public SeriesCollection LastHourSeries { get; set; }
+        private double _liveChartTrend;
+        public SeriesCollection LiveSeries { get; set; }
+
+        private int _liveEnergyIndex;
+        private double[] _liveEnergyBuffer;
+
+        private int _prevMinute;
+
+
 
         private SeriesCollection _column10Series;
         public SeriesCollection Column10Series
@@ -72,13 +79,6 @@ namespace DemoApp.ViewModels
                 OnPropertyChanged(nameof(Column10Series));
             }
         }
-
-        private DispatcherTimer _chartTimer;
-
-
-        private bool _test;
-
-        public string TestText { get { return "TEST_TEXT1"; } }
 
 
         public ChartValues<DateTimePoint> Values { get; set; }
@@ -108,71 +108,18 @@ namespace DemoApp.ViewModels
         #endregion
 
         public ChartViewModel(INavigator navigator,
+                              IDatabaseService databaseService,
                               IActivityStore activityStore) :
             base(activityStore)
         {
             _navigator = navigator;
+            _databaseService = databaseService;
 
             _currentDate = DateTime.Now;
 
-            _chartTimer = new DispatcherTimer();
-            _chartTimer.Tick += _chartTimer_Tick;
-            _chartTimer.Interval = TimeSpan.FromSeconds(2);
-            _chartTimer.Start();
-
-            MinY = 0;
-            MaxY = 100;
-                
-
-            LastHourSeries = new SeriesCollection
-            {
-                new LineSeries
-                {
-                    AreaLimit = -10,
-                    Values = new ChartValues<ObservableValue>
-                    {
-                        new ObservableValue(3),
-                        new ObservableValue(5),
-                        new ObservableValue(6),
-                        new ObservableValue(7),
-                        new ObservableValue(3),
-                        new ObservableValue(4),
-                        new ObservableValue(2),
-                        new ObservableValue(5),
-                        new ObservableValue(8),
-                        new ObservableValue(3),
-                        new ObservableValue(5),
-                        new ObservableValue(6),
-                        new ObservableValue(7),
-                        new ObservableValue(3),
-                        new ObservableValue(4),
-                        new ObservableValue(2),
-                        new ObservableValue(5),
-                        new ObservableValue(8)
-                    }
-                }
-            };
-            _trend = 8;
-
-            Task.Run(() =>
-            {
-                var r = new Random();
-                while (true)
-                {
-                    Thread.Sleep(500);
-                    _trend += (r.NextDouble() > 0.3 ? 1 : -1) * r.Next(0, 5);
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        LastHourSeries[0].Values.Add(new ObservableValue(_trend));
-                        LastHourSeries[0].Values.RemoveAt(0);
-                        SetLecture();
-                        UpdateAxisRanges();
-                    });
-                }
-            });
 
 
-
+            InitEnergyLiveChart();
 
 
             var now = DateTime.MinValue.AddHours(10);
@@ -214,12 +161,91 @@ namespace DemoApp.ViewModels
 
         }
 
-        private void _chartTimer_Tick(object sender, EventArgs e)
+        public void InitEnergyLiveChart()
         {
-            //SeriesCollection[2].Values.RemoveAt(0);
-            //SeriesCollection[2].Values.Add(5d);
+            DateTime now = DateTime.Now;
+            _prevMinute = now.Minute;
+
+
+            _liveEnergyIndex = 0;
+            _liveEnergyBuffer = new double[120];
+
+
+            LiveChartMinY = 0;
+            LiveChartMaxY = 100;
+
+            _liveChartTrend = 8;
+
+            LiveSeries = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    AreaLimit = -10,
+                    Values = new ChartValues<ObservableValue>
+                    {
+                        new ObservableValue(3),
+                        new ObservableValue(5),
+                        new ObservableValue(6),
+                        new ObservableValue(7),
+                        new ObservableValue(3),
+                        new ObservableValue(4),
+                        new ObservableValue(2),
+                        new ObservableValue(5),
+                        new ObservableValue(8),
+                        new ObservableValue(3),
+                        new ObservableValue(5),
+                        new ObservableValue(6),
+                        new ObservableValue(7),
+                        new ObservableValue(3),
+                        new ObservableValue(4),
+                        new ObservableValue(2),
+                        new ObservableValue(5),
+                        new ObservableValue(_liveChartTrend)
+                    }
+                }
+            };           
+
+            Task.Run(() => EnergyLiveChart_Thread());
         }
 
+        public void EnergyLiveChart_Thread()
+        {
+            var r = new Random();
+            while (true)
+            {
+                Thread.Sleep(500);
+                _liveChartTrend += (r.NextDouble() > 0.45 ? 1 : -1) * r.Next(0, 5);
+
+                if (_liveChartTrend < 0)
+                    _liveChartTrend = 0;
+
+                int currentMinute = DateTime.Now.Minute;
+                if (currentMinute != _prevMinute)
+                {                    
+                    double minuteAvg = 0;
+                    for (int i = 0; i < _liveEnergyIndex; i++)
+                    {
+                        minuteAvg += _liveEnergyBuffer[i];
+                    }
+                    minuteAvg /= _liveEnergyIndex;
+
+                    _databaseService.AddOrUpdateEnergyMinAvg(DateTime.Now, minuteAvg);
+
+                    _liveEnergyIndex = 0;
+                }
+                _prevMinute = currentMinute;
+
+                _liveEnergyBuffer[_liveEnergyIndex++] = _liveChartTrend;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LiveSeries[0].Values.Add(new ObservableValue(_liveChartTrend));
+                    LiveSeries[0].Values.RemoveAt(0);
+                    SetLiveEnergyLecture();
+                    UpdateLiveEnergyAxisRanges();
+                });
+            }
+        }
 
         public double LastLecture
         {
@@ -231,33 +257,39 @@ namespace DemoApp.ViewModels
             }
         }
 
-        private void UpdateAxisRanges()
+        private void UpdateLiveEnergyAxisRanges()
         {
-            var allValues = LastHourSeries
+            var allValues = LiveSeries
                .SelectMany(series => series.Values.Cast<ObservableValue>())
                .Select(value => value.Value);
 
-            //MinX = 0;
-            //MaxX = LastHourSeries[0].Values.Count - 1; // Assuming equal count for all series
+            LiveChartMinY = 0;
+            LiveChartMaxY = allValues.Max() + 1;
 
-            var prevMinY = MinY;
-            var prevMaxY = MaxY
-                ;
-            //MinY = allValues.Min() - 1;
-            MinY = 0;
-            MaxY = allValues.Max() + 1;
 
-            if (MinY < prevMinY)
-                ;
+            ////MinX = 0;
+            ////MaxX = LastHourSeries[0].Values.Count - 1; // Assuming equal count for all series
 
-            if (MaxY > prevMaxY)
-                ;
+            //var prevMinY = LiveChartMinY;
+            //var prevMaxY = LiveChartMaxY
+            //    ;
+            ////MinY = allValues.Min() - 1;
+            //LiveChartMinY = 0;
+            //LiveChartMaxY = allValues.Max() + 1;
+
+            //if (LiveChartMinY < prevMinY)
+            //    ;
+
+            //if (LiveChartMaxY > prevMaxY)
+            //    ;
 
         }
 
-        private void SetLecture()
+        //Updates text value in a smoother way
+        //Update from previous value to current value in 400ms, 100ms for each step
+        private void SetLiveEnergyLecture()
         {
-            var target = ((ChartValues<ObservableValue>)LastHourSeries[0].Values).Last().Value;
+            var target = ((ChartValues<ObservableValue>)LiveSeries[0].Values).Last().Value;
             var step = (target - _lastLecture) / 4;
 
             Task.Run(() =>
@@ -273,9 +305,9 @@ namespace DemoApp.ViewModels
 
         private void UpdateAllOnClick(object sender)
         {
-            LastHourSeries[0].Values.Add(new ObservableValue(new Random().Next(0, 10)));
-            while (LastHourSeries[0].Values.Count > 10)
-                LastHourSeries[0].Values.RemoveAt(0);
+            LiveSeries[0].Values.Add(new ObservableValue(new Random().Next(0, 10)));
+            while (LiveSeries[0].Values.Count > 10)
+                LiveSeries[0].Values.RemoveAt(0);
         }
 
         public override void OnEnterSoft()

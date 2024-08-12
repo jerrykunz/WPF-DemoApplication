@@ -233,16 +233,23 @@
     </ApplicationDefinition>
     <Compile Include="Config\Enum.cs" />
     <Compile Include="Converters\BooleanConverter.cs" />
+    <Compile Include="Databases\DatabaseSQLite.cs" />
+    <Compile Include="Databases\IDatabase.cs" />
+    <Compile Include="Databases\IDatabaseSQLite.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Factories\DatabaseServiceFactory.cs" />
     <Compile Include="FlatUIWindow.xaml.cs">
       <DependentUpon>FlatUIWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Id\Id.cs" />
     <Compile Include="Logging\Log4NetConfigurator.cs" />
     <Compile Include="Model\Settings\LanguageCollectionSettings.cs" />
     <Compile Include="Model\Settings\LanguageSettings.cs" />
     <Compile Include="ObservableObject.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Services\AppServices.cs" />
+    <Compile Include="Services\DatabaseService.cs" />
+    <Compile Include="Services\IDatabaseService.cs" />
     <Compile Include="Services\INavigator.cs" />
     <Compile Include="SettingsInitializer.cs" />
     <Compile Include="Settings\Preferences.Designer.cs">
@@ -473,8 +480,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Databases\" />
-    <Folder Include="Factories\" />
     <Folder Include="Helpers\" />
     <Folder Include="Sounds\" />
     <Folder Include="Themes\" />

@@ -99,7 +99,7 @@
                                 VerticalAlignment="Stretch"
                                 Grid.Row="2"
                                 Margin="-4, 0, 0, 0"
-                                Series="{Binding LastHourSeries}"
+                                Series="{Binding LiveSeries}"
                                 Hoverable="False"
                                 DataTooltip="{x:Null}">
                     <lvc:CartesianChart.AxisX>
@@ -107,7 +107,7 @@
                         <lvc:Axis  MinValue="2"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis  MinValue="{Binding MinY}"  MaxValue="{Binding MaxY}"></lvc:Axis>
+                        <lvc:Axis  MinValue="{Binding LiveChartMinY}"  MaxValue="{Binding LiveChartMaxY}"></lvc:Axis>
                     </lvc:CartesianChart.AxisY>
                 </lvc:CartesianChart>
 

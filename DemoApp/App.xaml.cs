@@ -2,6 +2,7 @@
 using DemoApp.Services;
 using DemoApp.Stores;
 using DemoApp.ViewModels;
+using DemoAppDatabase;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,7 @@ namespace DemoApp
             CurrentStyleFolder = Settings.Preferences.Default.StyleFolder;
             ZoomLevel = 0;
             ZoomLevelMax = Settings.Preferences.Default.ZoomLevels;
+
 
             //Useless, because can no longer access MergedDictionaries => can't change languages, styles, etc
             //Main window will be created automatically after this function

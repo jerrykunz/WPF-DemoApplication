@@ -1,4 +1,6 @@
-﻿using DemoApp.Stores;
+﻿using DemoApp.Databases;
+using DemoApp.Factories;
+using DemoApp.Stores;
 using DemoApp.ViewModels;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,6 +69,12 @@ namespace DemoApp.Services
 
             //Services
             services.AddSingleton<INavigator, Navigator>();
+
+            IDatabaseService databaseService = DatabaseServiceFactory.CreateDatabaseService();
+            services.AddSingleton<IDatabaseService>(databaseService);
+
+            IDatabaseSQLite dbSQLite = databaseService.GetDatabase<IDatabaseSQLite>();
+            services.AddSingleton<IDatabaseSQLite>(dbSQLite);
 
 
             //services.AddTransient<AdminMenuViewModel>();
