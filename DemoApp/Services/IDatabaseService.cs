@@ -1,4 +1,5 @@
 ﻿using DemoApp.Databases;
+using DemoAppDatabase.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,11 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Services
 {
-    public interface IDatabaseService : IDatabase
+    public interface IDatabaseService //: IDatabase
     {
+        string Name { get; }
         T GetDatabase<T>();
+        void AddOrUpdateEnergyMinAvg(DateTime timestamp, double average);
+        IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end);
     }
 }

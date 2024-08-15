@@ -107,7 +107,7 @@
                         <lvc:Axis  MinValue="2"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis  MinValue="{Binding LiveChartMinY}"  MaxValue="{Binding LiveChartMaxY}"></lvc:Axis>
+                        <lvc:Axis  MinValue="0"  MaxValue="{Binding LiveChartMaxY}"></lvc:Axis>
                     </lvc:CartesianChart.AxisY>
                 </lvc:CartesianChart>
 
@@ -122,7 +122,7 @@
                                        FontSize="22"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Top"
-                                       Text="{Binding LastLecture, StringFormat={}{0:N1}}"/>
+                                       Text="{Binding LastLectureString}"/>
                     <TextBlock Foreground="#303030"
                                        FontSize="10" 
                                        HorizontalAlignment="Left"
@@ -151,7 +151,7 @@
                         <Setter Property="Foreground" Value="#64FFFFFF"></Setter>
                         <Style.Triggers>
                             <Trigger Property="AxisOrientation" Value="Y">
-                                <Setter Property="IsMerged" Value="True"></Setter>
+                                <Setter Property="IsMerged" Value="False"></Setter>
                                 <Setter Property="MaxValue" Value="10"></Setter>
                             </Trigger>
                         </Style.Triggers>
@@ -175,11 +175,11 @@
                 </Grid.RowDefinitions>
                 <Border x:Name="Border2" Grid.Row="0" Grid.RowSpan="4" CornerRadius="5" Background="White" />
                 <Border Grid.Row="0" Grid.RowSpan="3" Background="#EB5A13" ></Border>
-                <TextBlock Grid.Row="0" TextAlignment="Center" Padding="10, 10, 0, 5" Foreground="White" FontSize="18">
-                    Time Power
+                <TextBlock Grid.Row="0" TextAlignment="Center" Padding="10, 10, 0, 5" Foreground="White" FontSize="18" TextWrapping="Wrap">
+                    Electricity Consumption Minute Average
                 </TextBlock>
                 <TextBlock Grid.Row="1" TextAlignment="Center" Foreground="#59FFFFFF" Padding="0,0,0,20" Text="{Binding CurrentDate}"/> 
-                <Button Grid.Row="3" Width="40" Height="40" VerticalAlignment="Top" 
+                <!--<Button Grid.Row="3" Width="40" Height="40" VerticalAlignment="Top" 
                     HorizontalAlignment="Right" Margin="20, -20" Panel.ZIndex="1"
                     Command="{Binding ClickCommand}">
                     <Button.Template>
@@ -197,29 +197,32 @@
                             </Grid>
                         </ControlTemplate>
                     </Button.Template>
-                </Button>
+                </Button>-->
                 <lvc:CartesianChart Name="TimePowerChart"
                                     Grid.Row="2"
                                     Margin="10, 0, 10, 20" 
                                     Hoverable="False"
                                     DataTooltip="{x:Null}">
                     <lvc:CartesianChart.Series>
-                        <lvc:ColumnSeries Values="{Binding Column10Series[0].Values}"/>
+                        <lvc:ColumnSeries Values="{Binding MinAvgSeries[0].Values}"/>
                     </lvc:CartesianChart.Series>
                     <lvc:CartesianChart.AxisX>
                         <lvc:Axis Title="Time"
-                          LabelFormatter="{Binding XFormatter}"
+                          LabelFormatter="{Binding MinAvgXFormatter}"
                           MinValue="0"
                           MaxValue="10"/>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis />
+                        <lvc:Axis Title="kWh"
+                                  MinValue="0"
+                                  MaxValue="{Binding MinuteAvgMaxY}"
+                                  LabelFormatter="{Binding MinAvgYFormatter}"/>
                     </lvc:CartesianChart.AxisY>
                 </lvc:CartesianChart>
                 <StackPanel Grid.Row="3" VerticalAlignment="Center" Margin="25, 0">
-                    <TextBlock Opacity=".4" FontSize="13">The Last 12 hours average <LineBreak /> Electricity Consumption</TextBlock>
+                    <TextBlock Opacity=".4" FontSize="13">The last 10 minutes average <LineBreak /> Electricity Consumption</TextBlock>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="#303030" FontSize="22" Text="20.45" />
+                        <TextBlock Foreground="#303030" FontSize="22" Text="{Binding TenMinuteAvgString}" />
                         <TextBlock Foreground="#303030" FontSize="10" VerticalAlignment="Bottom" Margin="8, 6">kWh</TextBlock>
                     </StackPanel>
                 </StackPanel>

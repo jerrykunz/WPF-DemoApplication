@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using DemoAppDatabase.Model;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
@@ -30,6 +32,21 @@ namespace DemoAppDatabase
             }
         }
 
+        public IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end)
+        {
+            var query = @"SELECT Time, Value
+                        FROM EnergyMinAvg
+                        WHERE Time >= @Start
+                        AND TIME <= @End";
+
+            using (var conn = StatsSqLiteDbConnection())
+            {
+                conn.Open();
+                var parameters = new { Start = start, End = end };
+                var result = conn.Query<EnergyMinAvgRecord>(query, parameters);
+                return result;
+            }
+        }
 
 
 
@@ -57,7 +74,7 @@ namespace DemoAppDatabase
             }
             
             string success, failed;
-            bool? dbRecreateSuccess = CheckAndFixStatsDatabase(out success, out failed);
+            bool? dbRecreateSuccess = CreateOrFixStatsDatabase(out success, out failed);
 
             if (dbRecreateSuccess == true)
             {
@@ -78,7 +95,7 @@ namespace DemoAppDatabase
             }
         }
 
-        public static bool? CheckAndFixStatsDatabase(out string recreatedTables, out string recreatedTablesFailed)
+        public static bool? CreateOrFixStatsDatabase(out string recreatedTables, out string recreatedTablesFailed)
         {
             bool? recreationSuccessful = null;
 

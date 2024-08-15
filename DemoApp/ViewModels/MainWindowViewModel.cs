@@ -562,9 +562,18 @@ namespace DemoApp.ViewModels
                     _windowLeft = Application.Current.MainWindow.Left;
                     _windowWidth = Application.Current.MainWindow.Width;
                     _windowHeight = Application.Current.MainWindow.Height;
+                    
+                    //Window.BorderThickness = new Thickness(8);
+                    //Application.Current.MainWindow.WindowState = WindowState.Maximized;
 
-                    Window.BorderThickness = new Thickness(8);
+
+                    System.Drawing.Rectangle rec = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(Application.Current.MainWindow).Handle).WorkingArea;
+                    //Application.Current.MainWindow.PointFromScreen(new Point(0, 0));
+                    Application.Current.MainWindow.MaxHeight = rec.Height;
+                    Application.Current.MainWindow.MaxWidth = rec.Width;
+                    Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
                     Application.Current.MainWindow.WindowState = WindowState.Maximized;
+
 
                     CornerRadius = _maximizedCornerRadius;
                     break;

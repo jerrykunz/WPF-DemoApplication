@@ -1,5 +1,6 @@
 ﻿using DemoApp.Id;
 using DemoAppDatabase;
+using DemoAppDatabase.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,26 @@ namespace DemoApp.Databases
 
             _mutex.ReleaseMutex();
             return success;
+        }
+
+        public IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end)
+        {
+            _mutex.WaitOne();
+
+            var db = new DapperConnector();
+
+            List<EnergyMinAvgRecord> records = new List<EnergyMinAvgRecord>();
+            try
+            {
+                records = db.GetEnergyMinAvg(start, end).ToList();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't get EnergyMinAvg between: " + start.ToString() + " and " + end.ToString(), ex);
+            }
+
+            _mutex.ReleaseMutex();
+            return records;
         }
     }
 }

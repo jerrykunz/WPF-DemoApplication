@@ -1,5 +1,6 @@
 ﻿using DemoApp.Databases;
 using DemoApp.Id;
+using DemoAppDatabase.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace DemoApp.Services
             return default;
         }
 
-        public bool AddOrUpdateEnergyMinAvg(DateTime timestamp, double average)
+        public void AddOrUpdateEnergyMinAvg(DateTime timestamp, double average)
         {
             try
             {
@@ -51,12 +52,17 @@ namespace DemoApp.Services
             catch (Exception ex)
             {
                 log.Error(ex);
-                return false;
             }
-
-            return true;
         }
 
-       
+        public IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end)
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return Databases[DatabaseNames.SQLite].GetEnergyMinAvg(start, end);
+            }
+
+            return new List<EnergyMinAvgRecord>();
+        }
     }
 }
