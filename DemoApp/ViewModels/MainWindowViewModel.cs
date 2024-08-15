@@ -156,6 +156,39 @@ namespace DemoApp.ViewModels
 
         #endregion
 
+        #region Cursors
+
+        private Cursor _cursorNWSE;
+        public Cursor CursorNWSE
+        {
+            get { return _cursorNWSE; }
+            set { _cursorNWSE = value; OnPropertyChanged(nameof(CursorNWSE)); }
+        }
+
+        private Cursor _cursorNESW;
+        public Cursor CursorNESW
+        {
+            get { return _cursorNESW; }
+            set { _cursorNESW = value; OnPropertyChanged(nameof(CursorNESW)); }
+        }
+
+        private Cursor _cursorNS;
+        public Cursor CursorNS
+        {
+            get { return _cursorNS; }
+            set { _cursorNS = value; OnPropertyChanged(nameof(CursorNS)); }
+        }
+
+        private Cursor _cursorWE;
+        public Cursor CursorWE
+        {
+            get { return _cursorWE; }
+            set { _cursorWE = value; OnPropertyChanged(nameof(CursorWE)); }
+        }
+
+
+        #endregion
+
         //private IResourceManager _resourceManager;
         //private LogSender _logSender;
 
@@ -433,6 +466,11 @@ namespace DemoApp.ViewModels
 
             //Vm and view init
 
+            CursorNS = Cursors.SizeNS;
+            CursorWE = Cursors.SizeWE;
+            CursorNWSE = Cursors.SizeNWSE;
+            CursorNESW = Cursors.SizeNESW;
+
             Maximized = Application.Current.MainWindow.WindowState == WindowState.Maximized;
             _navigator.ChangeViewModel<InitViewModel>(true, true);
         }
@@ -552,6 +590,11 @@ namespace DemoApp.ViewModels
                     Application.Current.MainWindow.Width = _windowWidth;
                     Application.Current.MainWindow.Height = _windowHeight;
 
+                    CursorNS = Cursors.SizeNS;
+                    CursorWE = Cursors.SizeWE;
+                    CursorNWSE = Cursors.SizeNWSE;
+                    CursorNESW = Cursors.SizeNESW;
+
                     Window.BorderThickness = new Thickness(0);
                     Application.Current.MainWindow.WindowState = WindowState.Normal;
 
@@ -562,7 +605,12 @@ namespace DemoApp.ViewModels
                     _windowLeft = Application.Current.MainWindow.Left;
                     _windowWidth = Application.Current.MainWindow.Width;
                     _windowHeight = Application.Current.MainWindow.Height;
-                    
+
+                    CursorNS = Cursors.Arrow;
+                    CursorWE = Cursors.Arrow;
+                    CursorNWSE = Cursors.Arrow;
+                    CursorNESW = Cursors.Arrow;
+
                     //Window.BorderThickness = new Thickness(8);
                     //Application.Current.MainWindow.WindowState = WindowState.Maximized;
 
