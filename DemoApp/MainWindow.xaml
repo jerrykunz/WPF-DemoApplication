@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:country="clr-namespace:CountryFlag;assembly=CountryFlag"
         xmlns:custom="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI"
         xmlns:local="clr-namespace:DemoApp"
         mc:Ignorable="d"
@@ -349,6 +350,7 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
                                         <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
                                     <CheckBox x:Name="cbToggleMenu" Grid.Column="0" IsChecked="True">
@@ -371,6 +373,61 @@
                                                FontSize="18"
                                                Foreground="White"
                                                Text="Demo Application" />
+                                    
+                                    
+                                    <ComboBox Grid.Column="2"
+                                              Foreground="White"
+                                              HorizontalAlignment="Right"
+                                              ItemsSource="{Binding LanguageItems}"
+                                              SelectedItem="{Binding SelectedLanguageItem}"
+                                              Margin="0"
+                                              Style="{DynamicResource ComboBoxFlatStyle}">
+
+                                        <ComboBox.ItemContainerStyle>
+                                            <Style TargetType="ComboBoxItem">
+                                                <!-- Default Text Color -->
+                                                <Setter Property="Foreground" Value="Black"/>
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <!-- Trigger to Change Text Color When Selected -->
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsSelected" Value="False">
+                                                        <Setter Property="Foreground" Value="Black"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ComboBox.ItemContainerStyle>
+
+                                        
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>                                                
+                                                <StackPanel Orientation="Horizontal">
+                                                    <!--<Image Source="pack://siteoforigin:,,,/Images/Flags/Circle/fi.png"
+                                                           Width="30"
+                                                           Height="30"
+                                                           Margin="0 0 5 0"/>-->
+                                                    <Ellipse Width="30"
+                                                             Height="30"
+                                                             Margin="0 0 5 0"
+                                                             Stroke="Black"
+                                                             StrokeThickness="0.35">
+                                                        <Ellipse.Fill>
+                                                            <ImageBrush Stretch="Uniform" ImageSource="pack://siteoforigin:,,,/Images/Flags/Square/gb.png"/>
+                                                        </Ellipse.Fill>
+                                                    </Ellipse>
+                                                    <TextBlock Text="{Binding Language}"
+                                                               Margin="0"
+                                                               Padding="0 1 0 0"
+                                                               Height="20"
+                                                               VerticalAlignment="Center" 
+                                                               HorizontalAlignment="Left"
+                                                               TextAlignment="Center"/>
+                                                </StackPanel>                                               
+                                            </DataTemplate>                                            
+                                        </ComboBox.ItemTemplate>
+                                        
+                                        
+                                    </ComboBox>
+                                    
                                 </Grid>
                             </Border>
 

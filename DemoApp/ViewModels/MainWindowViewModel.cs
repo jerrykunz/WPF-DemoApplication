@@ -1,7 +1,9 @@
-﻿using DemoApp.Services;
+﻿using DemoApp.Model;
+using DemoApp.Services;
 using DemoApp.Stores;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -188,6 +190,9 @@ namespace DemoApp.ViewModels
 
 
         #endregion
+
+        public ObservableCollection<LanguageItem> LanguageItems { get; private set; }
+        public LanguageItem SelectedLanguageItem { get; set; }
 
         //private IResourceManager _resourceManager;
         //private LogSender _logSender;
@@ -425,6 +430,13 @@ namespace DemoApp.ViewModels
             //Set style test
             App.Instance.SwitchStyle("default");
 
+
+            LanguageItems = new ObservableCollection<LanguageItem>
+            {
+                new LanguageItem { Code = "FI", Language = "FI"},
+                new LanguageItem { Code = "GB", Language = "EN"}
+            };
+            SelectedLanguageItem = LanguageItems[0];
 
             ////Set theme
             //if (Settings.Preferences.Default.ThemesUseCustom &&
