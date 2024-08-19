@@ -433,8 +433,9 @@ namespace DemoApp.ViewModels
 
             LanguageItems = new ObservableCollection<LanguageItem>
             {
-                new LanguageItem { Code = "FI", Language = "FI"},
-                new LanguageItem { Code = "GB", Language = "EN"}
+                new LanguageItem { Code = "en-GB", Name = "EN", FlagPath = "pack://siteoforigin:,,,/Images/Flags/Square/gb.png"},
+                new LanguageItem { Code = "fi-FI", Name = "FI", FlagPath = "pack://siteoforigin:,,,/Images/Flags/Square/fi.png"},
+                new LanguageItem { Code = "jp-JP", Name = "JP", FlagPath = "pack://siteoforigin:,,,/Images/Flags/Square/jp.png"},
             };
             SelectedLanguageItem = LanguageItems[0];
 

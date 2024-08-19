@@ -19,7 +19,7 @@
         <KeyBinding Modifiers="Alt" Key="F4" Command="{Binding ExitCommand}" />
         <KeyBinding Modifiers="Alt" Key="Enter" Command="{Binding FullScreenCommand}" />
     </Window.InputBindings>
-    
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="PreviewTouchDown">
             <i:InvokeCommandAction Command="{Binding MouseDownCommand}" />
@@ -55,19 +55,21 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border BorderThickness="0"
+        <Border BorderThickness="0" 
                 Grid.RowSpan="2"
                 CornerRadius="{Binding CornerRadius}"
                  Background="{DynamicResource WindowBackGround}" >
+            
+            <!--Moved between window controls-->
             <!--Double click to maximize/normalize-->
-            <i:Interaction.Triggers>
+            <!--<i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDown">
                     <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
                 </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeftButtonDown">
+                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                     <i:InvokeCommandAction Command="{Binding BorderMouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
                 </i:EventTrigger>
-            </i:Interaction.Triggers>
+            </i:Interaction.Triggers>-->
             <!--Double click to maximize/normalize end-->
 
 
@@ -121,7 +123,7 @@
                                 IsHitTestVisible="True"
                                 Margin="5, 0"/>
                     </Grid>
-                    
+
                     <Border x:Name="TopLeft" Grid.Row="1" Grid.Column="1" Cursor="{Binding CursorNWSE}" Background="Transparent">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDown">
@@ -217,12 +219,42 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+                   
 
                     <!--Window Controls-->
                     <Grid Grid.Row="0">
-                       
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+
+                            <Rectangle Grid.RowSpan="2" Grid.Row="1" Fill="Transparent"  Grid.Column="1">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction Command="{Binding BorderMouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Rectangle>
+                        </Grid>
+                        
+                        
+
+
                         <!--Main menu-->
-                        <Menu Margin="10 10 0 0"
+                        <Menu Margin="10 10 0 0" Grid.Column="0"
                           Background="{DynamicResource WindowBackGround}" 
                           BorderThickness="0"
                           HorizontalAlignment="Left"
@@ -241,9 +273,9 @@
                         <!--Main menu end-->
 
                         <!--Window controls-->
-                        <Grid Margin="0 10 10 0"
-                        VerticalAlignment="Top"
-                          HorizontalAlignment="Right">
+                        <Grid Margin="0 10 10 0" Grid.Column="2"
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Right">
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -338,7 +370,7 @@
 
                             <Border Margin="0 10 0 0"
                                     Grid.Row="0"
-                                    Padding="20"
+                                    Padding="20 10 0 10"
                                     CornerRadius="25 25 25 0">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -369,65 +401,99 @@
                                     </CheckBox>
 
                                     <TextBlock Grid.Column="1"
-                                               Margin="20 0 0 0"
+                                               Margin="20 5 0 0"
                                                FontSize="18"
                                                Foreground="White"
                                                Text="Demo Application" />
-                                    
-                                    
-                                    <ComboBox Grid.Column="2"
+
+
+
+
+                                    <Grid Grid.Column="2" HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Icon:PackIconRemixIcon Grid.Column="0"
+                                                                    Margin="5 0 15 0"
+                                                                Padding="0 0 0 4"
+                                                Foreground="White" 
+                                                               Height="25"
+                                                               Width="25"
+                                                   Kind="FontSize"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   />
+
+
+
+                                        <ComboBox Grid.Column="1"
                                               Foreground="White"
                                               HorizontalAlignment="Right"
                                               ItemsSource="{Binding LanguageItems}"
                                               SelectedItem="{Binding SelectedLanguageItem}"
-                                              Margin="0"
+                                              Margin="10 0"
                                               Style="{DynamicResource ComboBoxFlatStyle}">
 
-                                        <ComboBox.ItemContainerStyle>
-                                            <Style TargetType="ComboBoxItem">
-                                                <!-- Default Text Color -->
-                                                <Setter Property="Foreground" Value="Black"/>
-                                                <Setter Property="Background" Value="Transparent"/>
-                                                <!-- Trigger to Change Text Color When Selected -->
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsSelected" Value="False">
-                                                        <Setter Property="Foreground" Value="Black"/>
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ComboBox.ItemContainerStyle>
+                                            <ComboBox.ItemContainerStyle>
+                                                <Style TargetType="ComboBoxItem">
+                                                    <!-- Default Text Color -->
+                                                    <Setter Property="Foreground" Value="Black"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <!-- Trigger to Change Text Color When Selected -->
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsSelected" Value="False">
+                                                            <Setter Property="Foreground" Value="Black"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ComboBox.ItemContainerStyle>
 
-                                        
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>                                                
-                                                <StackPanel Orientation="Horizontal">
-                                                    <!--<Image Source="pack://siteoforigin:,,,/Images/Flags/Circle/fi.png"
-                                                           Width="30"
-                                                           Height="30"
-                                                           Margin="0 0 5 0"/>-->
-                                                    <Ellipse Width="30"
+
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+
+
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Ellipse Grid.Column="0"
+                                                                 SnapsToDevicePixels="True"
+                                                                 RenderOptions.BitmapScalingMode="HighQuality"
+                                                             Width="30"
                                                              Height="30"
-                                                             Margin="0 0 5 0"
+                                                             Margin="0 0 3 0"
                                                              Stroke="Black"
                                                              StrokeThickness="0.35">
-                                                        <Ellipse.Fill>
-                                                            <ImageBrush Stretch="Uniform" ImageSource="pack://siteoforigin:,,,/Images/Flags/Square/gb.png"/>
-                                                        </Ellipse.Fill>
-                                                    </Ellipse>
-                                                    <TextBlock Text="{Binding Language}"
-                                                               Margin="0"
-                                                               Padding="0 1 0 0"
+                                                            <Ellipse.Fill>
+                                                                <!--<ImageBrush Stretch="Uniform" ImageSource="pack://siteoforigin:,,,/Images/Flags/Square/gb.png"/>-->
+                                                                <ImageBrush Stretch="Uniform" ImageSource="{Binding FlagPath}" />
+                                                            </Ellipse.Fill>
+                                                        </Ellipse>
+                                                        <TextBlock Grid.Column="1"
+                                                        Text="{Binding Name}"
+                                                               FontSize="18"
+                                                               Margin="0 0 0 5.5"
+                                                               Padding="0"
+                                                               Width="32"
                                                                Height="20"
                                                                VerticalAlignment="Center" 
-                                                               HorizontalAlignment="Left"
+                                                               HorizontalAlignment="Center"
                                                                TextAlignment="Center"/>
-                                                </StackPanel>                                               
-                                            </DataTemplate>                                            
-                                        </ComboBox.ItemTemplate>
-                                        
-                                        
-                                    </ComboBox>
-                                    
+                                                    </Grid>
+
+
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+
+                                        </ComboBox>
+                                    </Grid>
+
+
+
                                 </Grid>
                             </Border>
 
@@ -504,7 +570,7 @@
                                         </StackPanel>
                                     </custom:NavigationPanel.Content>
                                 </custom:NavigationPanel>
-                                
+
                                 <ContentControl Grid.Column="1"
                                                 Content="{Binding CurrentView}">
                                     <i:Interaction.Triggers>
@@ -516,29 +582,29 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </ContentControl>
-                                
+
                             </Grid>
                         </Grid>
 
                     </Grid>
                     <!--Content End-->
-                    
+
                 </Grid>
 
             </Grid>
         </Border>
-     
+
 
     </Grid>
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
+
+
+
+
+
+
+
+
+
+
 </Window>

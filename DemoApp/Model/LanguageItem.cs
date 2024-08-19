@@ -8,7 +8,8 @@ namespace DemoApp.Model
 {
     public class LanguageItem
     {
-        public string Code { get; set; } // ISO 3166-1 Alpha-2 country code
-        public string Language { get; set; }
+        public string Code { get; set; }         
+        public string FlagPath { get; set; }
+        public string Name { get; set; }
     }
 }
