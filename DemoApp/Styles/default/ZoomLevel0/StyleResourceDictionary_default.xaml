@@ -389,6 +389,8 @@
                         Value="0" />
         <Setter Property="IsHitTestVisible"
                         Value="False" />
+        <Setter Property="FocusVisualStyle"
+                        Value="{x:Null}" />
     </Style>
 
     <ControlTemplate x:Key="NoMouseOverButtonTemplate"   

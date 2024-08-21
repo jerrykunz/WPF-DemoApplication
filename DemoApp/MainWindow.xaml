@@ -233,12 +233,12 @@
                         <Grid Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="4"/>
-                                <RowDefinition Height="4"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
 
-                            <Rectangle Grid.RowSpan="2" Grid.Row="1" Fill="Transparent"  Grid.Column="1">
+                            <Rectangle Grid.Row="1" 
+                                       Fill="Transparent">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseDown">
                                         <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
@@ -414,7 +414,24 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <Icon:PackIconRemixIcon Grid.Column="0"
+
+                                        <Button Grid.Column="0"
+                                                Command="{Binding ZoomCommand}"
+                                                Style="{DynamicResource InvisibleButton}"
+                                                Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                IsHitTestVisible="True"
+                                                Margin="5, 0 15 0">                                            
+                                            <Icon:PackIconRemixIcon Grid.Column="0"
+                                                                    Padding="0 0 0 4"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="FontSize"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                        </Button>
+
+                                        <!--<Icon:PackIconRemixIcon Grid.Column="0"
                                                                     Margin="5 0 15 0"
                                                                 Padding="0 0 0 4"
                                                 Foreground="White" 
@@ -423,7 +440,7 @@
                                                    Kind="FontSize"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"
-                                                   />
+                                                   />-->
 
 
 

@@ -156,6 +156,8 @@ namespace DemoApp.ViewModels
         public double Width { get; private set; }
         public double Height { get; private set; }
 
+        private bool _fullScreen;
+        private WindowState _prevToFullscreenState;
         #endregion
 
         #region Cursors
@@ -394,6 +396,19 @@ namespace DemoApp.ViewModels
             }
         }
 
+        private ICommand _zoomCommand;
+        public ICommand ZoomCommand
+        {
+            get
+            {
+                if (_zoomCommand == null)
+                {
+                    _zoomCommand = new DelegateCommand(Zoom);
+                }
+                return _zoomCommand;
+            }
+        }
+
         #endregion
 
         public MainWindowViewModel(INavigator navigator,
@@ -409,6 +424,9 @@ namespace DemoApp.ViewModels
             _maximizedCornerRadius = 0;
             _normalCornerRadius = 25;
             CornerRadius = _normalCornerRadius;
+
+            _fullScreen = false;
+            _prevToFullscreenState = App.Instance.MainWindow.WindowState;
 
             _navigator = navigator;
             _navigationStore = navigationStore;
@@ -571,20 +589,100 @@ namespace DemoApp.ViewModels
 
         public void FullScreen()
         {
-            switch (Application.Current.MainWindow.WindowState)
+           
+            if (!_fullScreen)
             {
-                case WindowState.Minimized:
-                case WindowState.Normal:
-                    log.Info("Alt+Enter pressed, switching to fullscreen");
-                    ToggleMaximize();
-                    Application.Current.MainWindow.Topmost = true;
-                    break;
+                _fullScreen = true;
+                _prevToFullscreenState = App.Instance.MainWindow.WindowState;
+                Application.Current.MainWindow.Topmost = true;
+                log.Info("Alt+Enter pressed, switching to fullscreen");
+                switch (Application.Current.MainWindow.WindowState)
+                {
+                    case WindowState.Normal:
+                        {
+                            _windowTop = Application.Current.MainWindow.Top;
+                            _windowLeft = Application.Current.MainWindow.Left;
+                            _windowWidth = Application.Current.MainWindow.Width;
+                            _windowHeight = Application.Current.MainWindow.Height;
 
-                case WindowState.Maximized:
-                    log.Info("Alt+Enter pressed, switching to normal size");
-                    ToggleMaximize();
-                    break;
+                            CursorNS = Cursors.Arrow;
+                            CursorWE = Cursors.Arrow;
+                            CursorNWSE = Cursors.Arrow;
+                            CursorNESW = Cursors.Arrow;
+
+                            System.Windows.Forms.Screen screen = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(Application.Current.MainWindow).Handle);
+
+                            Application.Current.MainWindow.MaxHeight = screen.Bounds.Height;
+                            Application.Current.MainWindow.MaxWidth = screen.Bounds.Width;
+                            Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
+                            Application.Current.MainWindow.WindowState = WindowState.Maximized;
+
+                            CornerRadius = _maximizedCornerRadius;
+                        }
+                        break;
+
+                    case WindowState.Maximized:
+                        {
+                            //otherwise can't change width/height properly
+                            Application.Current.MainWindow.WindowState = WindowState.Normal;
+
+                            CursorNS = Cursors.Arrow;
+                            CursorWE = Cursors.Arrow;
+                            CursorNWSE = Cursors.Arrow;
+                            CursorNESW = Cursors.Arrow;
+
+                            System.Windows.Forms.Screen screen = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(Application.Current.MainWindow).Handle);
+
+                            Application.Current.MainWindow.MaxHeight = screen.Bounds.Height;
+                            Application.Current.MainWindow.Height = screen.Bounds.Height;
+                            Application.Current.MainWindow.MaxWidth = screen.Bounds.Width;
+                            Application.Current.MainWindow.Width = screen.Bounds.Width;
+                            Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
+                            Application.Current.MainWindow.WindowState = WindowState.Maximized;
+
+                            CornerRadius = _maximizedCornerRadius;
+                        }
+                        break;
+                }
             }
+            else
+            {
+                _fullScreen = false;
+                Application.Current.MainWindow.Topmost = false;
+
+                switch (_prevToFullscreenState)
+                {
+                    case WindowState.Normal:
+                        Application.Current.MainWindow.Top = _windowTop;
+                        Application.Current.MainWindow.Left = _windowLeft;
+                        Application.Current.MainWindow.Width = _windowWidth;
+                        Application.Current.MainWindow.Height = _windowHeight;
+
+                        CursorNS = Cursors.SizeNS;
+                        CursorWE = Cursors.SizeWE;
+                        CursorNWSE = Cursors.SizeNWSE;
+                        CursorNESW = Cursors.SizeNESW;
+
+                        Window.BorderThickness = new Thickness(0);
+                        Application.Current.MainWindow.WindowState = WindowState.Normal;
+
+                        CornerRadius = _normalCornerRadius;
+
+                        break;
+
+                    case WindowState.Maximized:
+                        System.Drawing.Rectangle rec = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(Application.Current.MainWindow).Handle).WorkingArea;                        
+                        Application.Current.MainWindow.MaxHeight = rec.Height;
+                        Application.Current.MainWindow.MaxWidth = rec.Width;
+                        Application.Current.MainWindow.ResizeMode = ResizeMode.NoResize;
+                        Application.Current.MainWindow.WindowState = WindowState.Maximized;
+
+
+                        CornerRadius = _maximizedCornerRadius;
+                        break;
+                }
+            }
+            Maximized = Application.Current.MainWindow.WindowState == WindowState.Maximized;
         }
 
         public void Minimize()
@@ -598,6 +696,7 @@ namespace DemoApp.ViewModels
             switch(Application.Current.MainWindow.WindowState)
             {              
                 case WindowState.Maximized:
+                    _fullScreen = false;
                     Application.Current.MainWindow.Top = _windowTop;
                     Application.Current.MainWindow.Left = _windowLeft;
                     Application.Current.MainWindow.Width = _windowWidth;
@@ -655,14 +754,7 @@ namespace DemoApp.ViewModels
             e.Handled = true;
         }
 
-        public void BorderMouseDown(MouseButtonEventArgs e)
-        {
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                Application.Current.MainWindow.DragMove();
-            }            
-        }
+       
 
         private void Resize(MouseEventArgs e)
         {
@@ -895,12 +987,25 @@ namespace DemoApp.ViewModels
             element.MouseLeftButtonUp -= ResizeWindow_MouseLeftButtonUp;
         }
 
+        public void BorderMouseDown(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                Application.Current.MainWindow.DragMove();
+            }
+        }
+
         public void BorderMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
                 ToggleMaximize();
             }
+        }
+
+        public void Zoom()
+        {
+            App.Instance.ZoomStyle();
         }
         #endregion
     }
