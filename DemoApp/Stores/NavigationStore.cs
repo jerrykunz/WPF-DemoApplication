@@ -18,6 +18,10 @@ namespace DemoApp.Stores
     {
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public int NextIndex { get; set; }
+
+        public int Slots => 5;
+
         public event Action Changed;
 
         //whether new views and vms are created for each view change
@@ -49,6 +53,7 @@ namespace DemoApp.Stores
 
         public Type PreviousViewModelType { get; set; }
         public IViewModel CurrentViewModel { get; set; }
+        public Type CurrentViewModelType { get; set; }
         public IViewModel PreviousViewModel { get; set; }
        
         public UserControl CurrentView { get; set; }
@@ -61,7 +66,7 @@ namespace DemoApp.Stores
         #region Previous View Queue (Non-disposable views/vms)
         private readonly List<UserControl> _previousViews;
         private readonly int _previousViewsMaxSize;
-        public IReadOnlyCollection<UserControl> PreviousViews => _previousViews;
+        public List<UserControl> PreviousViews => _previousViews;
 
         public void AddToPreviousViewQueue(UserControl view)
         {
@@ -76,10 +81,29 @@ namespace DemoApp.Stores
 
         #endregion
 
+        #region Previous ViewModel Queue (Non-disposable views/vms)
+        private readonly List<IViewModel> _previousViewModels;
+        private readonly int _previousVmsMaxSize;
+        public List<IViewModel> PreviousViewModels => _previousViewModels;
+
+        public void AddToPreviousVmQueue(IViewModel viewModel)
+        {
+            _previousViewModels.Add(viewModel);
+
+            // If the queue exceeds the maximum size, remove the oldest item
+            if (_previousViewModels.Count > _previousVmsMaxSize)
+            {
+                _previousViewModels.RemoveAt(0);
+            }
+        }
+
+        #endregion
+
+
         #region Previous View Type Queue (Disposable views/vms)
         private readonly List<Type> _previousViewTypes;
         private readonly int _previousViewTypesMaxSize;
-        public IReadOnlyCollection<Type> PreviousViewTypes => _previousViewTypes;
+        public List<Type> PreviousViewTypes => _previousViewTypes;
 
         public void AddToPreviousViewTypeQueue(Type type)
         {
@@ -97,7 +121,7 @@ namespace DemoApp.Stores
         #region Previous View Name Queue (Disposable views/vms)
         private readonly List<string> _previousViewNames;
         private readonly int _previousViewNamesMaxSize;
-        public IReadOnlyCollection<string> PreviousViewNames => _previousViewNames;
+        public List<string> PreviousViewNames => _previousViewNames;
 
         public void AddToPreviousViewNameQueue(string name)
         {
@@ -112,35 +136,18 @@ namespace DemoApp.Stores
 
         #endregion
 
-        #region Previous ViewModel Queue (Non-disposable views/vms)
-        private readonly List<IViewModel> _previousViewModels;
-        private readonly int _previousVmsMaxSize;
-        public IReadOnlyCollection<IViewModel> PreviousViewModels => _previousViewModels;
-
-        public void AddToPreviousVmQueue(IViewModel viewModel)
-        {
-            _previousViewModels.Add(viewModel);
-
-            // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewModels.Count > _previousVmsMaxSize)
-            {
-                _previousViewModels.RemoveAt(0);
-            }
-        }
-
-        #endregion
-
         #region Previous ViewModel Type Queue (Disposable views/vms)
         private readonly List<Type> _previousViewModelTypes;
-        private readonly int _previousVmTypesMaxSize;
-        public IReadOnlyCollection<IViewModel> PreviousViewModelTypes => _previousViewModels;
+        public int PreviousVmTypesMaxSize { get; private set; }
+        public List<Type>PreviousViewModelTypes => _previousViewModelTypes;
+
 
         public void AddToPreviousVmTypeQueue(Type type)
         {
             _previousViewModelTypes.Add(type);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewModelTypes.Count > _previousVmTypesMaxSize)
+            if (_previousViewModelTypes.Count > PreviousVmTypesMaxSize)
             {
                 _previousViewModelTypes.RemoveAt(0);
             }
@@ -150,6 +157,8 @@ namespace DemoApp.Stores
 
         public NavigationStore()
         {
+            NextIndex = 0;
+
             MultiUseViewsAndVms = true;
             LooseViews = LooseViews.PerView; //true;
             _looseViewSubFolder = "default";
@@ -176,7 +185,7 @@ namespace DemoApp.Stores
             _previousViewModelTypes = new List<Type>();
 
             _previousVmsMaxSize = 5; //TODO: replace with settings
-            _previousVmTypesMaxSize = 5; //TODO: replace with settings
+            PreviousVmTypesMaxSize = 5; //TODO: replace with settings
 
             _previousViews = new List<UserControl>();
             _previousViewTypes = new List<Type>();

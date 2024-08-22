@@ -578,10 +578,10 @@
                                             <custom:NavigationPanelItem>
                                                 <TextBlock Text="Developer Guides" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding PreviousVmCommand}">
                                                 <TextBlock Text="Tutorials" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
                                                 <TextBlock Text="Reference" />
                                             </custom:NavigationPanelItem>
                                         </StackPanel>

@@ -17,6 +17,7 @@ namespace DemoApp.Services
         private delegate void PreviousVmDelegate(bool start, bool end, bool dispose);
         private delegate void ChangeVmDelegate(Type type, bool start, bool end, bool dispose);
         private delegate void ChangeVmDelegate<T>(bool start, bool end, bool dispose);
+        private delegate void ChangeVmIndexDelegate(int index, bool start, bool end, bool dispose);
         private delegate void ChangeViewDelegate(string name, bool start, bool end, bool dispose);
 
         public Navigator(INavigationStore navigationStore)
@@ -33,6 +34,11 @@ namespace DemoApp.Services
         public void ChangeViewModel<T>(bool onEnter, bool onExit) where T : class, IViewModel
         {
             ChangeViewModelInternal<T>(onEnter, onExit, false);
+        }
+
+        public void ChangeViewModelToIndex(int index, bool onEnter, bool onExit)
+        {
+            ChangeViewModelToIndexInternal(index, onEnter, onExit, false);
         }
 
         public void PreviousViewModel(bool onEnter, bool onExit)
@@ -118,39 +124,47 @@ namespace DemoApp.Services
 
             //Actual function
 
+            //If the index is not the last in the list, remove the ones before it
+            int previousVmTypesMaxIndex = _navigationStore.PreviousViewModelTypes.Count() - 1; //Math.Max(_navigationStore.PreviousViewModelTypes.Count() - 1, 0); //can't be less than zero
+            bool wasLatest = true;
+            if (_navigationStore.NextIndex <= previousVmTypesMaxIndex)
+            {
+                wasLatest = false;
+                for (int i = previousVmTypesMaxIndex; i >= _navigationStore.NextIndex; i--)
+                {
+                    _navigationStore.PreviousViewModelTypes.RemoveAt(i);
+                    _navigationStore.PreviousViewModels.RemoveAt(i);
+                    _navigationStore.PreviousViews.RemoveAt(i);
+                    _navigationStore.PreviousViewTypes.RemoveAt(i);
+                    _navigationStore.PreviousViewNames.RemoveAt(i);
+                }
+            }
+
+
             //set previous vm
             var previousViewModel = _navigationStore.CurrentViewModel;
+            var previousViewModelType = _navigationStore.CurrentViewModelType;
 
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
             var previousViewName = _navigationStore.CurrentViewName;
 
-            //if not the initial view/vm
-            if (previousViewModel != null)
+            //if this is null, everything else in that slot is too
+            if (previousViewModelType != null)
             {
+                //set previous view/vm types
+                _navigationStore.PreviousViewType = previousViewType;
+                _navigationStore.PreviousViewName = previousViewName;
+
                 //set previous views/vms (non-disposable only, otherwise the refs would stay and cause trouble)
                 if (!dispose)
                 {
                     _navigationStore.PreviousViewModel = previousViewModel;
-                    _navigationStore.AddToPreviousVmQueue(previousViewModel);
-
                     _navigationStore.PreviousView = previousView;
-                    _navigationStore.AddToPreviousViewQueue(previousView);
                 }
 
-                //set previous view/vm types
-                Type type = previousViewModel.GetType();
-                _navigationStore.PreviousViewModelType = type;
-                _navigationStore.AddToPreviousVmTypeQueue(type);
-
-                _navigationStore.PreviousViewType = previousViewType;
-                _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
-                _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
-
                 //vm exit script
-                //if navigator is used in onexits, there'll be trouble most likely
-                //onexit() could return new vm/view here and we could work it out, it would just change viewmodeltype
                 if (onExit)
                 {
                     previousViewModel.OnExit();
@@ -168,28 +182,51 @@ namespace DemoApp.Services
             }
 
             //get new vm
-            //_navigationStore.CurrentViewModel = _navigationStore.GetViewModel(viewModelType); //(IViewModel)Activator.CreateInstance(viewModelType);
             var newViewModel = _navigationStore.GetViewModel(viewModelType);
-            _navigationStore.CurrentViewModel = newViewModel; //_navigationStore.GetViewModel(typeof(T));
+
+            //set current vms
+            _navigationStore.CurrentViewModel = newViewModel;
+            _navigationStore.CurrentViewModelType = viewModelType;
 
             //get new view and set datacontext to new vm
-            UserControl newView = _navigationStore.GetViewByVm(viewModelType);
+            var newView = _navigationStore.GetViewByVm(viewModelType);
 
+            //if disposing, these queues are ignored
+            if (!dispose)
+            {
+                if (wasLatest)
+                {
+                    _navigationStore.AddToPreviousVmQueue(newViewModel);
+                    _navigationStore.AddToPreviousViewQueue(newView);
+                }
+            }
+
+            //set current views
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
 
-            //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
             Type currentViewType = null;
             _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
-
             _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
+
+            if (wasLatest)
+            {
+                _navigationStore.AddToPreviousVmTypeQueue(viewModelType);
+                _navigationStore.AddToPreviousViewTypeQueue(_navigationStore?.CurrentViewType);
+                _navigationStore.AddToPreviousViewNameQueue(_navigationStore?.CurrentViewName ?? _navigationStore?.CurrentViewType?.Name);
+            }
+
+            //we were not latest in the queue
+            if (wasLatest)
+            {
+                _navigationStore.NextIndex = Math.Min(_navigationStore.NextIndex + 1, _navigationStore.Slots);
+            }
 
             //loads new view to screen
             _navigationStore.RaiseChanged();
 
             //vm entry script
-            //I think you could use navigator in these and not be in trouble
             if (onEnter)
             {
                 _navigationStore.CurrentViewModel.OnEnter();
@@ -216,34 +253,45 @@ namespace DemoApp.Services
 
             //Actual function
 
+            //If the index is not the last in the list, remove the ones before it
+            int previousVmTypesMaxIndex = _navigationStore.PreviousViewModelTypes.Count() - 1; //Math.Max(_navigationStore.PreviousViewModelTypes.Count() - 1, 0); //can't be less than zero
+            bool wasLatest = true;
+            if (_navigationStore.NextIndex <= previousVmTypesMaxIndex)
+            {
+                wasLatest = false;
+                for (int i = previousVmTypesMaxIndex; i >= _navigationStore.NextIndex; i--)
+                {
+                    _navigationStore.PreviousViewModelTypes.RemoveAt(i);
+                    _navigationStore.PreviousViewModels.RemoveAt(i);
+                    _navigationStore.PreviousViews.RemoveAt(i);
+                    _navigationStore.PreviousViewTypes.RemoveAt(i);
+                    _navigationStore.PreviousViewNames.RemoveAt(i);
+                }
+            }
+
+
             //set previous vm
             var previousViewModel = _navigationStore.CurrentViewModel;
+            var previousViewModelType = _navigationStore.CurrentViewModelType;
 
             //set previous view & type
             var previousView = _navigationStore.CurrentView;
             var previousViewType = _navigationStore.CurrentViewType;
             var previousViewName = _navigationStore.CurrentViewName;
 
-            if (previousViewModel != null)
+            //if this is null, everything else in that slot is too
+            if (previousViewModelType != null)
             {
+                //set previous view/vm types
+                _navigationStore.PreviousViewType = previousViewType;
+                _navigationStore.PreviousViewName = previousViewName;
+
                 //set previous views/vms (non-disposable only, otherwise the refs would stay and cause trouble)
                 if (!dispose)
                 {
                     _navigationStore.PreviousViewModel = previousViewModel;
-                    _navigationStore.AddToPreviousVmQueue(previousViewModel);
-
-                    _navigationStore.PreviousView = previousView;
-                    _navigationStore.AddToPreviousViewQueue(previousView);
+                    _navigationStore.PreviousView = previousView;   
                 }
-
-                //set previous view/vm types
-                Type type = previousViewModel.GetType();
-                _navigationStore.PreviousViewModelType = type;
-                _navigationStore.AddToPreviousVmTypeQueue(type);
-
-                _navigationStore.PreviousViewType = previousViewType;
-                _navigationStore.AddToPreviousViewTypeQueue(previousViewType);
-                _navigationStore.AddToPreviousViewNameQueue(previousViewName ?? previousViewType.Name);
 
                 //vm exit script
                 if (onExit)
@@ -261,21 +309,141 @@ namespace DemoApp.Services
                     previousViewModel.Dispose();
                 }
             }
+
             //get new vm
             var newViewModel = _navigationStore.GetViewModel(typeof(T));
-            _navigationStore.CurrentViewModel = newViewModel; //_navigationStore.GetViewModel(typeof(T));
 
-            //get new view and set datacontext to new vm
-            var newView = _navigationStore.GetViewByVm(typeof(T));
+            //set current vms
+            _navigationStore.CurrentViewModel = newViewModel; 
+            _navigationStore.CurrentViewModelType = typeof(T);
 
+           //get new view and set datacontext to new vm
+           var newView = _navigationStore.GetViewByVm(typeof(T));
+
+            //if disposing, these queues are ignored
+            if (!dispose)
+            {
+                if (wasLatest)
+                {
+                    _navigationStore.AddToPreviousVmQueue(newViewModel);
+                    _navigationStore.AddToPreviousViewQueue(newView);
+                }
+            }
+
+            //set current views
             newView.DataContext = _navigationStore.CurrentViewModel;
             _navigationStore.CurrentView = newView;
 
-            //_navigationStore.CurrentViewType = _navigationStore.ViewsByVM[newViewModel.GetType()];
             Type currentViewType = null;
             _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModel.GetType(), out currentViewType);
             _navigationStore.CurrentViewType = currentViewType;
             _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModel.GetType()];
+
+            if (wasLatest)
+            {
+                _navigationStore.AddToPreviousVmTypeQueue(typeof(T));
+                _navigationStore.AddToPreviousViewTypeQueue(_navigationStore?.CurrentViewType);
+                _navigationStore.AddToPreviousViewNameQueue(_navigationStore?.CurrentViewName ?? _navigationStore?.CurrentViewType?.Name);
+            }
+
+            //we were not latest in the queue
+            if (wasLatest)
+            {
+                _navigationStore.NextIndex = Math.Min(_navigationStore.NextIndex + 1, _navigationStore.Slots);
+            }
+
+            //loads new view to screen
+            _navigationStore.RaiseChanged();
+
+            //vm entry script
+            if (onEnter)
+            {
+                _navigationStore.CurrentViewModel.OnEnter();
+            }
+            else
+            {
+                _navigationStore.CurrentViewModel.OnEnterSoft();
+            }
+        }
+
+        private void ChangeViewModelToIndexInternal(int index, bool onEnter, bool onExit, bool dispose)
+        {
+            var test = _navigationStore.PreviousViewModelTypes;
+
+            //set within limits
+            int maxIndex = _navigationStore.PreviousViewModelTypes.Count() - 1; //_navigationStore.Slots - 1;
+            index = Math.Min(Math.Max(index, 0), maxIndex);
+
+            //nothing to do
+            if (index == _navigationStore.NextIndex - 1)
+                return;
+
+            var threadApartment = System.Threading.Thread.CurrentThread.GetApartmentState();
+
+            //if UI thread, do task in new thread
+            if (threadApartment != System.Threading.ApartmentState.STA)
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                                System.Windows.Threading.DispatcherPriority.Normal,
+                                new ChangeVmIndexDelegate(this.ChangeViewModelToIndexInternal),
+                                index, onEnter, onExit, dispose);
+                return;
+            }
+
+            //Actual function         
+
+            _navigationStore.PreviousViewModelType = _navigationStore.CurrentViewModelType;
+
+            //set previous vm
+            _navigationStore.PreviousViewModel = _navigationStore.CurrentViewModel;
+
+            //set previous view
+            _navigationStore.PreviousView = _navigationStore.CurrentView;
+            
+
+            _navigationStore.PreviousViewType = _navigationStore.CurrentViewType;
+            _navigationStore.PreviousViewName = _navigationStore.CurrentViewName;
+
+
+            //vm exit script
+            if (onExit)
+            {
+                _navigationStore.PreviousViewModel.OnExit();
+            }
+            else
+            {
+                _navigationStore.PreviousViewModel.OnExitSoft();
+            }
+
+            //dispose previous vm if applicable
+            if (dispose)
+            {
+                _navigationStore.PreviousViewModel.Dispose();
+                _navigationStore.PreviousViewModel = null;
+                _navigationStore.PreviousView = null;
+            }
+
+            //create new vm
+            //previous vm = new vm
+            _navigationStore.NextIndex = index + 1;
+            var newViewModelType = _navigationStore.PreviousViewModelTypes[index];
+
+            var newViewModel = _navigationStore.GetViewModel(newViewModelType);
+            _navigationStore.CurrentViewModel = newViewModel;
+
+
+            //create new view and set datacontext to new vm
+            var newView = _navigationStore.GetViewByVm(newViewModelType);
+
+            newView.DataContext = _navigationStore.CurrentViewModel;
+            _navigationStore.CurrentView = newView;
+
+            //set current view type and name
+            Type currentViewType = null;
+            _navigationStore.ViewTypeByViewModelType.TryGetValue(newViewModelType, out currentViewType);
+            _navigationStore.CurrentViewType = currentViewType;
+
+            _navigationStore.CurrentViewName = _navigationStore.ViewNamesByVM[newViewModelType];
 
             //loads new view to screen
             _navigationStore.RaiseChanged();

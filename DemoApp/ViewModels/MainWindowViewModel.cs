@@ -50,12 +50,12 @@ namespace DemoApp.ViewModels
             private set { _navigationStore.CurrentViewModel = value; OnPropertyChanged(nameof(CurrentViewModel)); }
         }
 
-        public IReadOnlyCollection<IViewModel> PreviousViewModels
+        public List<IViewModel> PreviousViewModels
         {
             get { return _navigationStore.PreviousViewModels; }
         }
 
-        public IReadOnlyCollection<IViewModel> PreviousViewModelTypes
+        public List<Type> PreviousViewModelTypes
         {
             get { return _navigationStore.PreviousViewModelTypes; }
         }
@@ -406,6 +406,32 @@ namespace DemoApp.ViewModels
                     _zoomCommand = new DelegateCommand(Zoom);
                 }
                 return _zoomCommand;
+            }
+        }
+
+        private ICommand _previousVmCommand;
+        public ICommand PreviousVmCommand
+        {
+            get
+            {
+                if (_previousVmCommand == null)
+                {
+                    _previousVmCommand = new DelegateCommand(PreviousVm);
+                }
+                return _previousVmCommand;
+            }
+        }
+
+        private ICommand _nextVmCommand;
+        public ICommand NextVmCommand
+        {
+            get
+            {
+                if (_nextVmCommand == null)
+                {
+                    _nextVmCommand = new DelegateCommand(NextVm);
+                }
+                return _nextVmCommand;
             }
         }
 
@@ -1007,6 +1033,17 @@ namespace DemoApp.ViewModels
         {
             App.Instance.ZoomStyle();
         }
+
+        public void PreviousVm()
+        {
+            _navigator.ChangeViewModelToIndex(_navigationStore.NextIndex-2, true, true);
+        }
+
+        public void NextVm()
+        {
+            _navigator.ChangeViewModelToIndex(_navigationStore.NextIndex, true, true);
+        }
+
         #endregion
     }
 }

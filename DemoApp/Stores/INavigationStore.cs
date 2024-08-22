@@ -10,6 +10,11 @@ namespace DemoApp.Stores
 {
     public interface INavigationStore
     {
+        int NextIndex { get; set; }
+        int Slots { get; }
+        int PreviousVmTypesMaxSize { get; }
+
+
         Dictionary<Type, UserControl> ViewByVM { get; }
         Dictionary<Type, ViewModelBase> ViewModelByType { get; }
         Dictionary<Type, Type> ViewTypeByViewModelType { get; }
@@ -18,11 +23,11 @@ namespace DemoApp.Stores
         Dictionary<string, Type> ViewModelTypeByViewName { get; }
         Dictionary<string, Type> ViewTypesByViewName { get; }
 
-        IReadOnlyCollection<IViewModel> PreviousViewModels { get; }
-        IReadOnlyCollection<IViewModel> PreviousViewModelTypes { get; }
-        IReadOnlyCollection<UserControl> PreviousViews { get; }
-        IReadOnlyCollection<Type> PreviousViewTypes { get; }
-        IReadOnlyCollection<string> PreviousViewNames { get; }
+        List<IViewModel> PreviousViewModels { get; }
+        List<Type> PreviousViewModelTypes { get; }
+        List<UserControl> PreviousViews { get; }
+        List<Type> PreviousViewTypes { get; }
+        List<string> PreviousViewNames { get; }
 
         event Action Changed;
         //When old vms are not disposed, we can save the actual ref
@@ -35,6 +40,7 @@ namespace DemoApp.Stores
         Type PreviousViewType { get; set; }
         string PreviousViewName{ get; set; }
         IViewModel CurrentViewModel { get; set; }
+        Type CurrentViewModelType { get; set; }
         UserControl CurrentView { get; set; }
         Type CurrentViewType { get; set; }
         string CurrentViewName { get; set; }

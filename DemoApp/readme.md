@@ -68,6 +68,8 @@
 	- RelayCommand does the checking automatically according to UI events, you have less control when using this one
 	- If you have e.g. a string argument for your ICommand function you can use 'DelegateCommand<string>(FunctionWithStringArgument)', works with RelayCommand as well
 
+12) Activity checking and timeout
+
 settings josta laitetaan:
 	- languaget
 	- teemat
