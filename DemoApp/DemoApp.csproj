@@ -247,6 +247,7 @@
     <Compile Include="Id\Id.cs" />
     <Compile Include="Logging\Log4NetConfigurator.cs" />
     <Compile Include="Model\LanguageItem.cs" />
+    <Compile Include="Model\NavigationFunctionRecord.cs" />
     <Compile Include="Model\Settings\LanguageCollectionSettings.cs" />
     <Compile Include="Model\Settings\LanguageSettings.cs" />
     <Compile Include="ObservableObject.cs" />

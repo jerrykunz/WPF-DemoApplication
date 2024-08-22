@@ -1,4 +1,5 @@
 ﻿using DemoApp.Config;
+using DemoApp.Model;
 using DemoApp.Services;
 using DemoApp.ViewModels;
 using DemoApp.Views.Embedded;
@@ -19,8 +20,9 @@ namespace DemoApp.Stores
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public int NextIndex { get; set; }
+        public int CurrentIndex { get { return NextIndex - 1; } }
 
-        public int Slots => 5;
+        public int Slots { get; private set; }
 
         public event Action Changed;
 
@@ -32,7 +34,7 @@ namespace DemoApp.Stores
         private string _looseViewSubFolder;
 
         //all views and viewmodels by type
-        public Dictionary<Type, UserControl> ViewByVM { get; private set; }
+        public Dictionary<Type, UserControl> ViewByViewModelType { get; private set; }
         public Dictionary<string, UserControl> ViewByName { get; private set; }
         public Dictionary<Type, ViewModelBase> ViewModelByType { get; private set; }
 
@@ -47,6 +49,7 @@ namespace DemoApp.Stores
         //get the view or view names by vm
         public Dictionary<Type, Type> ViewTypeByViewModelType { get; set; }
         public Dictionary<Type, string> ViewNamesByVM { get; set; }
+        public Dictionary<Type, string> ViewNamesByViewType { get; set; }
 
         //get view type by name
         public Dictionary<string, Type> ViewTypesByViewName { get; set; }
@@ -63,37 +66,36 @@ namespace DemoApp.Stores
         public Type PreviousViewType { get; set; }
         public string PreviousViewName { get; set; }
 
-        #region Previous View Queue (Non-disposable views/vms)
-        private readonly List<UserControl> _previousViews;
-        private readonly int _previousViewsMaxSize;
-        public List<UserControl> PreviousViews => _previousViews;
+        public List<NavigationFunctionRecord> FunctionList { get; private set; }
 
-        public void AddToPreviousViewQueue(UserControl view)
+
+        #region Previous View Queue (Non-disposable views/vms)
+        public List<UserControl> ViewList { get; private set; }
+
+        public void AddToViewList(UserControl view)
         {
-            _previousViews.Add(view);
+            ViewList.Add(view);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewModels.Count > _previousViewsMaxSize)
+            if (ViewList.Count > Slots)
             {
-                _previousViews.RemoveAt(0);
+                ViewList.RemoveAt(0);
             }
         }
 
         #endregion
 
         #region Previous ViewModel Queue (Non-disposable views/vms)
-        private readonly List<IViewModel> _previousViewModels;
-        private readonly int _previousVmsMaxSize;
-        public List<IViewModel> PreviousViewModels => _previousViewModels;
+        public List<IViewModel> ViewModelList { get; private set; }
 
-        public void AddToPreviousVmQueue(IViewModel viewModel)
+        public void AddtoViewModelList(IViewModel viewModel)
         {
-            _previousViewModels.Add(viewModel);
+            ViewModelList.Add(viewModel);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewModels.Count > _previousVmsMaxSize)
+            if (ViewModelList.Count > Slots)
             {
-                _previousViewModels.RemoveAt(0);
+                ViewModelList.RemoveAt(0);
             }
         }
 
@@ -101,55 +103,49 @@ namespace DemoApp.Stores
 
 
         #region Previous View Type Queue (Disposable views/vms)
-        private readonly List<Type> _previousViewTypes;
-        private readonly int _previousViewTypesMaxSize;
-        public List<Type> PreviousViewTypes => _previousViewTypes;
+        public List<Type> ViewTypeList { get; private set; }
 
-        public void AddToPreviousViewTypeQueue(Type type)
+        public void AddToViewTypeList(Type type)
         {
-            _previousViewTypes.Add(type);
+            ViewTypeList.Add(type);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewTypes.Count > _previousViewTypesMaxSize)
+            if (ViewTypeList.Count > Slots)
             {
-                _previousViewTypes.RemoveAt(0);
+                ViewTypeList.RemoveAt(0);
             }
         }
 
         #endregion
 
         #region Previous View Name Queue (Disposable views/vms)
-        private readonly List<string> _previousViewNames;
-        private readonly int _previousViewNamesMaxSize;
-        public List<string> PreviousViewNames => _previousViewNames;
+        public List<string> ViewNameList { get; private set; }
 
-        public void AddToPreviousViewNameQueue(string name)
+        public void AddToViewNameList(string name)
         {
-            _previousViewNames.Add(name);
+            ViewNameList.Add(name);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewNames.Count > _previousViewNamesMaxSize)
+            if (ViewNameList.Count > Slots)
             {
-                _previousViewNames.RemoveAt(0);
+                ViewNameList.RemoveAt(0);
             }
         }
 
         #endregion
 
         #region Previous ViewModel Type Queue (Disposable views/vms)
-        private readonly List<Type> _previousViewModelTypes;
-        public int PreviousVmTypesMaxSize { get; private set; }
-        public List<Type>PreviousViewModelTypes => _previousViewModelTypes;
+        public List<Type> PreviousViewModelTypes { get; private set; }
 
 
-        public void AddToPreviousVmTypeQueue(Type type)
+        public void AddToViewModelTypeList(Type type)
         {
-            _previousViewModelTypes.Add(type);
+            PreviousViewModelTypes.Add(type);
 
             // If the queue exceeds the maximum size, remove the oldest item
-            if (_previousViewModelTypes.Count > PreviousVmTypesMaxSize)
+            if (PreviousViewModelTypes.Count > Slots)
             {
-                _previousViewModelTypes.RemoveAt(0);
+                PreviousViewModelTypes.RemoveAt(0);
             }
         }
 
@@ -158,13 +154,14 @@ namespace DemoApp.Stores
         public NavigationStore()
         {
             NextIndex = 0;
+            Slots = 5;
 
             MultiUseViewsAndVms = true;
             LooseViews = LooseViews.PerView; //true;
             _looseViewSubFolder = "default";
 
             //Used to get views/vm
-            ViewByVM = new Dictionary<Type, UserControl>();
+            ViewByViewModelType = new Dictionary<Type, UserControl>();
             ViewModelByType = new Dictionary<Type, ViewModelBase>();
 
             //Used to bind views to vms
@@ -180,22 +177,19 @@ namespace DemoApp.Stores
             ViewPrefersLooseByName = new HashSet<string>();
 
             ViewTypesByViewName = new Dictionary<string, Type>();
+            ViewNamesByViewType = new Dictionary<Type, string>();
 
-            _previousViewModels = new List<IViewModel>();
-            _previousViewModelTypes = new List<Type>();
+            ViewModelList = new List<IViewModel>();
+            PreviousViewModelTypes = new List<Type>();
 
-            _previousVmsMaxSize = 5; //TODO: replace with settings
-            PreviousVmTypesMaxSize = 5; //TODO: replace with settings
+            ViewList = new List<UserControl>();
+            ViewTypeList = new List<Type>();
 
-            _previousViews = new List<UserControl>();
-            _previousViewTypes = new List<Type>();
-            _previousViewsMaxSize = 5; //TODO: replace with settings
-            _previousViewTypesMaxSize = 5; //TODO: replace with settings
-
-            _previousViewNames = new List<string>();
-            _previousViewNamesMaxSize = 5; //TODO: replace with settings
+            ViewNameList = new List<string>();
 
             ViewByName = new Dictionary<string, UserControl>();
+
+            FunctionList = new List<NavigationFunctionRecord>();
 
             PopulateDictionaries();
         }
@@ -205,12 +199,11 @@ namespace DemoApp.Stores
             Changed?.Invoke();
         }
 
-        //this seems outdated...
         public UserControl GetView(Type t)
         {
-            if (ViewByVM.ContainsKey(t))
+            if (ViewByViewModelType.ContainsKey(t))
             {
-                return ViewByVM[t];
+                return ViewByViewModelType[t];
             }
 
             UserControl view = null;
@@ -237,19 +230,19 @@ namespace DemoApp.Stores
             {
                 if (MultiUseViewsAndVms)
                 {
-                    ViewByVM.Add(t, view);
+                    ViewByViewModelType.Add(t, view);
                 }
                 return view;
             }
 
             return null;
         }
-
         public UserControl GetViewByName(string name)
         {
             Type t = null;
             ViewTypesByViewName.TryGetValue(name, out t);
 
+            //already in multi use store? just take it from there
             if (ViewByName.ContainsKey(name))
             {
                 return ViewByName[name];
@@ -257,6 +250,7 @@ namespace DemoApp.Stores
 
             UserControl view = null;
 
+            //get loose version
             if (LooseViews == LooseViews.All ||
                 (LooseViews == LooseViews.PerView && 
                 ViewPrefersLooseByName.Contains(name)))
@@ -266,11 +260,30 @@ namespace DemoApp.Stores
                 s.Close();
             }
 
-            if (t != null &&
-                ViewModelTypeByViewType.ContainsKey(t))
+            //get embedded version 
+            //if (view == null &&
+            //    t != null &&
+            //    ViewModelTypeByViewType.ContainsKey(t))
+            //{
+            //    view = ViewByVM[ViewModelTypeByViewType[t]];
+            //}
+
+            if (view == null)
             {
-                view = ViewByVM[ViewModelTypeByViewType[t]];
+                //get embedded from dict
+                //really necessary?
+                //if (t != null &&
+                //    ViewModelTypeByViewType.ContainsKey(t))
+                //{
+                //    view = ViewByVM[ViewModelTypeByViewType[t]];
+                //}
+                ////create new view
+                //else
+                {
+                    view = Activator.CreateInstance(t) as UserControl;
+                }
             }
+
 
             if (view != null)
             {
@@ -278,16 +291,21 @@ namespace DemoApp.Stores
                 {
                     ViewByName.Add(name, view);
                 }
-                return view;
+                //return view;
             }
 
-            return null;
-        }
+            //return null;
 
-        //TODO: some views might be loose, some might not. instead of _looseViews, use a dict where each vm has a bool 'loose'
-        public UserControl GetViewByVm(Type t)
+            return view;
+        }
+        public UserControl GetViewByViewModelType(Type t)
         {
-            object view = null;
+            if (ViewByViewModelType.ContainsKey(t))
+            {
+                return ViewByViewModelType[t];
+            }
+
+            UserControl view = null;
 
             //A view can have both built-in and loose versions, here we determine which is the preferred as per settings
             bool preferLoose = false;
@@ -315,20 +333,14 @@ namespace DemoApp.Stores
             if (LooseViews == LooseViews.None ||
                 (LooseViews == LooseViews.PerView && !preferLoose))
             {
+                //get view type from viewmodeltype, then create that type
                 if (!ViewTypeByViewModelType.ContainsKey(t))
                 {
                     return null;
                 }
-
                 Type viewType = ViewTypeByViewModelType[t];
 
-                if (ViewByVM.ContainsKey(viewType))
-                {
-                    return ViewByVM[viewType];
-                }
-
-                //Views not present in AppServices, and don't need to be
-                view = Activator.CreateInstance(viewType);
+                view = Activator.CreateInstance(viewType) as UserControl;
             }
             else //LooseViews.All || (LooseViews.PerView && isLoose)
             {
@@ -348,18 +360,13 @@ namespace DemoApp.Stores
 
             if (view != null)
             {
-                //Don't know the exact reason for this, but let's not touch it for now
-                if (ViewByVM.ContainsKey(t))
-                    ViewByVM.Remove(t);
-
                 if (MultiUseViewsAndVms)
                 {
-                    ViewByVM.Add(t, view as UserControl);
-                }
-                return view as UserControl;
+                    ViewByViewModelType.Add(t, view);
+                }                
             }
 
-            return null;
+            return view;
         }
 
         public ViewModelBase GetViewModel(Type t)
@@ -382,8 +389,6 @@ namespace DemoApp.Stores
 
             return null;
         }
-
-
         public ViewModelBase GetViewModelByView(Type t)
         {
             if (!ViewModelTypeByViewType.ContainsKey(t))
@@ -391,7 +396,6 @@ namespace DemoApp.Stores
 
             return GetViewModel(ViewModelTypeByViewType[t]);
         }
-
         public ViewModelBase GetViewModelByViewName(string name)
         {
             if (!ViewModelTypeByViewName.ContainsKey(name))
@@ -399,6 +403,8 @@ namespace DemoApp.Stores
 
             return GetViewModel(ViewModelTypeByViewName[name]);
         }
+
+
 
         public UserControl LoadDialogView(string viewName, Type viewType)
         {
@@ -433,165 +439,6 @@ namespace DemoApp.Stores
             return null;
         }
 
-        //Will be loaded one by one as they become necessary, so this will be unused
-        public void LoadLayout(string layout)
-        {
-            try
-            {
-                FileStream s = null;
-                UserControl view = null;
-
-                ViewByVM.Clear();
-
-                //alternate way of getting behaviour assembly working in xaml
-                //Assembly assembly = Assembly.LoadFrom("Microsoft.Xaml.Behaviors.dll");
-
-                #region Views
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\WaitForUserView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(WaitForUserView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\WaitForAdminView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(WaitForAdminView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\AdminMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(AdminMenuView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\HelpView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(HelpView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\LanguageSelectionView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(LanguageSelectionView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ReconnectDevicesView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ReconnectDevicesView), view);
-
-                ////s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\CheckedOutView.xaml", FileMode.Open);
-                ////view = (UserControl)XamlReader.Load(s);
-                ////s.Close();
-                ////Views.Add(typeof(CheckedOutView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\CheckedOutStaffView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(CheckedOutStaffView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\WaitForCheckInView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(WaitForCheckInView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\CheckInView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(CheckInView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ExpiredItemsView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ExpiredItemsView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\LockerAdminView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(LockerAdminView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\CheckInMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(CheckInMenuView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ManualCheckOutView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ManualCheckOutView), view);
-
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\OutOfOrderView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(OutOfOrderView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ReadErrorView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ReadErrorView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\RemoveCardView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(RemoveCardView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\NoReservationsView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(NoReservationsView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\InvalidPatronView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(InvalidPatronView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ReservationCheckInMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ReservationCheckInMenuView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\BrowseCheckInMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(BrowseCheckInMenuView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\MixedCheckInMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(MixedCheckInMenuView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\AcceptTermsView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(AcceptTermsView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\MainMenuView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(MainMenuView), view);
-
-                ////This should not be commented out, unless the workaround fix for Bieberach is needed
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\BrowseView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(BrowseView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\ReadPatronCardPinView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(ReadPatronCardPinView), view);
-
-                //s = new FileStream(App.MainDirectoryPath + "\\Layouts\\" + layout + "\\OfflineTransactionsProcessingView.xaml", FileMode.Open);
-                //view = (UserControl)XamlReader.Load(s);
-                //s.Close();
-                //Views.Add(typeof(OfflineTransactionsProcessingView), view);
-                #endregion
-
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
 
         private void PopulateDictionaries()
         {
@@ -615,7 +462,9 @@ namespace DemoApp.Stores
             ViewTypesByViewName.Add("InitView", typeof(InitView));
             ViewTypesByViewName.Add("TestFirstView", typeof(TestFirstView));
 
-
+            //when changing view by type, and we want to set name also
+            ViewNamesByViewType.Add(typeof(InitView), "InitView");
+            ViewNamesByViewType.Add(typeof(TestFirstView), "TestFirstView");
 
 
             //LOOSE

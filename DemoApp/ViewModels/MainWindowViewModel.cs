@@ -52,7 +52,7 @@ namespace DemoApp.ViewModels
 
         public List<IViewModel> PreviousViewModels
         {
-            get { return _navigationStore.PreviousViewModels; }
+            get { return _navigationStore.ViewModelList; }
         }
 
         public List<Type> PreviousViewModelTypes
@@ -102,17 +102,17 @@ namespace DemoApp.ViewModels
 
         public IReadOnlyCollection<UserControl> PreviousViews
         {
-            get { return _navigationStore.PreviousViews; }
+            get { return _navigationStore.ViewList; }
         }
 
         public IReadOnlyCollection<Type> PreviousViewTypes
         {
-            get { return _navigationStore.PreviousViewTypes; }
+            get { return _navigationStore.ViewTypeList; }
         }
 
         public IReadOnlyCollection<string> PreviousViewNames
         {
-            get { return _navigationStore.PreviousViewNames; }
+            get { return _navigationStore.ViewNameList; }
         }
 
         #endregion
@@ -546,17 +546,29 @@ namespace DemoApp.ViewModels
 
         private void Navigate(string index)
         {
-            switch(index)
+            //switch(index)
+            //{
+            //    case "0":
+            //        _navigator.ChangeViewModel<TestFirstViewModel>(true, true);
+            //        break;
+            //    case "1":
+            //        _navigator.ChangeViewModel<ChartViewModel>(true, true);
+            //        break;
+
+            //}
+
+            switch (index)
             {
                 case "0":
-                    _navigator.ChangeViewModel<TestFirstViewModel>(true, true);
+                    _navigator.ChangeView("TestFirstView", true, true);
                     break;
                 case "1":
-                    _navigator.ChangeViewModel<ChartViewModel>(true, true);
+                    _navigator.ChangeView("ChartView", true, true);
                     break;
 
             }
         }
+
 
         private void MouseDown()
         {
@@ -1036,12 +1048,12 @@ namespace DemoApp.ViewModels
 
         public void PreviousVm()
         {
-            _navigator.ChangeViewModelToIndex(_navigationStore.NextIndex-2, true, true);
+            _navigator.ChangeToSlot(_navigationStore.CurrentIndex - 1, true, true);
         }
 
         public void NextVm()
         {
-            _navigator.ChangeViewModelToIndex(_navigationStore.NextIndex, true, true);
+            _navigator.ChangeToSlot(_navigationStore.NextIndex, true, true);
         }
 
         #endregion

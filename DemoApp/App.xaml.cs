@@ -162,12 +162,12 @@ namespace DemoApp
 
         public void SwitchLayout(string layout)
         {
-            AppServices.Instance.GetService<INavigationStore>().LoadLayout(layout);
+            //AppServices.Instance.GetService<INavigationStore>().LoadLayout(layout);
 
-            if (MainVm.CurrentViewModel != null)
-            {
-                AppServices.Instance.GetService<INavigator>().ChangeViewModel(MainVm.CurrentViewModel.GetType(), true, true);
-            }
+            //if (MainVm.CurrentViewModel != null)
+            //{
+            //    AppServices.Instance.GetService<INavigator>().ChangeViewModel(MainVm.CurrentViewModel.GetType(), true, true);
+            //}
         }
 
         public void SwitchLanguage(string languageCode)
