@@ -413,14 +413,60 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <Button Grid.Column="0"
+                                        <Grid Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Grid.Column="0"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding PreviousVmCommand}"
+                                                        Style="{DynamicResource InvisibleButton}"
+                                                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                        IsHitTestVisible="True"
+                                                        Margin="0 0 0 0">
+                                                <Icon:PackIconCodicons 
+                                                                    Padding="0"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="ChevronLeft"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                            </Button>
+
+                                            <Button Grid.Column="1"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding NextVmCommand}"
+                                                        Style="{DynamicResource InvisibleButton}"
+                                                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                        IsHitTestVisible="True"
+                                                        Margin="0 0 10 0">
+                                                <Icon:PackIconCodicons Grid.Column="0"
+                                                                    Padding="0"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="ChevronRight"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                            </Button>
+
+                                        </Grid>
+
+
+                                        <Button Grid.Column="1"
                                                 Command="{Binding ZoomCommand}"
                                                 Style="{DynamicResource InvisibleButton}"
                                                 Template="{DynamicResource NoMouseOverButtonTemplate}"
                                                 IsHitTestVisible="True"
-                                                Margin="5, 0 15 0">                                            
+                                                Margin="0 0 0 0">                                            
                                             <Icon:PackIconRemixIcon Grid.Column="0"
                                                                     Padding="0 0 0 4"
                                                                     Foreground="White" 
@@ -444,7 +490,7 @@
 
 
 
-                                        <ComboBox Grid.Column="1"
+                                        <ComboBox Grid.Column="2"
                                               Foreground="White"
                                               HorizontalAlignment="Right"
                                               ItemsSource="{Binding LanguageItems}"

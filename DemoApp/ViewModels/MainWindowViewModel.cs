@@ -26,6 +26,7 @@ namespace DemoApp.ViewModels
         private bool _mouseDown;
         #endregion
 
+        //TODO: are these even used?
         #region Navigation
 
         INavigator _navigator;
@@ -560,7 +561,8 @@ namespace DemoApp.ViewModels
             switch (index)
             {
                 case "0":
-                    _navigator.ChangeView("TestFirstView", true, true);
+                    //_navigator.ChangeView("TestFirstView", true, true);
+                    _navigator.ChangeView("IntroductionView", true, true);
                     break;
                 case "1":
                     _navigator.ChangeView("ChartView", true, true);

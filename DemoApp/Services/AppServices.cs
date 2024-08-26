@@ -62,10 +62,13 @@ namespace DemoApp.Services
             services.AddTransient<NavTest1ViewModel>();
             services.AddTransient<HubViewModel>();
             services.AddTransient<ChartViewModel>();
+            services.AddTransient<IntroductionViewModel>();
 
             //Stores
             services.AddSingleton<IActivityStore, ActivityStore>();
             services.AddSingleton<INavigationStore, NavigationStore>();
+
+            services.AddSingleton<ITextStore, TextStore>();
 
             //Services
             services.AddSingleton<INavigator, Navigator>();

@@ -219,6 +219,10 @@ namespace DemoApp
             try
             {
                 SetResourceDictionary(GetXAMLFilePath("LocalizationDictionary_ex.", languageCode), "ResourceDictionaryName", "Loc-"/*"Locex-"*/);
+
+                var helpStore = AppServices.Instance.GetService<ITextStore>();
+                helpStore.PopulateDictionaries(languageCode);
+
             }
             catch (Exception ex)
             {
