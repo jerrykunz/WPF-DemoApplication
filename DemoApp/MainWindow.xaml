@@ -260,15 +260,22 @@
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top">
                             <MenuItem Header="File" BorderThickness="0">
-                                <MenuItem Header="New.." BorderThickness="0" Icon="{x:Null}">
+                                <!--<MenuItem Header="New.." BorderThickness="0" Icon="{x:Null}">
                                 </MenuItem>
                                 <MenuItem Header="Save"  BorderThickness="0" Icon="{x:Null}"/>
-                                <MenuItem Header="Load"  BorderThickness="0" Icon="{x:Null}"/>
+                                <MenuItem Header="Load"  BorderThickness="0" Icon="{x:Null}"/>-->
                                 <MenuItem Header="Exit"  BorderThickness="0" Icon="{x:Null}"/>
                             </MenuItem>
-                            <MenuItem Header="Edit"/>
-                            <MenuItem Header="View"/>
-                            <MenuItem Header="Help"/>
+                            <MenuItem Header="Edit">
+                                <MenuItem Header="Settings" BorderThickness="0" Icon="{x:Null}"/>
+                            </MenuItem>
+                            <MenuItem Header="View">
+                                <MenuItem Header="Styles" BorderThickness="0" Icon="{x:Null}">
+                                    <MenuItem Header="Default" BorderThickness="0" Icon="{x:Null}"/>
+                                    <MenuItem Header="Custom" BorderThickness="0" Icon="{x:Null}"/>
+                                </MenuItem>
+                            </MenuItem>
+                            <!--<MenuItem Header="Help"/>-->
                         </Menu>
                         <!--Main menu end-->
 
@@ -622,13 +629,13 @@
                                                 <TextBlock Text="Charts" />
                                             </custom:NavigationPanelItem>
                                             <custom:NavigationPanelItem>
-                                                <TextBlock Text="Developer Guides" />
+                                                <TextBlock Text="Customer Form" />
                                             </custom:NavigationPanelItem>
                                             <custom:NavigationPanelItem Command="{Binding PreviousVmCommand}">
-                                                <TextBlock Text="Tutorials" />
+                                                <TextBlock Text="CRUD" />
                                             </custom:NavigationPanelItem>
                                             <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
-                                                <TextBlock Text="Reference" />
+                                                <TextBlock Text="Popups" />
                                             </custom:NavigationPanelItem>
                                         </StackPanel>
                                     </custom:NavigationPanel.Content>

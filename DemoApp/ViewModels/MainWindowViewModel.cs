@@ -530,7 +530,7 @@ namespace DemoApp.ViewModels
             CursorNESW = Cursors.SizeNESW;
 
             Maximized = Application.Current.MainWindow.WindowState == WindowState.Maximized;
-            _navigator.ChangeViewModel<InitViewModel>(true, true);
+            _navigator.ChangeViewModel<IntroductionViewModel>(true, true);
         }
 
         private void _navigationStore_Changed()
