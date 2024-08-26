@@ -17,4 +17,10 @@ namespace DemoApp.Id
         private DatabaseNames() { }
         public const string SQLite = "DatabaseSQLite";
     }
+
+    public class Logs
+    {
+        public const string SysLogTcp = "SysLogTcp";
+        public const string SysLogUdp = "SysLogUdp";
+    }
 }

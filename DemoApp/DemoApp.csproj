@@ -250,8 +250,27 @@
     <Compile Include="FlatUIWindow.xaml.cs">
       <DependentUpon>FlatUIWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\PrintableAsciiSanitizer.cs" />
     <Compile Include="Id\Id.cs" />
     <Compile Include="Logging\Log4NetConfigurator.cs" />
+    <Compile Include="Logging\SysLog\Converters\AppNameConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\CommandLineConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\DomainNameConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\FacilityConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\HostnameConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\IpAddressConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\MessageIdConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\PriorityConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\ProcessIdConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\ProcessNameConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\StructuredDataConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\ThreadIdConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\ThreadNameConverter.cs" />
+    <Compile Include="Logging\SysLog\Converters\VersionConverter.cs" />
+    <Compile Include="Logging\SysLog\LogExceptionToFileFilter.cs" />
+    <Compile Include="Logging\SysLog\SysLogFilterAppender.cs" />
+    <Compile Include="Logging\SysLog\SysLogLayout.cs" />
+    <Compile Include="Logging\SysLog\TcpAppender.cs" />
     <Compile Include="Model\LanguageItem.cs" />
     <Compile Include="Model\NavigationFunctionRecord.cs" />
     <Compile Include="Model\Settings\LanguageCollectionSettings.cs" />
@@ -263,6 +282,11 @@
     <Compile Include="Services\IDatabaseService.cs" />
     <Compile Include="Services\INavigator.cs" />
     <Compile Include="SettingsInitializer.cs" />
+    <Compile Include="Settings\Devices.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Devices.settings</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Preferences.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -3609,6 +3633,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="readme.md" />
+    <None Include="Settings\Devices.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Devices.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Settings\Preferences.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Preferences.Designer.cs</LastGenOutput>
@@ -3622,7 +3650,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="Sounds\" />
     <Folder Include="Themes\" />
   </ItemGroup>
