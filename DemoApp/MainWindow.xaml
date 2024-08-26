@@ -637,6 +637,12 @@
                                             <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
                                                 <TextBlock Text="Popups" />
                                             </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
+                                                <TextBlock Text="Syslog" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
+                                                <TextBlock Text="Settings" />
+                                            </custom:NavigationPanelItem>
                                         </StackPanel>
                                     </custom:NavigationPanel.Content>
                                 </custom:NavigationPanel>
