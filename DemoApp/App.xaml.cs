@@ -399,7 +399,8 @@ namespace DemoApp
                         //don't add to syslog loggers, or this class that will inherit root (it will show appenders 0 but still work)
                         if (iLog.Logger.Name == this.GetType().ToString() ||
                             iLog.Logger.Name == "SysLogTcp" ||
-                            iLog.Logger.Name == "SysLogUdp")
+                            iLog.Logger.Name == "SysLogUdp" ||
+                            iLog.Logger.Name == "DemoApp.ViewModels.LogViewModel") //this one is for log testing purposes, so exclude it
                             continue;
 
                         //everywhere else though

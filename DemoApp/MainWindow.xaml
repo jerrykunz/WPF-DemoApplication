@@ -628,19 +628,19 @@
                                             <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="1">
                                                 <TextBlock Text="Charts" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="2">
                                                 <TextBlock Text="Customer Form" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem Command="{Binding PreviousVmCommand}">
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="3">
                                                 <TextBlock Text="CRUD" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="4">
                                                 <TextBlock Text="Popups" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
-                                                <TextBlock Text="Syslog" />
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="5">
+                                                <TextBlock Text="Logging" />
                                             </custom:NavigationPanelItem>
-                                            <custom:NavigationPanelItem Command="{Binding NextVmCommand}">
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="6">
                                                 <TextBlock Text="Settings" />
                                             </custom:NavigationPanelItem>
                                         </StackPanel>

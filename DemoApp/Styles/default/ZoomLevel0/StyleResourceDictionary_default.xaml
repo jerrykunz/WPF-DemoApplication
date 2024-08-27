@@ -357,8 +357,8 @@
     <!--Don't use these end-->
 
     <!--determines default button style-->
-    <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle2}">
-    </Style>
+    <!--<Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+    </Style>-->
 
 
 

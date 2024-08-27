@@ -10,34 +10,7 @@
     <ScrollViewer  HorizontalScrollBarVisibility="Disabled"
                    VerticalScrollBarVisibility="Auto">
         <wpf:HtmlPanel Margin="10"
-                   Background="Transparent"                   
-                 Text="{Binding HtmlText}"/>
+                       Background="Transparent" 
+                       Text="{Binding HtmlText}"/>
     </ScrollViewer>
-
-    <!--<ScrollViewer Grid.Row="0" 
-                      Grid.Column="0"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  VerticalScrollBarVisibility="Auto">
-        <TextBlock Margin="10" TextWrapping="WrapWithOverflow">
-            <Run FontSize="24" FontWeight="Bold">Introduction </Run>
-            <LineBreak/>
-            <Run>This is a Windows Presentation Foundation (WPF) application that can be used as a base for many different types of application. The features are expanded upon below:</Run>
-            <LineBreak/>
-            <LineBreak/>
-            <Run FontSize="16" FontWeight="Bold">Custom Window</Run>
-            <LineBreak/>
-            <Run>Custom window (WindowStyle=None) with rounded corners, custom icons and all functionality written from scratch.\n
-   Functions include:
-	- Resizing
-	- Dragging
-	- Minimize/Maximize
-	- Double click center of upper window to maximize
-	- Alt+Enter fullscreen mode
-	- Alt+F4 close
-	- Close</Run>
-
-        </TextBlock>
-        
-        
-    </ScrollViewer>-->
 </UserControl>

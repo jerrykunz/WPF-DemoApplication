@@ -71,6 +71,10 @@ This is a Windows Presentation Foundation (WPF) case study, a demo application t
 
 12) Activity checking and timeout
 
+13) Separate DemoAppUI Visual Studio project
+	- Is a reference in the main project
+	- Customer can define their own UI controls and components here, and use them with the loose .xamls without access to program code.
+
 settings josta laitetaan:
 	- languaget
 	- teemat

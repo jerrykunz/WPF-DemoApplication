@@ -34,4 +34,13 @@ namespace DemoApp.Config
         Test1,
         Test2
     }
+
+    public enum LogViewModelLogLevel
+    {
+        Debug,
+        Info,
+        Warn,
+        Error,
+        Fatal
+    }
 }
