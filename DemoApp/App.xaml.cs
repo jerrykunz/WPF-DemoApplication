@@ -364,6 +364,11 @@ namespace DemoApp
                     sysLogLayout.ActivateOptions();
                     tcpLogAppender.Layout = sysLogLayout;
 
+                    if (syslogTextAppender != null)
+                    {
+                        (syslogTextAppender as FileAppender).Layout = sysLogLayout;
+                    }
+
                     //var sysLogFilter = new LogExceptionToFileFilter();
                     //sysLogFilter.ActivateOptions();
 
@@ -389,6 +394,11 @@ namespace DemoApp
                     sysLogLayout.ActivateOptions();
 
                     udpLogAppender.Layout = sysLogLayout;
+
+                    if (syslogTextAppender != null)
+                    {
+                        (syslogTextAppender as FileAppender).Layout = sysLogLayout;
+                    }
 
                     //var sysLogFilter = new LogExceptionToFileFilter();
                     //sysLogFilter.ActivateOptions();
