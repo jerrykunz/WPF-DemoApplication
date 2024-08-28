@@ -56,6 +56,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Modal.cs" />
     <Compile Include="Controls\NavigationPanel.cs" />
     <Compile Include="Controls\NavigationPanelItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

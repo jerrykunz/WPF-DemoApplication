@@ -930,4 +930,44 @@
     <!-- End of Flat ComboBox -->
 
 
+    <!--Modal-->
+    <Style x:Key="ModalNotificationStyle" TargetType="ContentControl">
+        <!--<Setter Property="Background" Value="Transparent" />-->
+        <Setter Property="Background" Value="#20000000" />
+    </Style>
+
+    <Style x:Key="NotificationBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource WindowBackGround}" />
+    </Style>
+
+    <Style x:Key="NotificationOuterBorderStyle" TargetType="Border">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect
+                    BlurRadius="5"
+                    ShadowDepth="5"
+                    Color="Gray" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="NotificationGridStyle" TargetType="Grid">
+        <Setter Property="Width" Value="415" />
+        <Setter Property="Height" Value="200" />
+        <Setter Property="Margin" Value="5,5,5,0" />
+    </Style>
+
+    <Style x:Key="NotificationTextBackground" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource WindowHighlightBrush}" />
+    </Style>
+
+    <Style x:Key="NotificationTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
 </ResourceDictionary>    

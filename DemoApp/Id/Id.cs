@@ -22,5 +22,7 @@ namespace DemoApp.Id
     {
         public const string SysLogTcp = "SysLogTcp";
         public const string SysLogUdp = "SysLogUdp";
+        public const string SysLogError = "SysLogError";
+        public const string SysLogFileAppender = "SysLogFileAppender";
     }
 }

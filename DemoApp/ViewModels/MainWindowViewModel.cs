@@ -194,6 +194,12 @@ namespace DemoApp.ViewModels
 
         #endregion
 
+        #region Popups
+
+        public bool PopupOpen { get; set; }
+        #endregion
+
+
         public ObservableCollection<LanguageItem> LanguageItems { get; private set; }
         public LanguageItem SelectedLanguageItem { get; set; }
 
@@ -521,6 +527,10 @@ namespace DemoApp.ViewModels
             //{
             //    log.Error(ex);
             //}
+
+
+
+            PopupOpen = false;
 
             //Vm and view init
 

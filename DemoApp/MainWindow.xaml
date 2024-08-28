@@ -13,7 +13,7 @@
         Background="Transparent"
         WindowStyle="None"
         Style="{StaticResource WindowStyle}"
-        Title="DemoApp" Height="450" Width="800">
+        Title="DemoApp" Height="675" Width="1200">
 
     <Window.InputBindings>
         <KeyBinding Modifiers="Alt" Key="F4" Command="{Binding ExitCommand}" />
@@ -54,6 +54,49 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+
+
+        <custom:Modal Grid.RowSpan="2"
+                Panel.ZIndex="10"
+                IsOpen="{Binding PopupOpen}"
+                Style="{StaticResource ModalNotificationStyle}"
+                BorderStyle="{StaticResource NotificationBorderStyle}"
+                OuterBorderStyle="{StaticResource NotificationOuterBorderStyle}">
+            <Viewbox StretchDirection="DownOnly">
+                <Grid Style="{StaticResource NotificationGridStyle}">
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <Border Style="{StaticResource NotificationTextBackground}" Grid.Row="0">
+                        <TextBlock
+                            Style="{StaticResource NotificationTextStyle}"
+                            Text="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+                    </Border>
+                    
+                    <StackPanel
+                            Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                        <Button
+                            Style="{StaticResource ButtonStyle}"
+                            Content="{DynamicResource Button_Continue}"
+                            Command="{Binding OfflineDialogCommand}">
+                        </Button>
+                    </StackPanel>
+                    
+                </Grid>
+            </Viewbox>
+        </custom:Modal>
+
+
+
+
+
 
         <Border BorderThickness="0" 
                 Grid.RowSpan="2"

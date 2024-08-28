@@ -33,4 +33,36 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type local:Modal}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Modal}">
+                    <ControlTemplate.Resources>
+                        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+                    </ControlTemplate.Resources>
+                    <Grid Background="{TemplateBinding Background}" Visibility="{TemplateBinding IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{TemplateBinding OuterBorderStyle}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            UseLayoutRounding="True">
+                            <Grid>
+                                <Grid.OpacityMask>
+                                    <VisualBrush Visual="{Binding ElementName=border}" />
+                                </Grid.OpacityMask>
+                                <Border
+                                    x:Name="border"
+                                    Style="{TemplateBinding BorderStyle}" 
+                                    CornerRadius="25"/>
+                                <ContentControl Content="{TemplateBinding Content}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

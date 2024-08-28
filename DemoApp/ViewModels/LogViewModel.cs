@@ -1,4 +1,5 @@
 ﻿using DemoApp.Config;
+using DemoApp.Logging.SysLog;
 using DemoApp.Stores;
 using log4net;
 using System;
@@ -16,7 +17,11 @@ namespace DemoApp.ViewModels
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly ILog sysLog = LogManager.GetLogger(SettingsInitializer.LoggerSysLog);
 
+        ISysLogErrorHandler _syslogErrorHandler;
+
         private ITextStore _textStore;
+
+
         public string HtmlTextLog { get; private set; }
         public string HtmlTextSyslog { get; private set; }
 
@@ -85,9 +90,12 @@ namespace DemoApp.ViewModels
         #endregion
 
         public LogViewModel(IActivityStore activityStore,
-                            ITextStore textStore) : base(activityStore)
+                            ITextStore textStore,
+                            ISysLogErrorHandler syslogErrorHandler) : base(activityStore)
         {
             _textStore = textStore;
+            _syslogErrorHandler = syslogErrorHandler;
+            _syslogErrorHandler.SysLogError += _syslogErrorHandler_SysLogError;
 
             HtmlTextLog = _textStore.GetString("LogViewLogText.html");
             _selectedLogLevel = LogViewModelLogLevel.Debug;
@@ -96,6 +104,11 @@ namespace DemoApp.ViewModels
             HtmlTextSyslog = _textStore.GetString("LogViewSyslogText.html");
             _selectedSyslogLevel = LogViewModelLogLevel.Debug;
             SyslogMessage = "Test message";
+        }
+
+        private void _syslogErrorHandler_SysLogError(object sender, SyslogErrorEventArgs e)
+        {
+
         }
 
         public void LogSave()
@@ -125,19 +138,19 @@ namespace DemoApp.ViewModels
             switch (SelectedLogLevel)
             {
                 case LogViewModelLogLevel.Debug:
-                    sysLog.Debug(LogMessage);
+                    sysLog.Debug(SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Info:
-                    sysLog.Info(LogMessage);
+                    sysLog.Info(SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Warn:
-                    sysLog.Warn(LogMessage);
+                    sysLog.Warn(SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Error:
-                    sysLog.Error(LogMessage);
+                    sysLog.Error(SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Fatal:
-                    sysLog.Fatal(LogMessage);
+                    sysLog.Fatal(SyslogMessage);
                     break;
             }
         }

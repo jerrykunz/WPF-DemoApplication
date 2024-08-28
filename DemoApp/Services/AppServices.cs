@@ -1,5 +1,6 @@
 ﻿using DemoApp.Databases;
 using DemoApp.Factories;
+using DemoApp.Logging.SysLog;
 using DemoApp.Stores;
 using DemoApp.ViewModels;
 using log4net;
@@ -80,6 +81,8 @@ namespace DemoApp.Services
             IDatabaseSQLite dbSQLite = databaseService.GetDatabase<IDatabaseSQLite>();
             services.AddSingleton<IDatabaseSQLite>(dbSQLite);
 
+
+            services.AddSingleton<ISysLogErrorHandler, SyslogErrorHandler>();
 
             //services.AddTransient<AdminMenuViewModel>();
             //services.AddTransient<CheckedOutStaffViewModel>();

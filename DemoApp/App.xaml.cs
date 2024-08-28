@@ -1,4 +1,5 @@
-﻿using DemoApp.Logging.SysLog;
+﻿using DemoApp.Id;
+using DemoApp.Logging.SysLog;
 using DemoApp.Model.Settings;
 using DemoApp.Services;
 using DemoApp.Stores;
@@ -76,9 +77,18 @@ namespace DemoApp
 
 
             //test
-            //Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Udp;
-            //Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Debug;
-            //Settings.Devices.Default.SysLogPort = 514; //1468;
+            //Settings.Devices.Default.SysLogHost = "127.0.0.1";
+            Settings.Devices.Default.SysLogHost = "8.8.8.8";
+            Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Udp;
+            Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Debug;
+            Settings.Devices.Default.SysLogPort = 514; //1468;
+            Settings.Devices.Default.SysLogInUse = true;
+            Settings.Devices.Default.Save();
+
+            //Settings.Devices.Default.SysLogHost = "127.0.0.1";
+            //Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Tcp;
+            //Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Off;
+            //Settings.Devices.Default.SysLogPort = 1468;
             //Settings.Devices.Default.SysLogInUse = true;
             //Settings.Devices.Default.Save();
 
@@ -298,17 +308,24 @@ namespace DemoApp
 
             var logAppenders = LogManager.GetRepository().GetAppenders();
 
-            IAppender logAppender = null;
+            IAppender syslogTextAppender = logAppenders.FirstOrDefault(x => x.Name == Logs.SysLogFileAppender);
+
+
+
+            IAppender syslogAppender = null;
             if (Settings.Devices.Default.SysLogProtocol == Config.SysLogProtocol.Tcp)
             {
-                logAppender = logAppenders.FirstOrDefault(x => x is TcpAppender);
+                syslogAppender = logAppenders.FirstOrDefault(x => x is TcpAppender);
             }
             else
             {
-                logAppender = logAppenders.FirstOrDefault(x => x is UdpAppender);
+                //log4net default syslog updappender
+                //syslogAppender = logAppenders.FirstOrDefault(x => x is UdpAppender);
+
+                syslogAppender = logAppenders.FirstOrDefault(x => x is UdpAppenderCustom);
             }
 
-            if (logAppender != null)
+            if (syslogAppender != null)
             {
                 IPAddress sysLogHost = null;
                 try
@@ -330,9 +347,9 @@ namespace DemoApp
                     }
                 }
 
-                if (logAppender is TcpAppender)
+                if (syslogAppender is TcpAppender)
                 {
-                    var tcpLogAppender = logAppender as TcpAppender;
+                    var tcpLogAppender = syslogAppender as TcpAppender;
 
                     tcpLogAppender.RemoteAddress = sysLogHost;
                     //port 6514 default
@@ -351,11 +368,13 @@ namespace DemoApp
                     //sysLogFilter.ActivateOptions();
 
                     //tcpLogAppender.AddFilter(sysLogFilter);
+                    tcpLogAppender.ErrorHandler = AppServices.Instance.GetService<ISysLogErrorHandler>(); //new SyslogErrorHandler();
                     tcpLogAppender.ActivateOptions();
                 }
                 else
                 {
-                    var udpLogAppender = logAppender as UdpAppender;
+                    //var udpLogAppender = syslogAppender as UdpAppender;
+                    var udpLogAppender = syslogAppender as UdpAppenderCustom;
 
                     udpLogAppender.RemoteAddress = sysLogHost;
                     //port 514 default
@@ -375,6 +394,7 @@ namespace DemoApp
                     //sysLogFilter.ActivateOptions();
 
                     //udpLogAppender.AddFilter(sysLogFilter);
+                    udpLogAppender.ErrorHandler = AppServices.Instance.GetService<ISysLogErrorHandler>(); //new SyslogErrorHandler();
                     udpLogAppender.ActivateOptions();
                 }
 
@@ -387,10 +407,25 @@ namespace DemoApp
                     Logger rootLoggerHierarchy = hierarchy.Root;
 
 
+                    List<IAppender> appenders = new List<IAppender>();
+                    appenders.Add(syslogAppender);
+
+                    //write to syslog.txt as well
+                    if (syslogTextAppender != null)
+                    {
+                        appenders.Add(syslogTextAppender);
+                    }
+
                     //add a level filter appender so we can syslog just the log events we want
                     SysLogFilterAppender appender = new SysLogFilterAppender(Settings.Devices.Default.SysLogSendLogsLevelMin,
                                                                              Settings.Devices.Default.SysLogSendLogsLevelMax,
-                                                                             new List<IAppender> { logAppender });
+                                                                             appenders);
+
+                    //SysLogFilterAppender appender = new SysLogFilterAppender(Settings.Devices.Default.SysLogSendLogsLevelMin,
+                    //                                                         Settings.Devices.Default.SysLogSendLogsLevelMax,
+                    //                                                         new List<IAppender> { syslogAppender });
+
+
                     rootLoggerHierarchy.AddAppender(appender);
 
                     var loggers = LogManager.GetCurrentLoggers();
@@ -400,6 +435,7 @@ namespace DemoApp
                         if (iLog.Logger.Name == this.GetType().ToString() ||
                             iLog.Logger.Name == "SysLogTcp" ||
                             iLog.Logger.Name == "SysLogUdp" ||
+                            iLog.Logger.Name == "SysLogError" ||
                             iLog.Logger.Name == "DemoApp.ViewModels.LogViewModel") //this one is for log testing purposes, so exclude it
                             continue;
 
