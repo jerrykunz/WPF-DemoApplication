@@ -1,4 +1,5 @@
-﻿using DemoApp.Model;
+﻿using DemoApp.Config;
+using DemoApp.Model;
 using DemoApp.Services;
 using DemoApp.Stores;
 using System;
@@ -196,7 +197,55 @@ namespace DemoApp.ViewModels
 
         #region Popups
 
-        public bool PopupOpen { get; set; }
+        private bool _popupOpen;
+        public bool PopupOpen
+        {
+            get { return _popupOpen; }
+            set { _popupOpen = value; OnPropertyChanged(nameof(PopupOpen)); }
+        }
+
+        private string _popupTitle;
+        public string PopupTitle
+        {
+            get { return _popupTitle; }
+            set { _popupTitle = value; OnPropertyChanged(nameof(PopupTitle)); }
+        }
+
+        private string _popupText;
+        public string PopupText
+        {
+            get { return _popupText; }
+            set { _popupText = value; OnPropertyChanged(nameof(PopupText)); }
+        }
+
+        private string _popupButtonOkText;
+        public string PopupButtonOkText
+        {
+            get { return _popupButtonOkText; }
+            set { _popupButtonOkText = value; OnPropertyChanged(nameof(PopupButtonOkText)); }
+        }
+
+        private string _popupButtonYesText;
+        public string PopupButtonYesText
+        {
+            get { return _popupButtonYesText; }
+            set { _popupButtonYesText = value; OnPropertyChanged(nameof(PopupButtonYesText)); }
+        }
+
+        private string _popupButtonNoText;
+        public string PopupButtonNoText
+        {
+            get { return _popupButtonNoText; }
+            set { _popupButtonNoText = value; OnPropertyChanged(nameof(PopupButtonNoText)); }
+        }
+
+        private PopupMode _popupMode;
+        public PopupMode PopupMode
+        {
+            get { return _popupMode; }
+            set { _popupMode = value; OnPropertyChanged(nameof(PopupMode)); }
+        }
+
         #endregion
 
 
@@ -442,6 +491,45 @@ namespace DemoApp.ViewModels
             }
         }
 
+        private ICommand _popupYesCommand;
+        public ICommand PopupYesCommand
+        {
+            get
+            {
+                if (_popupYesCommand == null)
+                {
+                    _popupYesCommand = new DelegateCommand(PopupYes);
+                }
+                return _popupYesCommand;
+            }
+        }
+
+        private ICommand _popupNoCommand;
+        public ICommand PopupNoCommand
+        {
+            get
+            {
+                if (_popupNoCommand == null)
+                {
+                    _popupNoCommand = new DelegateCommand(PopupNo);
+                }
+                return _popupNoCommand;
+            }
+        }
+
+        private ICommand _popupOkCommand;
+        public ICommand PopupOkCommand
+        {
+            get
+            {
+                if (_popupOkCommand == null)
+                {
+                    _popupOkCommand = new DelegateCommand(PopupOk);
+                }
+                return _popupOkCommand;
+            }
+        }
+
         #endregion
 
         public MainWindowViewModel(INavigator navigator,
@@ -530,7 +618,13 @@ namespace DemoApp.ViewModels
 
 
 
-            PopupOpen = false;
+            _popupOpen = true;
+            _popupButtonOkText = "OK";
+            _popupButtonNoText = "No";
+            _popupButtonYesText = "Yes";
+            _popupMode = PopupMode.OneButton;
+            _popupTitle = "Notification";
+            _popupText = "Thing happened.";
 
             //Vm and view init
 
@@ -1069,6 +1163,21 @@ namespace DemoApp.ViewModels
         public void NextVm()
         {
             _navigator.ChangeToSlot(_navigationStore.NextIndex, true, true);
+        }
+
+        public void PopupYes()
+        {
+
+        }
+
+        public void PopupNo()
+        {
+
+        }
+
+        public void PopupOk()
+        {
+            PopupMode = PopupMode.Inactive;
         }
 
         #endregion

@@ -954,7 +954,34 @@
     <Style x:Key="NotificationGridStyle" TargetType="Grid">
         <Setter Property="Width" Value="415" />
         <Setter Property="Height" Value="200" />
-        <Setter Property="Margin" Value="5,5,5,0" />
+        <!--<Setter Property="Margin" Value="5,5,5,0" />-->
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!--<Style x:Key="NotificationTitleBackground" TargetType="Border">
+        <Setter Property="Background" Value="Blue" />
+    </Style>-->
+
+    <Style x:Key="NotificationTitleBackground" TargetType="Border">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#1976ff" Offset="0" />
+                    <GradientStop Color="#1976d2" Offset="1" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="NotificationTitleStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0 5" />        
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <Style x:Key="NotificationTextBackground" TargetType="Border">
@@ -964,6 +991,7 @@
     <Style x:Key="NotificationTextStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="FontSize" Value="20" />
+        <Setter Property="Margin" Value="0 5 0 0" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="TextAlignment" Value="Center" />

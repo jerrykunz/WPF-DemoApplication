@@ -242,6 +242,7 @@
     </ApplicationDefinition>
     <Compile Include="Config\Enum.cs" />
     <Compile Include="Converters\BooleanConverter.cs" />
+    <Compile Include="Converters\PopupModeToVisibilityConverter.cs" />
     <Compile Include="Databases\DatabaseSQLite.cs" />
     <Compile Include="Databases\IDatabase.cs" />
     <Compile Include="Databases\IDatabaseSQLite.cs" />

@@ -43,4 +43,11 @@ namespace DemoApp.Config
         Error,
         Fatal
     }
+
+    public enum PopupMode
+    {
+        Inactive,
+        OneButton,
+        TwoButtons
+    }
 }

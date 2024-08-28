@@ -17,6 +17,9 @@
             <conv:VisibilityBooleanConverter TrueVisibility="Hidden" FalseVisibility="Visible" x:Key="BoolHiddenVisibleConverter"/>
             <conv:VisibilityBooleanConverter TrueVisibility="Collapsed" FalseVisibility="Visible" x:Key="BoolCollapsedVisibleConverter"/>
 
+            <conv:PopupModeToVisibilityConverter Mode="OneButton" TrueVisibility="Visible" FalseVisibility="Collapsed" x:Key="PopupOneButtonVisibleCollapsedConverter"/>
+            <conv:PopupModeToVisibilityConverter Mode="TwoButtons" TrueVisibility="Visible" FalseVisibility="Collapsed" x:Key="PopupTwoButtonsVisibleCollapsedConverter"/>
+            <conv:PopupModeActiveToVisibilityConverter TrueVisibility="Visible" FalseVisibility="Collapsed" x:Key="PopupActiveVisibleCollapsedConverter"/>
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/default/ZoomLevel0/StyleResourceDictionary_ex.xaml" />

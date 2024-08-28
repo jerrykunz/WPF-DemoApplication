@@ -58,39 +58,68 @@
 
 
         <custom:Modal Grid.RowSpan="2"
+                      Visibility="{Binding PopupMode, Converter={StaticResource PopupActiveVisibleCollapsedConverter}}"
                 Panel.ZIndex="10"
                 IsOpen="{Binding PopupOpen}"
                 Style="{StaticResource ModalNotificationStyle}"
                 BorderStyle="{StaticResource NotificationBorderStyle}"
                 OuterBorderStyle="{StaticResource NotificationOuterBorderStyle}">
-            <Viewbox StretchDirection="DownOnly">
-                <Grid Style="{StaticResource NotificationGridStyle}">
-                    
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    
-                    <Border Style="{StaticResource NotificationTextBackground}" Grid.Row="0">
-                        <TextBlock
-                            Style="{StaticResource NotificationTextStyle}"
-                            Text="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
-                    </Border>
-                    
-                    <StackPanel
-                            Grid.Row="1"
+            <Grid Style="{StaticResource NotificationGridStyle}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Style="{StaticResource NotificationTitleBackground}">
+                    <TextBlock Style="{StaticResource NotificationTitleStyle}"
+                               Text="{Binding PopupTitle}" />
+                </Border>
+
+                <Border Grid.Row="1"
+                        Style="{StaticResource NotificationTextBackground}">
+                    <TextBlock Style="{StaticResource NotificationTextStyle}"
+                               Text="{Binding PopupText}" />
+                </Border>
+
+                <Grid Grid.Row="2">
+
+                    <Button Visibility="{Binding PopupMode, Converter={StaticResource PopupOneButtonVisibleCollapsedConverter}}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Orientation="Horizontal">
-                        <Button
                             Style="{StaticResource ButtonStyle}"
-                            Content="{DynamicResource Button_Continue}"
-                            Command="{Binding OfflineDialogCommand}">
-                        </Button>
+                            Content="{Binding PopupButtonOkText}"
+                            Command="{Binding PopupOkCommand}"/>
+
+
+                    <StackPanel Visibility="{Binding PopupMode, Converter={StaticResource PopupTwoButtonsVisibleCollapsedConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                        <Button Style="{StaticResource ButtonStyle}"
+                                Content="{Binding PopupButtonYesText}"
+                                Command="{Binding PopupYesCommand}"/>
+                        <Button Style="{StaticResource ButtonStyle}"
+                                Content="{Binding PopupButtonNoText}"
+                                Command="{Binding PopupNoCommand}"/>
+
                     </StackPanel>
-                    
                 </Grid>
-            </Viewbox>
+                
+                <!--<StackPanel
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                    <Button
+                        Style="{StaticResource ButtonStyle}"
+                        Content="{DynamicResource Button_Continue}"
+                        Command="{Binding OfflineDialogCommand}">
+                    </Button>
+                </StackPanel>-->
+                    
+            </Grid>
         </custom:Modal>
 
 
