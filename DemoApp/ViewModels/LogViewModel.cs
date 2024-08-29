@@ -19,16 +19,10 @@ namespace DemoApp.ViewModels
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly ILog sysLog = LogManager.GetLogger(SettingsInitializer.LoggerSysLog);
 
-        ISysLogErrorHandler _syslogErrorHandler;
-
         private ITextStore _textStore;
 
-
+        //Logs
         public string HtmlTextLog { get; private set; }
-        public string HtmlTextSyslog { get; private set; }
-
-
-
         public ObservableCollection<LogViewModelLogLevel> LogLevels { get { return new ObservableCollection<LogViewModelLogLevel>((LogViewModelLogLevel[])Enum.GetValues(typeof(LogViewModelLogLevel))); } }
 
         private LogViewModelLogLevel _selectedLogLevel;
@@ -37,12 +31,11 @@ namespace DemoApp.ViewModels
             get { return _selectedLogLevel; }
             set { _selectedLogLevel = value; OnPropertyChanged(nameof(SelectedLogLevel)); }
         }
-
         public string LogMessage { get; set; }
 
 
-
-
+        //Syslog
+        public string HtmlTextSyslog { get; private set; }
         public ObservableCollection<LogViewModelLogLevel> SyslogLevels { get { return new ObservableCollection<LogViewModelLogLevel>((LogViewModelLogLevel[])Enum.GetValues(typeof(LogViewModelLogLevel))); } }
 
         private LogViewModelLogLevel _selectedSyslogLevel;
@@ -51,9 +44,7 @@ namespace DemoApp.ViewModels
             get { return _selectedSyslogLevel; }
             set { _selectedSyslogLevel = value; OnPropertyChanged(nameof(SelectedSyslogLevel)); }
         }
-
         public string SyslogMessage { get; set; }
-
 
 
 
@@ -92,11 +83,9 @@ namespace DemoApp.ViewModels
         #endregion
 
         public LogViewModel(IActivityStore activityStore,
-                            ITextStore textStore,
-                            ISysLogErrorHandler syslogErrorHandler) : base(activityStore)
+                            ITextStore textStore) : base(activityStore)
         {
             _textStore = textStore;
-            _syslogErrorHandler = syslogErrorHandler;
 
             HtmlTextLog = _textStore.GetString("LogViewLogText.html");
             _selectedLogLevel = LogViewModelLogLevel.Debug;
@@ -165,7 +154,7 @@ namespace DemoApp.ViewModels
 
         private void Appender_TestSuccess(object sender, EventArgs e)
         {
-            App.Instance.MainVm.AddToPopupQueue(new PopupModel
+            int id = App.Instance.MainVm.AddToPopupQueue(new PopupModel
             {
                 Mode = PopupMode.OneButton,
                 Title = "Notification",
@@ -176,7 +165,7 @@ namespace DemoApp.ViewModels
 
         private void Appender_TestFailed(object sender, SyslogErrorEventArgs e)
         {
-            App.Instance.MainVm.AddToPopupQueue(new PopupModel
+            int id = App.Instance.MainVm.AddToPopupQueue(new PopupModel
             {
                 Mode = PopupMode.OneButton,
                 Title = "Error",

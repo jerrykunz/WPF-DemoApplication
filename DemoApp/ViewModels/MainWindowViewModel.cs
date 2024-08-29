@@ -1183,6 +1183,17 @@ namespace DemoApp.ViewModels
             if (_popups.Count() <= 1)
             {
                 PopupMode = PopupMode.Inactive;
+
+                try
+                {
+                    _popups.Dequeue();
+                }
+                catch(Exception ex)
+                {
+                    log.Error("Attempting to dequeue an empty popup queue", ex);
+                }
+
+                return;
             }
 
             //remove current popup
