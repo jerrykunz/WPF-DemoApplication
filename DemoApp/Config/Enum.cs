@@ -50,4 +50,11 @@ namespace DemoApp.Config
         OneButton,
         TwoButtons
     }
+
+    public enum PopupClickedButton
+    {
+        Ok,
+        Yes,
+        No
+    }
 }

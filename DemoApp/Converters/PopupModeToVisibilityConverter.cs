@@ -39,21 +39,42 @@ namespace DemoApp.Converters
         }
     }
 
-    public class PopupModeActiveToVisibilityConverter : IValueConverter
+    //public class PopupModeActiveToVisibilityConverter : IValueConverter
+    //{
+    //    public Visibility TrueVisibility { get; set; }
+    //    public Visibility FalseVisibility { get; set; }
+    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        if (!(value is PopupMode))
+    //            return FalseVisibility;
+
+    //        if ((PopupMode)value == PopupMode.Inactive)
+    //        {
+    //            return FalseVisibility;
+    //        }
+
+    //        return TrueVisibility;
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
+    public class PopupModeActiveToBoolConverter : IValueConverter
     {
-        public Visibility TrueVisibility { get; set; }
-        public Visibility FalseVisibility { get; set; }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is PopupMode))
-                return FalseVisibility;
+                return false;
 
             if ((PopupMode)value == PopupMode.Inactive)
             {
-                return FalseVisibility;
+                return false;
             }
 
-            return TrueVisibility;
+            return true;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

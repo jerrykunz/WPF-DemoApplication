@@ -56,6 +56,8 @@ namespace DemoApp
         public LanguageSettings PreviousLanguage { get; set; }
         public LanguageSettings CurrentLanguage { get; set; }
 
+        public ISysLogAppender SysLogAppender { get; set; }
+
         //test
         public string CurrentStyleFolder { get; set; }
         public int ZoomLevel { get; set; }
@@ -78,19 +80,19 @@ namespace DemoApp
 
             //test
             //Settings.Devices.Default.SysLogHost = "127.0.0.1";
-            Settings.Devices.Default.SysLogHost = "8.8.8.8";
-            Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Udp;
-            Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Debug;
-            Settings.Devices.Default.SysLogPort = 514; //1468;
-            Settings.Devices.Default.SysLogInUse = true;
-            Settings.Devices.Default.Save();
-
-            //Settings.Devices.Default.SysLogHost = "127.0.0.1";
-            //Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Tcp;
-            //Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Off;
-            //Settings.Devices.Default.SysLogPort = 1468;
+            //Settings.Devices.Default.SysLogHost = "8.8.8.8";
+            //Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Udp;
+            //Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Debug;
+            //Settings.Devices.Default.SysLogPort = 514; //1468;
             //Settings.Devices.Default.SysLogInUse = true;
             //Settings.Devices.Default.Save();
+
+            Settings.Devices.Default.SysLogHost = "127.0.0.1";
+            Settings.Devices.Default.SysLogProtocol = Config.SysLogProtocol.Tcp;
+            Settings.Devices.Default.SysLogSendLogsLevelMin = Config.Log4NetLogLevel.Off;
+            Settings.Devices.Default.SysLogPort = 1468;
+            Settings.Devices.Default.SysLogInUse = true;
+            Settings.Devices.Default.Save();
 
 
             ApplySysLogSettings();
@@ -350,6 +352,7 @@ namespace DemoApp
                 if (syslogAppender is TcpAppender)
                 {
                     var tcpLogAppender = syslogAppender as TcpAppender;
+                    SysLogAppender = tcpLogAppender;
 
                     tcpLogAppender.RemoteAddress = sysLogHost;
                     //port 6514 default
@@ -380,6 +383,7 @@ namespace DemoApp
                 {
                     //var udpLogAppender = syslogAppender as UdpAppender;
                     var udpLogAppender = syslogAppender as UdpAppenderCustom;
+                    SysLogAppender = udpLogAppender;
 
                     udpLogAppender.RemoteAddress = sysLogHost;
                     //port 514 default

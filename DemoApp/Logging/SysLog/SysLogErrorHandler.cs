@@ -10,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Logging.SysLog
 {
-    public class SyslogErrorEventArgs : EventArgs
-    {
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
-        public ErrorCode? ErrorCode { get; set; }
+    //public class SyslogErrorEventArgs : EventArgs
+    //{
+    //    public string Message { get; set; }
+    //    public Exception Exception { get; set; }
+    //    public ErrorCode? ErrorCode { get; set; }
 
-        public SyslogErrorEventArgs()
-        {
-            Message = string.Empty;
-            Exception = null;
-            ErrorCode = null;
-        }
-    }
+    //    public SyslogErrorEventArgs()
+    //    {
+    //        Message = string.Empty;
+    //        Exception = null;
+    //        ErrorCode = null;
+    //    }
+    //}
 
     public class SyslogErrorHandler : ISysLogErrorHandler
     {

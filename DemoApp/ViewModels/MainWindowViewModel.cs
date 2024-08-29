@@ -197,11 +197,17 @@ namespace DemoApp.ViewModels
 
         #region Popups
 
-        private bool _popupOpen;
-        public bool PopupOpen
+        public event EventHandler<PopupEventArgs> PopupButtonClicked;
+
+        private Queue<PopupModel> _popups;
+
+        private int _popupQueueNumber;
+
+        private PopupMode _popupMode;
+        public PopupMode PopupMode
         {
-            get { return _popupOpen; }
-            set { _popupOpen = value; OnPropertyChanged(nameof(PopupOpen)); }
+            get { return _popupMode; }
+            set { _popupMode = value; OnPropertyChanged(nameof(PopupMode)); }
         }
 
         private string _popupTitle;
@@ -218,33 +224,21 @@ namespace DemoApp.ViewModels
             set { _popupText = value; OnPropertyChanged(nameof(PopupText)); }
         }
 
-        private string _popupButtonOkText;
-        public string PopupButtonOkText
+        private string _popupButton1Text;
+        public string PopupButton1Text
         {
-            get { return _popupButtonOkText; }
-            set { _popupButtonOkText = value; OnPropertyChanged(nameof(PopupButtonOkText)); }
+            get { return _popupButton1Text; }
+            set { _popupButton1Text = value; OnPropertyChanged(nameof(PopupButton1Text)); }
         }
 
-        private string _popupButtonYesText;
-        public string PopupButtonYesText
+        private string _popupButton2Text;
+        public string PopupButton2Text
         {
-            get { return _popupButtonYesText; }
-            set { _popupButtonYesText = value; OnPropertyChanged(nameof(PopupButtonYesText)); }
+            get { return _popupButton2Text; }
+            set { _popupButton2Text = value; OnPropertyChanged(nameof(PopupButton2Text)); }
         }
 
-        private string _popupButtonNoText;
-        public string PopupButtonNoText
-        {
-            get { return _popupButtonNoText; }
-            set { _popupButtonNoText = value; OnPropertyChanged(nameof(PopupButtonNoText)); }
-        }
-
-        private PopupMode _popupMode;
-        public PopupMode PopupMode
-        {
-            get { return _popupMode; }
-            set { _popupMode = value; OnPropertyChanged(nameof(PopupMode)); }
-        }
+       
 
         #endregion
 
@@ -491,42 +485,16 @@ namespace DemoApp.ViewModels
             }
         }
 
-        private ICommand _popupYesCommand;
-        public ICommand PopupYesCommand
+        private ICommand _popupCommand;
+        public ICommand PopupCommand
         {
             get
             {
-                if (_popupYesCommand == null)
+                if (_popupCommand == null)
                 {
-                    _popupYesCommand = new DelegateCommand(PopupYes);
+                    _popupCommand = new DelegateCommand<string>(Popup);
                 }
-                return _popupYesCommand;
-            }
-        }
-
-        private ICommand _popupNoCommand;
-        public ICommand PopupNoCommand
-        {
-            get
-            {
-                if (_popupNoCommand == null)
-                {
-                    _popupNoCommand = new DelegateCommand(PopupNo);
-                }
-                return _popupNoCommand;
-            }
-        }
-
-        private ICommand _popupOkCommand;
-        public ICommand PopupOkCommand
-        {
-            get
-            {
-                if (_popupOkCommand == null)
-                {
-                    _popupOkCommand = new DelegateCommand(PopupOk);
-                }
-                return _popupOkCommand;
+                return _popupCommand;
             }
         }
 
@@ -616,15 +584,15 @@ namespace DemoApp.ViewModels
             //    log.Error(ex);
             //}
 
+            _popups = new Queue<PopupModel>();
 
 
-            _popupOpen = true;
-            _popupButtonOkText = "OK";
-            _popupButtonNoText = "No";
-            _popupButtonYesText = "Yes";
-            _popupMode = PopupMode.OneButton;
-            _popupTitle = "Notification";
-            _popupText = "Thing happened.";
+            //_popupOpen = true;
+            //_popupButton1Text = "Yes";
+            //_popupButton2Text = "No";
+            //_popupMode = PopupMode.OneButton;
+            //_popupTitle = "Notification";
+            //_popupText = "Thing happened.";
 
             //Vm and view init
 
@@ -1165,19 +1133,68 @@ namespace DemoApp.ViewModels
             _navigator.ChangeToSlot(_navigationStore.NextIndex, true, true);
         }
 
-        public void PopupYes()
+        public void Popup(string command)
         {
+            try
+            {
+                PopupClickedButton cmd = (PopupClickedButton)int.Parse(command);
 
+                int queueNumber = _popupQueueNumber;
+
+                switch (cmd)
+                {
+                    case PopupClickedButton.Ok:
+                        NextPopup();
+                        break;
+
+                    default:
+                        break;
+                }
+
+                PopupButtonClicked?.Invoke(this, new PopupEventArgs { Button = cmd, QueueNumber = queueNumber });
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
         }
 
-        public void PopupNo()
+        public int AddToPopupQueue(PopupModel popup)
         {
+            popup.QueueNumber = _popups.Count();
+            _popups.Enqueue(popup);
 
+            if (PopupMode == PopupMode.Inactive)
+            {
+                _popupQueueNumber = popup.QueueNumber;
+                PopupMode = popup.Mode;
+                PopupTitle = popup.Title;
+                PopupText = popup.Text;
+                PopupButton1Text = popup.Button1Text;
+                PopupButton2Text = popup.Button2Text;
+            }
+
+            return popup.QueueNumber;
         }
 
-        public void PopupOk()
+        public void NextPopup()
         {
-            PopupMode = PopupMode.Inactive;
+            //no popups, remove modal from sight
+            if (_popups.Count() <= 1)
+            {
+                PopupMode = PopupMode.Inactive;
+            }
+
+            //remove current popup
+            _popups.Dequeue();
+
+            //peek at next popup and take values from there
+            var popup = _popups.Peek();
+            PopupMode = popup.Mode;
+            PopupTitle = popup.Title;
+            PopupText = popup.Text;
+            PopupButton1Text = popup.Button1Text;
+            PopupButton2Text = popup.Button2Text;            
         }
 
         #endregion

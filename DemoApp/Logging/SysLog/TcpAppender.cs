@@ -1,4 +1,5 @@
-﻿using log4net.Appender;
+﻿using DemoApp.Id;
+using log4net.Appender;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,19 @@ using System.Threading.Tasks;
 namespace DemoApp.Logging.SysLog
 {
     //https://github.com/TSYS-Merchant/syslog4net/
-    public class TcpAppender : AppenderSkeleton
+    public class TcpAppender : AppenderSkeleton, ISysLogAppender
     {
         private static int _failedConnectionCount = 0;
+        public bool Testing { get; set; }
+        public event EventHandler<EventArgs> TestSuccess;
+        public event EventHandler<SyslogErrorEventArgs> TestFailed;
 
         #region Public Instance Constructors
 
         public TcpAppender()
         {
+            Testing = false;
+
             // set port to some invalid value, forcing you to set the port
             this._remotePort = IPEndPoint.MinPort - 1;
         }
@@ -96,6 +102,14 @@ namespace DemoApp.Logging.SysLog
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            if (Testing)
+            {
+                if ((loggingEvent.MessageObject as string).StartsWith(Logs.SysLogTestMessageId))
+                {
+                    AppendTest(loggingEvent);
+                    return;
+                }
+            }
 
             try
             {
@@ -168,6 +182,107 @@ namespace DemoApp.Logging.SysLog
                 loggingData.Client.Close();
             }
         }
+
+        private void AppendTest(LoggingEvent loggingEvent)
+        {
+            try
+            {
+                TcpClient client = new TcpClient();
+
+                string message = RenderLoggingEvent(loggingEvent);
+
+                //Async Programming Model allows socket connection to happen on threadpool so app can continue.
+                client.BeginConnect(
+                    this.RemoteAddress,
+                    this.RemotePort,
+                    this.ConnectionEstablishedCallbackTest,
+                    new AsyncLoggingData()
+                    {
+                        Client = client,
+                        LoggingEvent = loggingEvent,
+                        Message = message
+                    });
+            }
+            catch (Exception ex)
+            {
+                TestFailed?.Invoke(this, new SyslogErrorEventArgs
+                {
+                    Message = "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                    Exception = ex,
+                    ErrorCode = ErrorCode.WriteFailure
+
+                });
+
+                ErrorHandler.Error(
+                    "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " +
+                    this.RemotePort + ".", ex, ErrorCode.WriteFailure);
+            }
+        }
+
+        private void ConnectionEstablishedCallbackTest(IAsyncResult asyncResult)
+        {
+            // TODO callback happens on background thread. lose data if app pool recycled?
+            AsyncLoggingData loggingData = asyncResult.AsyncState as AsyncLoggingData;
+            if (loggingData == null)
+            {
+                throw new ArgumentException("LoggingData is null", "loggingData");
+            }
+
+            try
+            {
+                loggingData.Client.EndConnect(asyncResult);
+            }
+            catch (Exception ex)
+            {
+                Interlocked.Increment(ref _failedConnectionCount);
+                if (_failedConnectionCount >= 1)
+                {
+                    TestFailed?.Invoke(this, new SyslogErrorEventArgs
+                    {
+                        Message = "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                        Exception = ex,
+                        ErrorCode = ErrorCode.WriteFailure
+
+                    });
+
+                    //We have failed to connect to all the IP Addresses. connection has failed overall.
+                    ErrorHandler.Error(
+                        "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " +
+                        this.RemotePort + ".", ex, ErrorCode.FileOpenFailure);
+                    return;
+                }
+            }
+
+            try
+            {
+                Byte[] buffer = this._encoding.GetBytes(loggingData.Message.ToCharArray());
+                using (var netStream = loggingData.Client.GetStream())
+                {
+                    netStream.Write(buffer, 0, buffer.Length);
+                }
+                TestSuccess?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                TestFailed?.Invoke(this, new SyslogErrorEventArgs
+                {
+                    Message = "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                    Exception = ex,
+                    ErrorCode = ErrorCode.WriteFailure
+
+                });
+
+                ErrorHandler.Error(
+                    "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " +
+                    this.RemotePort + ".", ex, ErrorCode.WriteFailure);
+            }
+            finally
+            {
+                loggingData.Client.Close();
+            }
+        }
+
+       
         override protected bool RequiresLayout
         {
             get { return true; }

@@ -247,6 +247,7 @@
     <Compile Include="Databases\IDatabase.cs" />
     <Compile Include="Databases\IDatabaseSQLite.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="EventArgs.cs" />
     <Compile Include="Factories\DatabaseServiceFactory.cs" />
     <Compile Include="FlatUIWindow.xaml.cs">
       <DependentUpon>FlatUIWindow.xaml</DependentUpon>
@@ -268,6 +269,7 @@
     <Compile Include="Logging\SysLog\Converters\ThreadIdConverter.cs" />
     <Compile Include="Logging\SysLog\Converters\ThreadNameConverter.cs" />
     <Compile Include="Logging\SysLog\Converters\VersionConverter.cs" />
+    <Compile Include="Logging\SysLog\ISysLogAppender.cs" />
     <Compile Include="Logging\SysLog\ISysLogErrorHandler.cs" />
     <Compile Include="Logging\SysLog\LogExceptionToFileFilter.cs" />
     <Compile Include="Logging\SysLog\SysLogErrorHandler.cs" />
@@ -277,6 +279,7 @@
     <Compile Include="Logging\SysLog\UdpAppenderCustom.cs" />
     <Compile Include="Model\LanguageItem.cs" />
     <Compile Include="Model\NavigationFunctionRecord.cs" />
+    <Compile Include="Model\PopupModel.cs" />
     <Compile Include="Model\Settings\LanguageCollectionSettings.cs" />
     <Compile Include="Model\Settings\LanguageSettings.cs" />
     <Compile Include="ObservableObject.cs" />

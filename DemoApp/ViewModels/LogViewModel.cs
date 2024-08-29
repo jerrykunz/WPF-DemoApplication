@@ -1,5 +1,7 @@
 ﻿using DemoApp.Config;
+using DemoApp.Id;
 using DemoApp.Logging.SysLog;
+using DemoApp.Model;
 using DemoApp.Stores;
 using log4net;
 using System;
@@ -95,7 +97,6 @@ namespace DemoApp.ViewModels
         {
             _textStore = textStore;
             _syslogErrorHandler = syslogErrorHandler;
-            _syslogErrorHandler.SysLogError += _syslogErrorHandler_SysLogError;
 
             HtmlTextLog = _textStore.GetString("LogViewLogText.html");
             _selectedLogLevel = LogViewModelLogLevel.Debug;
@@ -104,11 +105,6 @@ namespace DemoApp.ViewModels
             HtmlTextSyslog = _textStore.GetString("LogViewSyslogText.html");
             _selectedSyslogLevel = LogViewModelLogLevel.Debug;
             SyslogMessage = "Test message";
-        }
-
-        private void _syslogErrorHandler_SysLogError(object sender, SyslogErrorEventArgs e)
-        {
-
         }
 
         public void LogSave()
@@ -131,28 +127,78 @@ namespace DemoApp.ViewModels
                     log.Fatal(LogMessage);
                     break;
             }
+
+            App.Instance.MainVm.AddToPopupQueue(new PopupModel
+            {
+                Mode = PopupMode.OneButton,
+                Title = "Notification",
+                Text = "Message saved to logfile succesfully",
+                Button1Text = "Ok"
+            });
         }
 
         public void SysLogSend()
         {
+            App.Instance.SysLogAppender.Testing = true;
+
             switch (SelectedLogLevel)
             {
                 case LogViewModelLogLevel.Debug:
-                    sysLog.Debug(SyslogMessage);
+                    sysLog.Debug(Logs.SysLogTestMessageId + SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Info:
-                    sysLog.Info(SyslogMessage);
+                    sysLog.Info(Logs.SysLogTestMessageId + SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Warn:
-                    sysLog.Warn(SyslogMessage);
+                    sysLog.Warn(Logs.SysLogTestMessageId + SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Error:
-                    sysLog.Error(SyslogMessage);
+                    sysLog.Error(Logs.SysLogTestMessageId + SyslogMessage);
                     break;
                 case LogViewModelLogLevel.Fatal:
-                    sysLog.Fatal(SyslogMessage);
+                    sysLog.Fatal(Logs.SysLogTestMessageId + SyslogMessage);
                     break;
             }
+
+            App.Instance.SysLogAppender.Testing = false;
+        }
+
+        private void Appender_TestSuccess(object sender, EventArgs e)
+        {
+            App.Instance.MainVm.AddToPopupQueue(new PopupModel
+            {
+                Mode = PopupMode.OneButton,
+                Title = "Notification",
+                Text = "Message sent succesfully",
+                Button1Text = "Ok"
+            });
+        }
+
+        private void Appender_TestFailed(object sender, SyslogErrorEventArgs e)
+        {
+            App.Instance.MainVm.AddToPopupQueue(new PopupModel
+            {
+                Mode = PopupMode.OneButton,
+                Title = "Error",
+                Text = e.Message,
+                Button1Text = "Ok"
+            });
+        }
+
+        public override void OnEnter()
+        {
+            App.Instance.SysLogAppender.TestFailed += Appender_TestFailed;
+            App.Instance.SysLogAppender.TestSuccess += Appender_TestSuccess;
+
+            base.OnEnter();
+        }
+
+        public override void OnExit()
+        {
+            App.Instance.SysLogAppender.TestFailed -= Appender_TestFailed;
+            App.Instance.SysLogAppender.TestSuccess -= Appender_TestSuccess;
+
+            base.OnExit();
         }
 
     }

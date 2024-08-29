@@ -1,4 +1,5 @@
-﻿using log4net.Appender;
+﻿using DemoApp.Id;
+using log4net.Appender;
 using log4net.Core;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,12 @@ using System.Threading.Tasks;
 
 namespace DemoApp.Logging.SysLog
 {
-    public class UdpAppenderCustom : AppenderSkeleton
+    public class UdpAppenderCustom : AppenderSkeleton, ISysLogAppender
     {
+        public bool Testing { get; set; }
+        public event EventHandler<EventArgs> TestSuccess;
+        public event EventHandler<SyslogErrorEventArgs> TestFailed;
+
         #region Public Instance Constructors
 
         public UdpAppenderCustom()
@@ -92,6 +97,15 @@ namespace DemoApp.Logging.SysLog
 
         protected override void Append(LoggingEvent loggingEvent)
         {
+            if (Testing)
+            {
+                if ((loggingEvent.MessageObject as string).StartsWith(Logs.SysLogTestMessageId))
+                {
+                    AppendTest(loggingEvent);
+                    return;
+                }
+            }
+
             UdpClient udpClient = null;
             try
             {
@@ -124,6 +138,49 @@ namespace DemoApp.Logging.SysLog
             }            
         }
 
+        private void AppendTest(LoggingEvent loggingEvent)
+        {
+
+            UdpClient udpClient = null;
+            try
+            {
+                // Create a new UdpClient
+                udpClient = new UdpClient();
+
+                string message = RenderLoggingEvent(loggingEvent);
+
+                // Convert the message string to a byte array
+                byte[] data = this._encoding.GetBytes(message.ToCharArray());
+
+                // Send the message asynchronously to the specified remote address and port
+                udpClient.BeginSend(data,
+                                    data.Length,
+                                    new IPEndPoint(this.RemoteAddress, this.RemotePort),
+                                    new AsyncCallback(SendCallback),
+                                    udpClient);
+
+            }
+            catch (Exception ex)
+            {
+                if (udpClient != null)
+                {
+                    udpClient.Dispose();
+                }
+
+                TestFailed?.Invoke(this, new SyslogErrorEventArgs
+                {
+                    Message = "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                    Exception = ex,
+                    ErrorCode = ErrorCode.WriteFailure
+
+                });
+
+                ErrorHandler.Error("Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                                   ex,
+                                   ErrorCode.WriteFailure);
+            }
+        }
+
 
         private void SendCallback(IAsyncResult ar)
         {
@@ -135,6 +192,8 @@ namespace DemoApp.Logging.SysLog
 
                 // Complete the asynchronous send operation
                 udpClient.EndSend(ar);
+
+                TestSuccess?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -142,6 +201,14 @@ namespace DemoApp.Logging.SysLog
                 {
                     udpClient.Dispose();
                 }
+
+                TestFailed?.Invoke(this, new SyslogErrorEventArgs
+                {
+                    Message = "Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
+                    Exception = ex,
+                    ErrorCode = ErrorCode.WriteFailure
+
+                });
 
                 ErrorHandler.Error("Unable to send logging event to remote host " + this.RemoteAddress.ToString() + " on port " + this.RemotePort + ".",
                                    ex,

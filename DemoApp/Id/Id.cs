@@ -24,5 +24,6 @@ namespace DemoApp.Id
         public const string SysLogUdp = "SysLogUdp";
         public const string SysLogError = "SysLogError";
         public const string SysLogFileAppender = "SysLogFileAppender";
+        public const string SysLogTestMessageId = "-§SysLogTest§-";
     }
 }

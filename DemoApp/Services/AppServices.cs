@@ -81,8 +81,9 @@ namespace DemoApp.Services
             IDatabaseSQLite dbSQLite = databaseService.GetDatabase<IDatabaseSQLite>();
             services.AddSingleton<IDatabaseSQLite>(dbSQLite);
 
-
             services.AddSingleton<ISysLogErrorHandler, SyslogErrorHandler>();
+
+
 
             //services.AddTransient<AdminMenuViewModel>();
             //services.AddTransient<CheckedOutStaffViewModel>();

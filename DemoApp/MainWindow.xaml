@@ -58,9 +58,8 @@
 
 
         <custom:Modal Grid.RowSpan="2"
-                      Visibility="{Binding PopupMode, Converter={StaticResource PopupActiveVisibleCollapsedConverter}}"
                 Panel.ZIndex="10"
-                IsOpen="{Binding PopupOpen}"
+                IsOpen="{Binding PopupMode, Converter={StaticResource PopupModeActiveToBoolConverter}}"
                 Style="{StaticResource ModalNotificationStyle}"
                 BorderStyle="{StaticResource NotificationBorderStyle}"
                 OuterBorderStyle="{StaticResource NotificationOuterBorderStyle}">
@@ -78,6 +77,7 @@
                 </Border>
 
                 <Border Grid.Row="1"
+                        Margin="5"
                         Style="{StaticResource NotificationTextBackground}">
                     <TextBlock Style="{StaticResource NotificationTextStyle}"
                                Text="{Binding PopupText}" />
@@ -89,8 +89,8 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Style="{StaticResource ButtonStyle}"
-                            Content="{Binding PopupButtonOkText}"
-                            Command="{Binding PopupOkCommand}"/>
+                            Content="{Binding PopupButton1Text}"
+                            Command="{Binding PopupCommand}" CommandParameter="0"/>
 
 
                     <StackPanel Visibility="{Binding PopupMode, Converter={StaticResource PopupTwoButtonsVisibleCollapsedConverter}}"
@@ -98,11 +98,11 @@
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
                         <Button Style="{StaticResource ButtonStyle}"
-                                Content="{Binding PopupButtonYesText}"
-                                Command="{Binding PopupYesCommand}"/>
+                                Content="{Binding PopupButton1Text}"
+                                Command="{Binding PopupCommand}" CommandParameter="1"/>
                         <Button Style="{StaticResource ButtonStyle}"
-                                Content="{Binding PopupButtonNoText}"
-                                Command="{Binding PopupNoCommand}"/>
+                                Content="{Binding PopupButton2Text}"
+                                Command="{Binding PopupCommand}"  CommandParameter="2"/>
 
                     </StackPanel>
                 </Grid>

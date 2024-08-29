@@ -4,6 +4,7 @@ using log4net.Layout;
 using System;
 using System.Globalization;
 using DemoApp.Logging.SysLog.Converters;
+using DemoApp.Id;
 
 namespace DemoApp.Logging.SysLog
 {
@@ -83,6 +84,9 @@ namespace DemoApp.Logging.SysLog
                     message = message.Substring(0, lMaxMessageLength);
                     message = string.Concat(message, Environment.NewLine);
                 }
+
+                //filter out testmessage identifiers
+                message = message.Replace(Logs.SysLogTestMessageId, "");
 
                 if (OnlyFirstLine)
                 {
