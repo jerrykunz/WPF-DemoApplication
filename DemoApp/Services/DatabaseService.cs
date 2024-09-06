@@ -64,5 +64,69 @@ namespace DemoApp.Services
 
             return new List<EnergyMinAvgRecord>();
         }
+
+        public void AddAccount(AccountRecord account)
+        {
+            try
+            {
+                foreach (IDatabase db in _databases.Values)
+                {
+                    Task.Run(() =>
+                    {
+                        db.AddAccount(account);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        public void DeleteAccount(int id)
+        {
+            try
+            {
+                foreach (IDatabase db in _databases.Values)
+                {
+                    Task.Run(() =>
+                    {
+                        db.DeleteAccount(id);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        public void UpdateAccount(AccountRecord account)
+        {
+            try
+            {
+                foreach (IDatabase db in _databases.Values)
+                {
+                    Task.Run(() =>
+                    {
+                        db.UpdateAccount(account);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        public IEnumerable<AccountRecord> GetAllAccounts()
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return Databases[DatabaseNames.SQLite].GetAllAccounts();
+            }
+
+            return new List<AccountRecord>();
+        }
     }
 }

@@ -65,6 +65,7 @@ namespace DemoApp.Services
             services.AddTransient<ChartViewModel>();
             services.AddTransient<IntroductionViewModel>();
             services.AddTransient<LogViewModel>();
+            services.AddTransient<CrudViewModel>();
 
             //Stores
             services.AddSingleton<IActivityStore, ActivityStore>();

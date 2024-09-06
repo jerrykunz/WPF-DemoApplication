@@ -12,5 +12,9 @@ namespace DemoApp.Databases
         string Name { get; }
         bool AddOrUpdateEnergyMinAvg(DateTime timestamp, double average);
         IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end);
+        bool AddAccount(AccountRecord account);
+        bool DeleteAccount(int id);
+        bool UpdateAccount(AccountRecord account);
+        IEnumerable<AccountRecord> GetAllAccounts();
     }
 }

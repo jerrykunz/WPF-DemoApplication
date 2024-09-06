@@ -477,6 +477,7 @@ namespace DemoApp.Stores
             ViewNamesByVM.Add(typeof(ChartViewModel), "ChartView");
             ViewNamesByVM.Add(typeof(IntroductionViewModel), "IntroductionView");
             ViewNamesByVM.Add(typeof(LogViewModel), "LogView");
+            ViewNamesByVM.Add(typeof(CrudViewModel), "CrudView");
 
             //get vm by view name
             //it can be the case that 2 or more views share the same viewmodel, in this case when switching based on view, all of these views should be set here
@@ -488,6 +489,7 @@ namespace DemoApp.Stores
             ViewModelTypeByViewName.Add("ChartView", typeof(ChartViewModel));
             ViewModelTypeByViewName.Add("IntroductionView", typeof(IntroductionViewModel));
             ViewModelTypeByViewName.Add("LogView", typeof(LogViewModel));
+            ViewModelTypeByViewName.Add("CrudView", typeof(CrudViewModel));
 
             //whether to load as embedded or loose (LooseViews property in this class)
             //should match with ViewPrefersLoose
@@ -500,6 +502,7 @@ namespace DemoApp.Stores
             ViewPrefersLooseByName.Add("ChartView");
             ViewPrefersLooseByName.Add("IntroductionView");
             ViewPrefersLooseByName.Add("LogView");
+            ViewPrefersLooseByName.Add("CrudView");
 
 
         }

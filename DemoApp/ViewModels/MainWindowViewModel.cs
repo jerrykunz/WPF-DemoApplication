@@ -639,6 +639,9 @@ namespace DemoApp.ViewModels
                 case "1":
                     _navigator.ChangeView("ChartView", true, true);
                     break;
+                case "3":
+                    _navigator.ChangeView("CrudView", true, true);
+                    break;
                 case "5":
                     _navigator.ChangeView("LogView", true, true);
                     break;

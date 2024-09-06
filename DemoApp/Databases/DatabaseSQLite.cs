@@ -63,5 +63,88 @@ namespace DemoApp.Databases
             _mutex.ReleaseMutex();
             return records;
         }
+
+        public bool AddAccount(AccountRecord account)
+        {
+            _mutex.WaitOne();
+            bool success = false;
+
+            var db = new DapperConnector();
+
+            try
+            {
+                db.AddAccount(account);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't add Account with name " + account.AccountName + ":" , ex);
+            }
+
+            _mutex.ReleaseMutex();
+            return success;
+        }
+
+        public bool DeleteAccount(int id)
+        {
+            _mutex.WaitOne();
+            bool success = false;
+
+            var db = new DapperConnector();
+
+            try
+            {
+                db.DeleteAccount(id);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't delete Account with id " + id + ":", ex);
+            }
+
+            _mutex.ReleaseMutex();
+            return success;
+        }
+
+        public bool UpdateAccount(AccountRecord account)
+        {
+            _mutex.WaitOne();
+            bool success = false;
+
+            var db = new DapperConnector();
+
+            try
+            {
+                db.UpdateAccount(account);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't update Account with id " + account.Id + ":", ex);
+            }
+
+            _mutex.ReleaseMutex();
+            return success;
+        }
+
+        public IEnumerable<AccountRecord> GetAllAccounts()
+        {
+            _mutex.WaitOne();
+
+            var db = new DapperConnector();
+
+            List<AccountRecord> records = new List<AccountRecord>();
+            try
+            {
+                records = db.GetAllAccounts().ToList();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't get Accounts: ",  ex);
+            }
+
+            _mutex.ReleaseMutex();
+            return records;
+        }
     }
 }
