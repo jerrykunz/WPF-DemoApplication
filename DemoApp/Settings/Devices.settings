@@ -1,0 +1,42 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DemoApp.Settings" GeneratedClassName="Devices">
+  <Profiles />
+  <Settings>
+    <Setting Name="SysLogInUse" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SysLogHost" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+    <Setting Name="SysLogPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6514</Value>
+    </Setting>
+    <Setting Name="SysLogEncoding" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1252</Value>
+    </Setting>
+    <Setting Name="SysLogLayout" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;%syslog-priority&gt;1 %utcdate{yyyy-MM-ddTHH:mm:ss.FFZ} %syslog-hostname %syslog-domainname %appdomain %syslog-process-id %syslog-message-id %syslog-structured-data %message%newline%exception</Value>
+    </Setting>
+    <Setting Name="SysLogFacilityCode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">16</Value>
+    </Setting>
+    <Setting Name="SysLogStructuredDataPrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">example@32473</Value>
+    </Setting>
+    <Setting Name="SysLogPrependMessageLength" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SysLogEntryFirstLineOnly" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SysLogSendLogsLevelMin" Type="DemoApp.Config.Log4NetLogLevel" Scope="User">
+      <Value Profile="(Default)">Off</Value>
+    </Setting>
+    <Setting Name="SysLogSendLogsLevelMax" Type="DemoApp.Config.Log4NetLogLevel" Scope="User">
+      <Value Profile="(Default)">Off</Value>
+    </Setting>
+    <Setting Name="SysLogProtocol" Type="DemoApp.Config.SysLogProtocol" Scope="User">
+      <Value Profile="(Default)">Tcp</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

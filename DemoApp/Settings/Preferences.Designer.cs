@@ -61,7 +61,7 @@ namespace DemoApp.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SingleBorderWindow")]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
         public global::System.Windows.WindowStyle WindowStyle {
             get {
                 return ((global::System.Windows.WindowStyle)(this["WindowStyle"]));

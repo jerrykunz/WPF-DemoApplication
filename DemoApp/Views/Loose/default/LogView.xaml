@@ -1,0 +1,148 @@
+﻿<UserControl x:Class="System.Windows.Controls.UserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DemoApp.Views.Loose.default"
+             xmlns:wpf="clr-namespace:TheArtOfDev.HtmlRenderer.WPF;assembly=HtmlRenderer.WPF"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <wpf:HtmlPanel Grid.Row="0"
+                       VerticalAlignment="Top"
+                       Margin="0"
+                       Padding="0"
+                       Background="Transparent" 
+                       Text="{Binding HtmlTextLog}"/>
+
+        <Grid Grid.Row="1"
+              Grid.IsSharedSizeScope="True" 
+              Margin="10 0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" 
+              Margin="0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="G1" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G2" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G3" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                       HorizontalAlignment="Left"
+                       TextAlignment="Center"
+                       Text="Log level"/>
+                <TextBlock Grid.Column="1"
+                       HorizontalAlignment="Left"
+                       TextAlignment="Center"
+                       Text="Message"/>
+            </Grid>
+
+
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="G1" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G2" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G3" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
+                  ItemsSource="{Binding LogLevels}"
+                  SelectedItem="{Binding SelectedLogLevel}"
+                  Width="100"
+                  Height="25"/>
+                <TextBox  Grid.Column="1"
+                  Padding="0 2"
+                 Text="{Binding LogMessage, Mode=TwoWay}"
+                 Width="200"
+                 Height="25"/>
+                <Button Grid.Column="2"
+                Padding="10 0 10 3"
+                VerticalAlignment="Center"
+                FontWeight="Bold"
+                Command="{Binding LogSaveCommand}"
+                Content="Save"
+                Margin="0"
+                Width="Auto"
+                Height="25"/>
+            </Grid>
+        </Grid>
+
+        <wpf:HtmlPanel Grid.Row="2"
+                       Margin="0 10 0 0"
+                       Background="Transparent" 
+                       Text="{Binding HtmlTextSyslog}"/>
+
+
+        <Grid Grid.Row="3"
+              Grid.IsSharedSizeScope="True" 
+              Margin="10 0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" 
+              Margin="0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="G1" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G2" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G3" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                       HorizontalAlignment="Left"
+                       TextAlignment="Center"
+                       Text="Log level"/>
+                <TextBlock Grid.Column="1"
+                       HorizontalAlignment="Left"
+                       TextAlignment="Center"
+                       Text="Message"/>
+            </Grid>
+
+
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="G1" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G2" Width="Auto"/>
+                    <ColumnDefinition SharedSizeGroup="G3" Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding SyslogLevels}"
+                          SelectedItem="{Binding SelectedSyslogLevel}"
+                          Width="100"
+                          Height="25"/>
+                <TextBox  Grid.Column="1"
+                          Padding="0 2"
+                          Text="{Binding SyslogMessage, Mode=TwoWay}"
+                          Width="200"
+                          Height="25"/>
+                <Button Grid.Column="2"
+                        Padding="10 0 10 3"
+                VerticalAlignment="Center"
+                        FontWeight="Bold"
+                        Command="{Binding SyslogSendCommand}"
+                        Content="Send"
+                        Margin="0"
+                        Width="Auto"
+                        Height="25"/>
+            </Grid>
+        </Grid>
+    </Grid>
+    
+    
+    
+    
+    
+   
+</UserControl>

@@ -1,4 +1,7 @@
-﻿using DemoApp.Stores;
+﻿using DemoApp.Databases;
+using DemoApp.Factories;
+using DemoApp.Logging.SysLog;
+using DemoApp.Stores;
 using DemoApp.ViewModels;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,13 +61,29 @@ namespace DemoApp.Services
             services.AddTransient<InitViewModel>();
             services.AddTransient<TestFirstViewModel>();
             services.AddTransient<NavTest1ViewModel>();
+            services.AddTransient<HubViewModel>();
+            services.AddTransient<ChartViewModel>();
+            services.AddTransient<IntroductionViewModel>();
+            services.AddTransient<LogViewModel>();
+            services.AddTransient<CrudViewModel>();
 
             //Stores
             services.AddSingleton<IActivityStore, ActivityStore>();
             services.AddSingleton<INavigationStore, NavigationStore>();
 
+            services.AddSingleton<ITextStore, TextStore>();
+
             //Services
             services.AddSingleton<INavigator, Navigator>();
+
+            IDatabaseService databaseService = DatabaseServiceFactory.CreateDatabaseService();
+            services.AddSingleton<IDatabaseService>(databaseService);
+
+            IDatabaseSQLite dbSQLite = databaseService.GetDatabase<IDatabaseSQLite>();
+            services.AddSingleton<IDatabaseSQLite>(dbSQLite);
+
+            services.AddSingleton<ISysLogErrorHandler, SyslogErrorHandler>();
+
 
 
             //services.AddTransient<AdminMenuViewModel>();

@@ -4,12 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:country="clr-namespace:CountryFlag;assembly=CountryFlag"
+        xmlns:custom="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI"
         xmlns:local="clr-namespace:DemoApp"
         mc:Ignorable="d"
-        Topmost="{Binding Path=WinTopmost, Mode=OneWay}"
-        WindowState="{Binding Path=WinState, Mode=OneWay}"
-        WindowStyle="{Binding Path=WinStyle, Mode=OneWay}"  
-        Title="DemoApp" Height="450" Width="800">
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStyle="None"
+        Style="{StaticResource WindowStyle}"
+        Title="DemoApp" Height="675" Width="1200">
 
     <Window.InputBindings>
         <KeyBinding Modifiers="Alt" Key="F4" Command="{Binding ExitCommand}" />
@@ -45,11 +49,710 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Viewbox SnapsToDevicePixels="True" Stretch="Fill" StretchDirection="Both">
-        <DockPanel Width="{Binding Width}" 
-                   Height="{Binding Height}"
-                   SnapsToDevicePixels="True">
-            <ContentControl Content="{Binding CurrentView}" />
-        </DockPanel>
-    </Viewbox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+
+        <custom:Modal Grid.RowSpan="2"
+                Panel.ZIndex="10"
+                IsOpen="{Binding PopupMode, Converter={StaticResource PopupModeActiveToBoolConverter}}"
+                Style="{StaticResource ModalNotificationStyle}"
+                BorderStyle="{StaticResource NotificationBorderStyle}"
+                OuterBorderStyle="{StaticResource NotificationOuterBorderStyle}">
+            <Grid Style="{StaticResource NotificationGridStyle}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Style="{StaticResource NotificationTitleBackground}">
+                    <TextBlock Style="{StaticResource NotificationTitleStyle}"
+                               Text="{Binding PopupTitle}" />
+                </Border>
+
+                <Border Grid.Row="1"
+                        Margin="5"
+                        Style="{StaticResource NotificationTextBackground}">
+                    <TextBlock Style="{StaticResource NotificationTextStyle}"
+                               Text="{Binding PopupText}" />
+                </Border>
+
+                <Grid Grid.Row="2">
+
+                    <Button Visibility="{Binding PopupMode, Converter={StaticResource PopupOneButtonVisibleCollapsedConverter}}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ButtonStyle}"
+                            Content="{Binding PopupButton1Text}"
+                            Command="{Binding PopupCommand}" CommandParameter="0"/>
+
+
+                    <StackPanel Visibility="{Binding PopupMode, Converter={StaticResource PopupTwoButtonsVisibleCollapsedConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+                        <Button Style="{StaticResource ButtonStyle}"
+                                Content="{Binding PopupButton1Text}"
+                                Command="{Binding PopupCommand}" CommandParameter="1"/>
+                        <Button Style="{StaticResource ButtonStyle}"
+                                Content="{Binding PopupButton2Text}"
+                                Command="{Binding PopupCommand}"  CommandParameter="2"/>
+
+                    </StackPanel>
+                </Grid>
+                
+                <!--<StackPanel
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal">
+                    <Button
+                        Style="{StaticResource ButtonStyle}"
+                        Content="{DynamicResource Button_Continue}"
+                        Command="{Binding OfflineDialogCommand}">
+                    </Button>
+                </StackPanel>-->
+                    
+            </Grid>
+        </custom:Modal>
+
+
+
+
+
+
+        <Border BorderThickness="0" 
+                Grid.RowSpan="2"
+                CornerRadius="{Binding CornerRadius}"
+                 Background="{DynamicResource WindowBackGround}" >
+            
+            <!--Moved between window controls-->
+            <!--Double click to maximize/normalize-->
+            <!--<i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDown">
+                    <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                    <i:InvokeCommandAction Command="{Binding BorderMouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>-->
+            <!--Double click to maximize/normalize end-->
+
+
+            <Grid>
+
+                <!--resize grid-->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="5"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="5"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Resize borders -->
+                    <Grid Grid.Row="1" Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="1"
+                                Width="16"
+                                Command="{Binding MinimizeCommand}"
+                                Style="{DynamicResource InvisibleButton}"
+                                Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                IsHitTestVisible="True"
+                                Margin="5, 0"/>
+                        <Button Grid.Column="2"
+                                Width="16"
+                                Command="{Binding MaximizeCommand}"
+                                Style="{DynamicResource InvisibleButton}"
+                                Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                IsHitTestVisible="True"
+                                Margin="5, 0"/>
+                        <Button Grid.Column="3"
+                                Width="16"
+                                Command="{Binding CloseCommand}"
+                                Style="{DynamicResource InvisibleButton}"
+                                Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                IsHitTestVisible="True"
+                                Margin="5, 0"/>
+                    </Grid>
+
+                    <Border x:Name="TopLeft" Grid.Row="1" Grid.Column="1" Cursor="{Binding CursorNWSE}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="Top" Grid.Row="0" Grid.Column="2" Cursor="{Binding CursorNS}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="TopRight" Grid.Row="1" Grid.Column="3" Cursor="{Binding CursorNESW}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="Left" Grid.Row="2" Grid.Column="0" Cursor="{Binding CursorWE}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border Grid.Row="2" Grid.Column="1" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="Right" Grid.Row="2" Grid.Column="4" Cursor="{Binding CursorWE}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border Grid.Row="2" Grid.Column="3" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="BottomLeft" Grid.Row="3" Grid.Column="1" Cursor="{Binding CursorNESW}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="Bottom" Grid.Row="4" Grid.Column="2" Cursor="{Binding CursorNS}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border Grid.Row="3" Grid.Column="2"  Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+
+                    <Border x:Name="BottomRight" Grid.Row="3" Grid.Column="3" Cursor="{Binding CursorNWSE}" Background="Transparent">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <i:InvokeCommandAction Command="{Binding ResizeCommand}" PassEventArgsToCommand="True"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Border>
+                </Grid>
+                <!--resize grid end-->
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                   
+
+                    <!--Window Controls-->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+
+                            <Rectangle Grid.Row="1" 
+                                       Fill="Transparent">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding BorderMouseDownCommand}" PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction Command="{Binding BorderMouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Rectangle>
+                        </Grid>
+                        
+                        
+
+
+                        <!--Main menu-->
+                        <Menu Margin="10 10 0 0" Grid.Column="0"
+                          Background="{DynamicResource WindowBackGround}" 
+                          BorderThickness="0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top">
+                            <MenuItem Header="File" BorderThickness="0">
+                                <!--<MenuItem Header="New.." BorderThickness="0" Icon="{x:Null}">
+                                </MenuItem>
+                                <MenuItem Header="Save"  BorderThickness="0" Icon="{x:Null}"/>
+                                <MenuItem Header="Load"  BorderThickness="0" Icon="{x:Null}"/>-->
+                                <MenuItem Header="Exit"  BorderThickness="0" Icon="{x:Null}"/>
+                            </MenuItem>
+                            <MenuItem Header="Edit">
+                                <MenuItem Header="Settings" BorderThickness="0" Icon="{x:Null}"/>
+                            </MenuItem>
+                            <MenuItem Header="View">
+                                <MenuItem Header="Styles" BorderThickness="0" Icon="{x:Null}">
+                                    <MenuItem Header="Default" BorderThickness="0" Icon="{x:Null}"/>
+                                    <MenuItem Header="Custom" BorderThickness="0" Icon="{x:Null}"/>
+                                </MenuItem>
+                            </MenuItem>
+                            <!--<MenuItem Header="Help"/>-->
+                        </Menu>
+                        <!--Main menu end-->
+
+                        <!--Window controls-->
+                        <Grid Margin="0 10 10 0" Grid.Column="2"
+                              VerticalAlignment="Top"
+                              HorizontalAlignment="Right">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                            Command="{Binding MinimizeCommand}"
+                            Style="{DynamicResource InvisibleButton}"
+                            Template="{DynamicResource NoMouseOverButtonTemplate}"
+                            IsHitTestVisible="True"
+                            Margin="5, 0">
+                                <Icon:PackIconMaterial
+                                           Foreground="{DynamicResource MainwindowIconColor}" 
+                                           Kind="Minus"
+                                           VerticalAlignment="Top"
+                                           HorizontalAlignment="Right"/>
+                            </Button>
+
+                            <Button Grid.Column="1"
+                            Command="{Binding MaximizeCommand}"
+                            Style="{DynamicResource InvisibleButton}"
+                            Template="{DynamicResource NoMouseOverButtonTemplate}"
+                            IsHitTestVisible="True"
+                             Margin="5, 0">
+
+                                <Grid>
+
+                                    <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
+                                                   Kind="SquareOutline"
+                                                   VerticalAlignment="Top"
+                                                   HorizontalAlignment="Right"
+                                                   Visibility="{Binding Maximized, Converter={StaticResource BoolCollapsedVisibleConverter}}"/>
+                                    <Icon:PackIconBoxIcons Foreground="{DynamicResource MainwindowIconColor}"
+                                                   Kind="RegularCopy"
+                                                   VerticalAlignment="Top"
+                                                   HorizontalAlignment="Right"
+                                                   Visibility="{Binding Maximized, Converter={StaticResource BoolVisibleCollapsedConverter}}"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Grid.Column="2"
+                            Command="{Binding CloseCommand}"
+                            Style="{DynamicResource InvisibleButton}"
+                            Template="{DynamicResource NoMouseOverButtonTemplate}"
+                            IsHitTestVisible="True"
+                            Margin="5, 0">
+
+                                <Icon:PackIconMaterial Foreground="{DynamicResource MainwindowIconColor}"
+                                               Kind="Close"
+                                               VerticalAlignment="Top"
+                                               HorizontalAlignment="Right"/>
+                            </Button>
+                        </Grid>
+                        <!--Window controls end-->
+
+                    </Grid>
+                    <!--Window Controls end-->
+
+                    <!--Content-->
+                    <Grid Grid.Row="1"
+                          Margin="10 0 10 10">
+                        <!--needs this to block some of the clicks going to first border-->
+                        <Border BorderThickness="1"  Background="{DynamicResource WindowBackGround}" >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Border>
+
+                        <!--<ContentControl Content="{Binding CurrentView}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ContentControl>-->
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Border Margin="0 10 0 0"
+                                    Grid.Row="0"
+                                    Padding="20 10 0 10"
+                                    CornerRadius="25 25 25 0">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#1976ff" Offset="0"/>
+                                        <GradientStop Color="#1976d2" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox x:Name="cbToggleMenu" Grid.Column="0" IsChecked="True">
+                                        <CheckBox.Template>
+                                            <ControlTemplate TargetType="CheckBox">
+                                                <Grid Background="Transparent">
+                                                    <Viewbox Width="25" Height="25">
+                                                        <Path
+                                     Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+                                     Fill="White"
+                                     Stretch="Fill" />
+                                                    </Viewbox>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </CheckBox.Template>
+                                    </CheckBox>
+
+                                    <TextBlock Grid.Column="1"
+                                               Margin="20 5 0 0"
+                                               FontSize="18"
+                                               Foreground="White"
+                                               Text="Demo Application" />
+
+
+
+
+                                    <Grid Grid.Column="2" HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Grid.Column="0"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding PreviousVmCommand}"
+                                                        Style="{DynamicResource InvisibleButton}"
+                                                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                        IsHitTestVisible="True"
+                                                        Margin="0 0 0 0">
+                                                <Icon:PackIconCodicons 
+                                                                    Padding="0"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="ChevronLeft"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                            </Button>
+
+                                            <Button Grid.Column="1"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Center"
+                                                        Command="{Binding NextVmCommand}"
+                                                        Style="{DynamicResource InvisibleButton}"
+                                                        Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                        IsHitTestVisible="True"
+                                                        Margin="0 0 10 0">
+                                                <Icon:PackIconCodicons Grid.Column="0"
+                                                                    Padding="0"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="ChevronRight"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                            </Button>
+
+                                        </Grid>
+
+
+                                        <Button Grid.Column="1"
+                                                Command="{Binding ZoomCommand}"
+                                                Style="{DynamicResource InvisibleButton}"
+                                                Template="{DynamicResource NoMouseOverButtonTemplate}"
+                                                IsHitTestVisible="True"
+                                                Margin="0 0 0 0">                                            
+                                            <Icon:PackIconRemixIcon Grid.Column="0"
+                                                                    Padding="0 0 0 4"
+                                                                    Foreground="White" 
+                                                                    Height="25"
+                                                                    Width="25"
+                                                                    Kind="FontSize"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Center"/>
+                                        </Button>
+
+                                        <!--<Icon:PackIconRemixIcon Grid.Column="0"
+                                                                    Margin="5 0 15 0"
+                                                                Padding="0 0 0 4"
+                                                Foreground="White" 
+                                                               Height="25"
+                                                               Width="25"
+                                                   Kind="FontSize"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   />-->
+
+
+
+                                        <ComboBox Grid.Column="2"
+                                              Foreground="White"
+                                              HorizontalAlignment="Right"
+                                              ItemsSource="{Binding LanguageItems}"
+                                              SelectedItem="{Binding SelectedLanguageItem}"
+                                              Margin="10 0"
+                                              Style="{DynamicResource ComboBoxFlatStyle}">
+
+                                            <ComboBox.ItemContainerStyle>
+                                                <Style TargetType="ComboBoxItem">
+                                                    <!-- Default Text Color -->
+                                                    <Setter Property="Foreground" Value="Black"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <!-- Trigger to Change Text Color When Selected -->
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsSelected" Value="False">
+                                                            <Setter Property="Foreground" Value="Black"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ComboBox.ItemContainerStyle>
+
+
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+
+
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Ellipse Grid.Column="0"
+                                                                 SnapsToDevicePixels="True"
+                                                                 RenderOptions.BitmapScalingMode="HighQuality"
+                                                             Width="30"
+                                                             Height="30"
+                                                             Margin="0 0 3 0"
+                                                             Stroke="Black"
+                                                             StrokeThickness="0.35">
+                                                            <Ellipse.Fill>
+                                                                <!--<ImageBrush Stretch="Uniform" ImageSource="pack://siteoforigin:,,,/Images/Flags/Square/gb.png"/>-->
+                                                                <ImageBrush Stretch="Uniform" ImageSource="{Binding FlagPath}" />
+                                                            </Ellipse.Fill>
+                                                        </Ellipse>
+                                                        <TextBlock Grid.Column="1"
+                                                        Text="{Binding Name}"
+                                                               FontSize="18"
+                                                               Margin="0 0 0 5.5"
+                                                               Padding="0"
+                                                               Width="32"
+                                                               Height="20"
+                                                               VerticalAlignment="Center" 
+                                                               HorizontalAlignment="Center"
+                                                               TextAlignment="Center"/>
+                                                    </Grid>
+
+
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+
+                                        </ComboBox>
+                                    </Grid>
+
+
+
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <custom:NavigationPanel Grid.Column="0"                                                        
+                                                        BorderBrush="#dbdbdb"
+                                                        BorderThickness="0 0 1 0"
+                                                        FallbackOpenWidth="165"
+                                                        IsOpen="{Binding IsChecked, ElementName=cbToggleMenu}"
+                                                        OpenCloseDuration="0:0:0.25">
+                                    <custom:NavigationPanel.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#f2f2f2" Offset="0"/>
+                                            <GradientStop Color="#e2e2e2" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </custom:NavigationPanel.Background>
+
+                                    <custom:NavigationPanel.Resources>
+                                        <Style TargetType="custom:NavigationPanelItem">
+                                            <Setter Property="Padding" Value="20 10" />
+                                            <Setter Property="FontSize" Value="16" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Foreground" Value="#444" />
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="MouseEnter">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                                            To="#dbdbdb"
+                                                                            Duration="0:0:0.1" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                                <EventTrigger RoutedEvent="MouseLeave">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Background).(SolidColorBrush.Color)"
+                                                                            To="Transparent"
+                                                                            Duration="0:0:0.1" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Foreground" Value="#1669bb" />
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Foreground" Value="#1669bb" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </custom:NavigationPanel.Resources>
+                                    <custom:NavigationPanel.Content>
+                                        <StackPanel Margin="0 10">
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="0">
+                                                <TextBlock Text="Introduction"/>
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="1">
+                                                <TextBlock Text="Charts" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="2">
+                                                <TextBlock Text="Customer Form" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="3">
+                                                <TextBlock Text="CRUD" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="4">
+                                                <TextBlock Text="Popups" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="5">
+                                                <TextBlock Text="Logging" />
+                                            </custom:NavigationPanelItem>
+                                            <custom:NavigationPanelItem Command="{Binding NavigationCommand}" CommandParameter="6">
+                                                <TextBlock Text="Settings" />
+                                            </custom:NavigationPanelItem>
+                                        </StackPanel>
+                                    </custom:NavigationPanel.Content>
+                                </custom:NavigationPanel>
+
+                                <ContentControl Grid.Column="1"
+                                                Content="{Binding CurrentView}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDown">
+                                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <i:InvokeCommandAction Command="{Binding HandleMouseCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ContentControl>
+
+                            </Grid>
+                        </Grid>
+
+                    </Grid>
+                    <!--Content End-->
+
+                </Grid>
+
+            </Grid>
+        </Border>
+
+
+    </Grid>
+
+
+
+
+
+
+
+
+
+
+
 </Window>

@@ -1,4 +1,5 @@
 ﻿using Bluegrams.Application;
+using DemoApp.Id;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ namespace DemoApp
         {
             if (!_initialized)
             {
-                //PortableSettingsProvider.ApplyProvider(Settings.Devices.Default);
+                PortableSettingsProvider.ApplyProvider(Settings.Devices.Default);
                 PortableSettingsProvider.ApplyProvider(Settings.Preferences.Default);
                 //PortableSettingsProvider.ApplyProvider(Settings.Data.Default);
                 //PortableSettingsProvider.ApplyProvider(Settings.Misc.Default);
@@ -24,10 +25,10 @@ namespace DemoApp
                 string executableName = Process.GetCurrentProcess().MainModule.FileName;
                 PortableSettingsProvider.SettingsFileName = App.ProcessName + ".config";
 
-                //if (Settings.Devices.Default.SysLogProtocol == Config.SysLogProtocol.Tcp)
-                //    LoggerSysLog = Logs.SysLogTcp;
-                //else
-                //    LoggerSysLog = Logs.SysLogUdp;
+                if (Settings.Devices.Default.SysLogProtocol == Config.SysLogProtocol.Tcp)
+                    LoggerSysLog = Logs.SysLogTcp;
+                else
+                    LoggerSysLog = Logs.SysLogUdp;
 
                 _initialized = true;
             }

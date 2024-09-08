@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WPF Case Study</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        ul {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Introduction</h1>
+    <p>This is a Windows Presentation Foundation (WPF) case study, a demo application that can be used as a base for many types of applications. The features are listed below:</p>
+
+    <h2>1) Custom Window (WindowStyle=None)</h2>
+    <p>Features a custom window with rounded corners, custom icons, and all functionality written from scratch. Functions include:</p>
+    <ul>
+        <li>Resizing</li>
+        <li>Dragging</li>
+        <li>Minimize/Maximize</li>
+        <li>Double click center of upper window to maximize</li>
+        <li>Alt+Enter fullscreen mode</li>
+        <li>Alt+F4 close</li>
+        <li>Close</li>
+    </ul>
+
+    <h2>2) Navigation Bar</h2>
+    <p>The navigation bar includes these functionalities:</p>
+    <ul>
+        <li>Hideable navigation bar</li>
+        <li>
+            Dynamic language change:
+            <ul>
+                <li>Supports infinite languages, each with its own flag picture</li>
+            </ul>
+        </li>
+        <li>
+            Zoom button:
+            <ul>
+                <li>Per theme amount of zoom levels, 3 by default, supports infinite amounts</li>
+                <li>Changes element sizes, customizable per element via style .xamls</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>3) Logging</h2>
+    <p>Logging with a customized log4net:</p>
+    <ul>
+        <li>Logs to files and syslog</li>
+        <li>Configurable from settings</li>
+    </ul>
+
+    <h2>4) Popups Using Modals</h2>
+    <p>Can be tested via 'Popups' in navigation.</p>
+
+    <h2>5) Charts Using LiveCharts</h2>
+    <ul>
+        <li>Generates random data, shows on live energy chart, saves to SQLite database for each minute</li>
+        <li>Retrieves data from SQLite database on entering view, shows this data in 1/10 minute average charts if within 10 minutes of the current moment</li>
+    </ul>
+
+    <h2>6) CRUD SQLite</h2>
+    <ul>
+        <li>Encrypted with a password</li>
+        <li>Create, read, update, and delete records as you wish</li>
+    </ul>
+
+    <h2>7) Multipage Form</h2>
+    <p>Keeps data across multiple pages.</p>
+
+    <h2>8) Navigation Engine</h2>
+    <ul>
+        <li>You can navigate based on the wanted view or viewmodel</li>
+        <li>If navigating via views, many views can share the same viewmodel, making the codebase simpler</li>
+        <li>You can define whether previous viewmodels are disposed of or kept in memory waiting for the next time it is navigated into, keeping the previous state or resetting on entry</li>
+        <li>Views can be based on loose .xaml files, or you can have the static views embedded within the program</li>
+        <li>The program remembers a customizable amount (default 8) of previous views, making it possible to backtrack using the 'Previous' button</li>
+    </ul>
+
+    <h2>9) Styles</h2>
+    <ul>
+        <li>You can define the folder where to retrieve the style .xamls from, each folder should have all the styles used by the application</li>
+        <li>You can define an infinite amount of new styles that customize the elements' appearance, and you can change them at runtime per folder</li>
+        <li>Each theme has as many zoom levels as you wish to define</li>
+        <li>Use in combination with loose views to completely change the appearance of the program</li>
+    </ul>
+
+    <h2>10) Loose Views</h2>
+    <ul>
+        <li>You can define the folder where to retrieve the loose views .xamls from, each folder should have all the views used by the application</li>
+        <li>You can define an infinite amount of new loose view folders that customize the elements' position and appearance, as well as new elements entirely, and you can change the used folder at runtime</li>
+        <li>You could also choose per view whether to use a loose .xaml, or the application embedded version</li>
+        <li>Use in combination with styles in order to completely change the appearance of the program</li>
+    </ul>
+
+    <h2>11) Settings</h2>
+    <ul>
+        <li>Can be used like a default .NET application (settings per user in C:\Users\<YourUser>\Appdata\Local\<ProgramName>)</li>
+        <li>Default .NET style can also be set to use roaming network profiles</li>
+        <li>Settings can also be portable, located in the program folder (...\DemoApp\DemoApp.config)</li>
+        <li>Portable settings can be PC-agnostic (DemoApp.config holds the same settings for all PCs using this folder) or per PC (DemoApp.config file holds settings for all different PCs using this folder)</li>
+        <li>You can define these for a whole settings class or each setting individually, portable or not</li>
+    </ul>
+
+    <h2>12) DelegateCommand & RelayCommand</h2>
+    <ul>
+        <li>DelegateCommand availability must be manually updated via RaiseCanExecuteChanged(), through which it checks the canExecute function</li>
+        <li>RelayCommand does the checking automatically according to UI events; you have less control when using this one</li>
+        <li>If you have, e.g., a string argument for your ICommand function, you can use 'DelegateCommand&lt;string&gt;(FunctionWithStringArgument)'; works with RelayCommand as well</li>
+    </ul>
+
+    <h2>13) Activity Checking and Timeout</h2>
+    <p>Includes functionality for activity checking and handling timeouts.</p>
+</body>
+</html>

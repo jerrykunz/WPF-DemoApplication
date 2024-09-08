@@ -11,6 +11,7 @@ namespace DemoApp.Services
     {
         void ChangeViewModel(Type viewModelType, bool onEnter, bool onExit);
         void ChangeViewModel<T>(bool onEnter, bool onExit) where T : class, IViewModel;
+        void ChangeToSlot(int index, bool onEnter, bool onExit);
         void PreviousViewModel(bool onEnter, bool onExit);
         void ChangeView(Type viewType, bool onEnter, bool onExit);
         void ChangeView<T>(bool onEnter, bool onExit);

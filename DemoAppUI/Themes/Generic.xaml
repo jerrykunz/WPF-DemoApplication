@@ -1,0 +1,68 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:DemoAppUI.Controls">
+
+
+    <Style TargetType="{x:Type local:NavigationPanel}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:NavigationPanel}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentControl Content="{TemplateBinding Content}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:NavigationPanelItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:NavigationPanelItem}">
+                    <Border
+                     Padding="{TemplateBinding Padding}"
+                     Background="{TemplateBinding Background}"
+                     BorderBrush="{TemplateBinding BorderBrush}"
+                     BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentControl Content="{TemplateBinding Content}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:Modal}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:Modal}">
+                    <ControlTemplate.Resources>
+                        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+                    </ControlTemplate.Resources>
+                    <Grid Background="{TemplateBinding Background}" Visibility="{TemplateBinding IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{TemplateBinding OuterBorderStyle}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            UseLayoutRounding="True">
+                            <Grid>
+                                <Grid.OpacityMask>
+                                    <VisualBrush Visual="{Binding ElementName=border}" />
+                                </Grid.OpacityMask>
+                                <Border
+                                    x:Name="border"
+                                    Style="{TemplateBinding BorderStyle}" 
+                                    CornerRadius="25"/>
+                                <ContentControl Content="{TemplateBinding Content}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
