@@ -1,4 +1,4 @@
-#WPF-DemoApplication
+# WPF-DemoApplication
 
 Introduction
 This is a Windows Presentation Foundation (WPF) case study, a demo application that can be used as a base for many types of application. The features are listed below:
