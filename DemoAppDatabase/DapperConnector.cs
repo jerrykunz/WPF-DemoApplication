@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DemoAppDatabase
 {
@@ -365,7 +366,52 @@ namespace DemoAppDatabase
         }
 
 
-        public void AddAccount(AccountRecord account)
+        public async void AddAccount(AccountRecord account)
+        {
+            string pass = GetVariable();
+
+            var accountNameTask = Task.Run(() => EncryptionService.Encrypt(account.AccountName, pass));
+            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true));
+            var emailTask = Task.Run(() => EncryptionService.Encrypt(account.Email, pass));
+            var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
+            var passwordHashTask = Task.Run(() => EncryptionService.Encrypt(account.PasswordHash, pass));
+            var firstNameTask = Task.Run(() => EncryptionService.Encrypt(account.FirstName, pass));       
+            var familyNameTask = Task.Run(() => EncryptionService.Encrypt(account.FamilyName, pass));
+            var phoneNumberTask = Task.Run(() =>  EncryptionService.Encrypt(account.PhoneNumber, pass));
+            var addressTask = Task.Run(() => EncryptionService.Encrypt(account.Address, pass));
+            var zipcodeTask = Task.Run(() => EncryptionService.Encrypt(account.Zipcode, pass));
+            var countryTask = Task.Run(() => EncryptionService.Encrypt(account.Country, pass));
+
+            await Task.WhenAll(accountNameTask, accountNameHashTask, emailTask, emailHashTask, passwordHashTask, firstNameTask, familyNameTask, phoneNumberTask, addressTask, zipcodeTask, countryTask);
+
+
+
+            var p = new DynamicParameters();
+            p.Add("@AccountName", accountNameTask.Result);
+            p.Add("@AccountNameHash", accountNameHashTask.Result);
+            p.Add("@Email", emailTask.Result);
+            p.Add("@EmailHash", emailHashTask.Result);
+            p.Add("@PasswordHash", passwordHashTask.Result);
+            p.Add("@FirstName", firstNameTask.Result);
+            p.Add("@FamilyName", familyNameTask.Result);
+            p.Add("@PhoneNumber", phoneNumberTask.Result);
+            p.Add("@Address", addressTask.Result);
+            p.Add("@Zipcode", zipcodeTask.Result);
+            p.Add("@Country", countryTask.Result);
+            ClearString(ref pass);
+
+            var query = @"INSERT INTO Accounts
+                ( AccountName, AccountNameHash, Email, EmailHash, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country ) VALUES
+                ( @AccountName, @AccountNameHash, @Email, @EmailHash, @PasswordHash, @FirstName, @FamilyName, @PhoneNumber, @Address, @Zipcode, @Country )";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+
+        public void AddAccount2(AccountRecord account)
         {
             string pass = GetVariable();
             var p = new DynamicParameters();
@@ -432,23 +478,41 @@ namespace DemoAppDatabase
             }
         }
 
-        public void UpdateAccount(AccountRecord account)
+        public async void UpdateAccount(AccountRecord account)
         {
             string pass = GetVariable();
+
+            var accountNameTask = Task.Run(() => EncryptionService.Encrypt(account.AccountName, pass));
+            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true));
+            var emailTask = Task.Run(() => EncryptionService.Encrypt(account.Email, pass));
+            var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
+            var passwordHashTask = Task.Run(() => EncryptionService.Encrypt(account.PasswordHash, pass));
+            var firstNameTask = Task.Run(() => EncryptionService.Encrypt(account.FirstName, pass));
+            var familyNameTask = Task.Run(() => EncryptionService.Encrypt(account.FamilyName, pass));
+            var phoneNumberTask = Task.Run(() => EncryptionService.Encrypt(account.PhoneNumber, pass));
+            var addressTask = Task.Run(() => EncryptionService.Encrypt(account.Address, pass));
+            var zipcodeTask = Task.Run(() => EncryptionService.Encrypt(account.Zipcode, pass));
+            var countryTask = Task.Run(() => EncryptionService.Encrypt(account.Country, pass));
+
+            await Task.WhenAll(accountNameTask, accountNameHashTask, emailTask, emailHashTask, passwordHashTask, firstNameTask, familyNameTask, phoneNumberTask, addressTask, zipcodeTask, countryTask);
+
             var p = new DynamicParameters();
             p.Add("@Id", account.Id);
-            p.Add("@AccountName", EncryptionService.Encrypt(account.AccountName, pass));
-            p.Add("@AccountNameHash", EncryptionService.ComputeSha256Hash(account.AccountName, true));
-            p.Add("@Email", EncryptionService.Encrypt(account.Email, pass));
-            p.Add("@EmailHash", EncryptionService.ComputeSha256Hash(account.Email, true));
-            p.Add("@PasswordHash", EncryptionService.Encrypt(account.PasswordHash, pass));
-            p.Add("@FirstName", EncryptionService.Encrypt(account.FirstName, pass));
-            p.Add("@FamilyName", EncryptionService.Encrypt(account.FamilyName, pass));
-            p.Add("@PhoneNumber", EncryptionService.Encrypt(account.PhoneNumber, pass));
-            p.Add("@Address", EncryptionService.Encrypt(account.Address, pass));
-            p.Add("@Zipcode", EncryptionService.Encrypt(account.Zipcode, pass));
-            p.Add("@Country", EncryptionService.Encrypt(account.Country, pass));
+            p.Add("@AccountName", accountNameTask.Result);
+            p.Add("@AccountNameHash", accountNameHashTask.Result);
+            p.Add("@Email", emailTask.Result);
+            p.Add("@EmailHash", emailHashTask.Result);
+            p.Add("@PasswordHash", passwordHashTask.Result);
+            p.Add("@FirstName", firstNameTask.Result);
+            p.Add("@FamilyName", familyNameTask.Result);
+            p.Add("@PhoneNumber", phoneNumberTask.Result);
+            p.Add("@Address", addressTask.Result);
+            p.Add("@Zipcode", zipcodeTask.Result);
+            p.Add("@Country", countryTask.Result);
             ClearString(ref pass);
+
+
+
 
             // Define the query for updating the account
             var query = @"
@@ -489,6 +553,7 @@ namespace DemoAppDatabase
                 conn.Open();
                 var result = conn.Query<AccountRecord>(query);
 
+                //TODO: multiple tasks and parallel for
                 string pass = GetVariable();
                 foreach (AccountRecord rec in result)
                 {
@@ -505,6 +570,51 @@ namespace DemoAppDatabase
                 ClearString(ref pass);
 
                 return result;
+            }
+        }
+
+        public IEnumerable<AccountRecord> GetAllAccounts2()
+        {
+            var query = @"SELECT Id, AccountName, Email, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country
+                  FROM Accounts";
+
+            using (var conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                List<AccountRecord> accounts = conn.Query<AccountRecord>(query).AsList<AccountRecord>();
+                //TODO: multiple tasks and parallel for
+                string pass = GetVariable();
+
+                Parallel.For(0, accounts.Count, (i) =>
+                {
+                    AccountRecord rec = accounts[i];
+
+                    rec.AccountName = EncryptionService.Decrypt(rec.AccountName, pass);
+                    rec.Email = EncryptionService.Decrypt(rec.Email, pass);
+                    rec.PasswordHash = EncryptionService.Decrypt(rec.PasswordHash, pass);
+                    rec.FirstName = EncryptionService.Decrypt(rec.FirstName, pass);
+                    rec.FamilyName = EncryptionService.Decrypt(rec.FamilyName, pass);
+                    rec.PhoneNumber = EncryptionService.Decrypt(rec.PhoneNumber, pass);
+                    rec.Address = EncryptionService.Decrypt(rec.Address, pass);
+                    rec.Zipcode = EncryptionService.Decrypt(rec.Zipcode, pass);
+                    rec.Country = EncryptionService.Decrypt(rec.Country, pass);
+                });
+
+                foreach (AccountRecord rec in accounts)
+                {
+                    rec.AccountName = EncryptionService.Decrypt(rec.AccountName, pass);
+                    rec.Email = EncryptionService.Decrypt(rec.Email, pass);
+                    rec.PasswordHash = EncryptionService.Decrypt(rec.PasswordHash, pass);
+                    rec.FirstName = EncryptionService.Decrypt(rec.FirstName, pass);
+                    rec.FamilyName = EncryptionService.Decrypt(rec.FamilyName, pass);
+                    rec.PhoneNumber = EncryptionService.Decrypt(rec.PhoneNumber, pass);
+                    rec.Address = EncryptionService.Decrypt(rec.Address, pass);
+                    rec.Zipcode = EncryptionService.Decrypt(rec.Zipcode, pass);
+                    rec.Country = EncryptionService.Decrypt(rec.Country, pass);
+                }
+                ClearString(ref pass);
+
+                return accounts;
             }
         }
 

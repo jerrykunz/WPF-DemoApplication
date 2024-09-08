@@ -18,7 +18,7 @@ namespace DemoAppDatabase.Services
         public static string Encrypt(string plainText, string password)
         {
             if (string.IsNullOrEmpty(plainText))
-                throw new ArgumentNullException(nameof(plainText));
+                return string.Empty;
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
 

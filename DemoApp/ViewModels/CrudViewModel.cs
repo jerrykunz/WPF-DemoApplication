@@ -26,13 +26,14 @@ namespace DemoApp.ViewModels
 
         public override void OnEnter()
         {
-            //_databaseService.AddAccount(new AccountRecord
-            //{
-            //    AccountName = "ExampleAccount1",
-            //    Email = "johndoe@mail.net",
-            //    PasswordHash = EncryptionService.ComputeSha256Hash("password123"),
-            //    FirstName = "John"
-            //});
+            string pwHash = EncryptionService.ComputeSha256Hash("password123");
+            _databaseService.AddAccount(new AccountRecord
+            {
+                AccountName = "ExampleAccount1",
+                Email = "johndoe@mail.net",
+                PasswordHash = pwHash,
+                FirstName = "John"
+            });
 
             Accounts.Clear();
             var tempAccounts = _databaseService.GetAllAccounts();
