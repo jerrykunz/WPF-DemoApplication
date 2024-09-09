@@ -83,7 +83,20 @@ namespace DemoApp.Services
             }
         }
 
-        public void DeleteAccount(int id)
+        public async Task AddAccountSingleFast(AccountRecord account)
+        {
+            try
+            {
+                var tasks = _databases.Values.Select(db => db.AddAccountSingleFast(account));
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error adding account:", ex);
+            }
+        }
+
+        public void DeleteAccountViaId(int id)
         {
             try
             {
@@ -91,7 +104,43 @@ namespace DemoApp.Services
                 {
                     Task.Run(() =>
                     {
-                        db.DeleteAccount(id);
+                        db.DeleteAccountViaId(id);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        public void DeleteAccountViaAccountNameHash(string accountNameHash)
+        {
+            try
+            {
+                foreach (IDatabase db in _databases.Values)
+                {
+                    Task.Run(() =>
+                    {
+                        db.DeleteAccountViaAccountNameHash(accountNameHash);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        public void DeleteAccountViaEmailHash(string emailHash)
+        {
+            try
+            {
+                foreach (IDatabase db in _databases.Values)
+                {
+                    Task.Run(() =>
+                    {
+                        db.DeleteAccountViaEmailHash(emailHash);
                     });
                 }
             }
@@ -119,11 +168,64 @@ namespace DemoApp.Services
             }
         }
 
+        public async Task UpdateAccountSingleFast(AccountRecord account)
+        {
+            try
+            {
+                var tasks = _databases.Values.Select(db => db.UpdateAccountSingleFast(account));
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error adding account:", ex);
+            }
+        }
+
         public IEnumerable<AccountRecord> GetAllAccounts()
         {
             if (Databases.ContainsKey(DatabaseNames.SQLite))
             {
                 return Databases[DatabaseNames.SQLite].GetAllAccounts();
+            }
+
+            return new List<AccountRecord>();
+        }
+
+        public AccountRecord GetAccountViaId(int id)
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return Databases[DatabaseNames.SQLite].GetAccountViaId(id);
+            }
+
+            return null;
+        }
+
+        public AccountRecord GetAccountViaAccountNameHash(string accountNameHash)
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return Databases[DatabaseNames.SQLite].GetAccountViaAccountNameHash(accountNameHash);
+            }
+
+            return null;
+        }
+
+        public AccountRecord GetAccountViaAccountEmailHash(string emailHash)
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return Databases[DatabaseNames.SQLite].GetAccountViaAccountEmailHash(emailHash);
+            }
+
+            return null;
+        }
+
+        public async Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return await Databases[DatabaseNames.SQLite].GetAccountsAsync(pageNumber, pageSize);
             }
 
             return new List<AccountRecord>();

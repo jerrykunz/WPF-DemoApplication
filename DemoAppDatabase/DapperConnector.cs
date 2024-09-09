@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using DemoAppDatabase.Model;
 using DemoAppDatabase.Services;
+using MessagePack;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -35,7 +36,7 @@ namespace DemoAppDatabase
             ClearString(ref variable);
         }
 
-        private static string GetVariable()
+        public static string GetVariable()
         {
             IntPtr unmanagedString = IntPtr.Zero;
             try
@@ -53,7 +54,7 @@ namespace DemoAppDatabase
             }
         }
 
-        static void ClearString(ref string str)
+        public static void ClearString(ref string str)
         {
             if (str != null)
             {
@@ -332,21 +333,30 @@ namespace DemoAppDatabase
 
                         try
                         {
+                            //conn.Execute(@"CREATE TABLE Accounts
+                            //            (
+                            //                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            //                AccountNameHash VARCHAR(1) UNIQUE NOT NULL,
+                            //                AccountName VARCHAR(1) NOT NULL,
+                            //                FirstName VARCHAR(1),
+                            //                FamilyName VARCHAR(1),
+                            //                EmailHash VARCHAR(1) UNIQUE NOT NULL,
+                            //                Email VARCHAR(1) NOT NULL,
+                            //                PhoneNumber VARCHAR(1),
+                            //                Address VARCHAR(1),
+                            //                Zipcode VARCHAR(1),
+                            //                Country VARCHAR(1),
+                            //                PasswordHash VARCHAR(1) NOT NULL
+                            //            );"
+
                             conn.Execute(@"CREATE TABLE Accounts
                                         (
                                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                             AccountNameHash VARCHAR(1) UNIQUE NOT NULL,
-                                            AccountName VARCHAR(1) NOT NULL,
-                                            FirstName VARCHAR(1),
-                                            FamilyName VARCHAR(1),
                                             EmailHash VARCHAR(1) UNIQUE NOT NULL,
-                                            Email VARCHAR(1) NOT NULL,
-                                            PhoneNumber VARCHAR(1),
-                                            Address VARCHAR(1),
-                                            Zipcode VARCHAR(1),
-                                            Country VARCHAR(1),
-                                            PasswordHash VARCHAR(1) NOT NULL
+                                            Data BLOB NOT NULL
                                         );"
+
                                         );
 
                             recreatedTables += "Accounts, ";
@@ -366,43 +376,29 @@ namespace DemoAppDatabase
         }
 
 
-        public async void AddAccount(AccountRecord account)
-        {
+        public async Task AddAccountSingleFast(AccountRecord account)        {
+            var messagePackAccountTask = Task.Run(() => MessagePackSerializer.Serialize(account));
+
             string pass = GetVariable();
 
-            var accountNameTask = Task.Run(() => EncryptionService.Encrypt(account.AccountName, pass));
-            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true));
-            var emailTask = Task.Run(() => EncryptionService.Encrypt(account.Email, pass));
+            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true)); 
             var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
-            var passwordHashTask = Task.Run(() => EncryptionService.Encrypt(account.PasswordHash, pass));
-            var firstNameTask = Task.Run(() => EncryptionService.Encrypt(account.FirstName, pass));       
-            var familyNameTask = Task.Run(() => EncryptionService.Encrypt(account.FamilyName, pass));
-            var phoneNumberTask = Task.Run(() =>  EncryptionService.Encrypt(account.PhoneNumber, pass));
-            var addressTask = Task.Run(() => EncryptionService.Encrypt(account.Address, pass));
-            var zipcodeTask = Task.Run(() => EncryptionService.Encrypt(account.Zipcode, pass));
-            var countryTask = Task.Run(() => EncryptionService.Encrypt(account.Country, pass));
 
-            await Task.WhenAll(accountNameTask, accountNameHashTask, emailTask, emailHashTask, passwordHashTask, firstNameTask, familyNameTask, phoneNumberTask, addressTask, zipcodeTask, countryTask);
+            await Task.WhenAll(messagePackAccountTask);
 
+            var dataTask = Task.Run(() => EncryptionService.Encrypt(messagePackAccountTask.Result, pass));
 
+            await Task.WhenAll(accountNameHashTask, emailHashTask, dataTask);
 
             var p = new DynamicParameters();
-            p.Add("@AccountName", accountNameTask.Result);
             p.Add("@AccountNameHash", accountNameHashTask.Result);
-            p.Add("@Email", emailTask.Result);
             p.Add("@EmailHash", emailHashTask.Result);
-            p.Add("@PasswordHash", passwordHashTask.Result);
-            p.Add("@FirstName", firstNameTask.Result);
-            p.Add("@FamilyName", familyNameTask.Result);
-            p.Add("@PhoneNumber", phoneNumberTask.Result);
-            p.Add("@Address", addressTask.Result);
-            p.Add("@Zipcode", zipcodeTask.Result);
-            p.Add("@Country", countryTask.Result);
+            p.Add("@Data", dataTask.Result);
             ClearString(ref pass);
 
             var query = @"INSERT INTO Accounts
-                ( AccountName, AccountNameHash, Email, EmailHash, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country ) VALUES
-                ( @AccountName, @AccountNameHash, @Email, @EmailHash, @PasswordHash, @FirstName, @FamilyName, @PhoneNumber, @Address, @Zipcode, @Country )";
+                ( AccountNameHash, EmailHash, Data ) VALUES
+                ( @AccountNameHash, @EmailHash, @Data )";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
             {
@@ -410,105 +406,26 @@ namespace DemoAppDatabase
                 conn.Execute(query, p);
             }
         }
-
-        public void AddAccount2(AccountRecord account)
+        public async Task UpdateAccountSingleFast(AccountRecord account)
         {
-            string pass = GetVariable();
-            var p = new DynamicParameters();
-            p.Add("@AccountName", EncryptionService.Encrypt(account.AccountName, pass));
-            p.Add("@AccountNameHash", EncryptionService.ComputeSha256Hash(account.AccountName, true));
-            p.Add("@Email", EncryptionService.Encrypt(account.Email, pass));
-            p.Add("@EmailHash", EncryptionService.ComputeSha256Hash(account.Email, true));
-            p.Add("@PasswordHash", EncryptionService.Encrypt(account.PasswordHash, pass));
+            var messagePackAccountTask = Task.Run(() => MessagePackSerializer.Serialize(account));
 
-
-            if (!string.IsNullOrWhiteSpace(account.FirstName))
-                p.Add("@FirstName", EncryptionService.Encrypt(account.FirstName, pass));
-            else
-                p.Add("@Firstname", string.Empty);
-
-            if (!string.IsNullOrWhiteSpace(account.FamilyName))
-                p.Add("@FamilyName", EncryptionService.Encrypt(account.FamilyName, pass));
-            else
-                p.Add("@FamilyName", string.Empty);
-
-            if (!string.IsNullOrWhiteSpace(account.PhoneNumber))
-                p.Add("@PhoneNumber", EncryptionService.Encrypt(account.PhoneNumber, pass));
-            else
-                p.Add("@PhoneNumber", string.Empty);
-
-            if (!string.IsNullOrWhiteSpace(account.Address))
-                p.Add("@Address", EncryptionService.Encrypt(account.Address, pass));
-            else
-                p.Add("@Address", string.Empty);
-
-            if (!string.IsNullOrWhiteSpace(account.Zipcode))
-                p.Add("@Zipcode", EncryptionService.Encrypt(account.Zipcode, pass));
-            else
-                p.Add("@Zipcode", string.Empty);
-
-            if (!string.IsNullOrWhiteSpace(account.Country))
-                p.Add("@Country", EncryptionService.Encrypt(account.Country, pass));
-            else
-                p.Add("@Country", string.Empty);
-            ClearString(ref pass);
-
-            var query = @"INSERT INTO Accounts
-                ( AccountName, AccountNameHash, Email, EmailHash, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country ) VALUES
-                ( @AccountName, @AccountNameHash, @Email, @EmailHash, @PasswordHash, @FirstName, @FamilyName, @PhoneNumber, @Address, @Zipcode, @Country )";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-
-        public void DeleteAccount(int id)
-        {
-            var p = new DynamicParameters();
-            p.Add("@Id", id);
-
-            string query = @"DELETE FROM Accounts WHERE Id = @Id;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-
-        public async void UpdateAccount(AccountRecord account)
-        {
             string pass = GetVariable();
 
-            var accountNameTask = Task.Run(() => EncryptionService.Encrypt(account.AccountName, pass));
             var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true));
-            var emailTask = Task.Run(() => EncryptionService.Encrypt(account.Email, pass));
             var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
-            var passwordHashTask = Task.Run(() => EncryptionService.Encrypt(account.PasswordHash, pass));
-            var firstNameTask = Task.Run(() => EncryptionService.Encrypt(account.FirstName, pass));
-            var familyNameTask = Task.Run(() => EncryptionService.Encrypt(account.FamilyName, pass));
-            var phoneNumberTask = Task.Run(() => EncryptionService.Encrypt(account.PhoneNumber, pass));
-            var addressTask = Task.Run(() => EncryptionService.Encrypt(account.Address, pass));
-            var zipcodeTask = Task.Run(() => EncryptionService.Encrypt(account.Zipcode, pass));
-            var countryTask = Task.Run(() => EncryptionService.Encrypt(account.Country, pass));
 
-            await Task.WhenAll(accountNameTask, accountNameHashTask, emailTask, emailHashTask, passwordHashTask, firstNameTask, familyNameTask, phoneNumberTask, addressTask, zipcodeTask, countryTask);
+            await Task.WhenAll(messagePackAccountTask);
+
+            var dataTask = Task.Run(() => EncryptionService.Encrypt(messagePackAccountTask.Result, pass));
+
+            await Task.WhenAll(accountNameHashTask, emailHashTask, dataTask);
 
             var p = new DynamicParameters();
             p.Add("@Id", account.Id);
-            p.Add("@AccountName", accountNameTask.Result);
             p.Add("@AccountNameHash", accountNameHashTask.Result);
-            p.Add("@Email", emailTask.Result);
             p.Add("@EmailHash", emailHashTask.Result);
-            p.Add("@PasswordHash", passwordHashTask.Result);
-            p.Add("@FirstName", firstNameTask.Result);
-            p.Add("@FamilyName", familyNameTask.Result);
-            p.Add("@PhoneNumber", phoneNumberTask.Result);
-            p.Add("@Address", addressTask.Result);
-            p.Add("@Zipcode", zipcodeTask.Result);
-            p.Add("@Country", countryTask.Result);
+            p.Add("@Data", dataTask.Result);
             ClearString(ref pass);
 
 
@@ -517,17 +434,95 @@ namespace DemoAppDatabase
             // Define the query for updating the account
             var query = @"
                         UPDATE Accounts
-                        SET AccountName = @AccountName,
-                            AccountNameHash = @AccountNameHash,
-                            Email = @Email,
+                        SET AccountNameHash = @AccountNameHash,
+                            EmailHash = @Emailhash,                            
+                            Data = @Data
+                        WHERE Id = @Id";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+
+                int rowsAffected = conn.Execute(query, p);
+
+                if (rowsAffected == 0)
+                {
+                    throw new Exception("Account to be updated not found");
+                }
+            }
+        }
+        public void AddAccount(AccountRecord account)
+        {
+            var messagePackAccount = MessagePackSerializer.Serialize(account);
+
+            string pass = GetVariable();
+
+            var accountNameHash = EncryptionService.ComputeSha256Hash(account.AccountName, true);
+            var emailHash =  EncryptionService.ComputeSha256Hash(account.Email, true);
+            var data = EncryptionService.Encrypt(messagePackAccount, pass);
+
+            var p = new DynamicParameters();
+            p.Add("@AccountNameHash", accountNameHash);
+            p.Add("@EmailHash", emailHash);
+            p.Add("@Data", data);
+            ClearString(ref pass);
+
+            var query = @"INSERT INTO Accounts
+                ( AccountNameHash, EmailHash, Data ) VALUES
+                ( @AccountNameHash, @EmailHash, @Data )";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+
+        public void AddAccount(AccountRecordEncrypted account)
+        {
+            var p = new DynamicParameters();
+            p.Add("@AccountNameHash", account.AccountNameHash);
+            p.Add("@EmailHash", account.EmailHash);
+            p.Add("@Data", account.Data);
+
+            var query = @"INSERT INTO Accounts
+                ( AccountNameHash, EmailHash, Data ) VALUES
+                ( @AccountNameHash, @EmailHash, @Data )";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+
+        public void UpdateAccount(AccountRecord account)
+        {
+            var messagePackAccount = MessagePackSerializer.Serialize(account);
+
+            string pass = GetVariable();
+
+            var accountNameHash = EncryptionService.ComputeSha256Hash(account.AccountName, true);
+            var emailHash = EncryptionService.ComputeSha256Hash(account.Email, true);
+            var dataTask = EncryptionService.Encrypt(messagePackAccount, pass);
+
+
+            var p = new DynamicParameters();
+            p.Add("@Id", account.Id);
+            p.Add("@AccountNameHash", accountNameHash);
+            p.Add("@EmailHash", emailHash);
+            p.Add("@Data", dataTask);
+            ClearString(ref pass);
+
+
+
+
+            // Define the query for updating the account
+            var query = @"
+                        UPDATE Accounts
+                        SET AccountNameHash = @AccountNameHash,                          
                             EmailHash = @Emailhash,
-                            PasswordHash = @PasswordHash,
-                            FirstName = @FirstName,
-                            FamilyName = @FamilyName,
-                            PhoneNumber = @PhoneNumber,
-                            Address = @Address,
-                            Zipcode = @Zipcode,
-                            Country = @Country
+                            Data = @Data
                         WHERE Id = @Id";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
@@ -543,78 +538,209 @@ namespace DemoAppDatabase
             }
         }
 
-        public IEnumerable<AccountRecord> GetAllAccounts()
+        public void UpdateAccount(AccountRecordEncrypted account)
         {
-            var query = @"SELECT Id, AccountName, Email, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country
-                  FROM Accounts";
+            var p = new DynamicParameters();
+            p.Add("@Id", account.Id);
+            p.Add("@AccountNameHash", account.AccountNameHash);
+            p.Add("@EmailHash", account.EmailHash);
+            p.Add("@Data", account.Data);
 
-            using (var conn = AccountsSqLiteDbConnection())
+            // Define the query for updating the account
+            var query = @"
+                        UPDATE Accounts
+                        SET AccountNameHash = @AccountNameHash,                          
+                            EmailHash = @Emailhash,
+                            Data = @Data
+                        WHERE Id = @Id";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
             {
                 conn.Open();
-                var result = conn.Query<AccountRecord>(query);
 
-                //TODO: multiple tasks and parallel for
-                string pass = GetVariable();
-                foreach (AccountRecord rec in result)
+                int rowsAffected = conn.Execute(query, p);
+
+                if (rowsAffected == 0)
                 {
-                    rec.AccountName = EncryptionService.Decrypt(rec.AccountName, pass);
-                    rec.Email = EncryptionService.Decrypt(rec.Email, pass);
-                    rec.PasswordHash = EncryptionService.Decrypt(rec.PasswordHash, pass);
-                    rec.FirstName = EncryptionService.Decrypt(rec.FirstName, pass);
-                    rec.FamilyName = EncryptionService.Decrypt(rec.FamilyName, pass);
-                    rec.PhoneNumber = EncryptionService.Decrypt(rec.PhoneNumber, pass);
-                    rec.Address = EncryptionService.Decrypt(rec.Address, pass);
-                    rec.Zipcode = EncryptionService.Decrypt(rec.Zipcode, pass);
-                    rec.Country = EncryptionService.Decrypt(rec.Country, pass);
+                    throw new Exception("Account to be updated not found");
                 }
-                ClearString(ref pass);
-
-                return result;
             }
         }
 
-        public IEnumerable<AccountRecord> GetAllAccounts2()
+        public void DeleteAccountViaId(int id)
         {
-            var query = @"SELECT Id, AccountName, Email, PasswordHash, FirstName, FamilyName, PhoneNumber, Address, Zipcode, Country
-                  FROM Accounts";
+            var p = new DynamicParameters();
+            p.Add("@Id", id);
+
+            string query = @"DELETE FROM Accounts WHERE Id = @Id;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+        public void DeleteAccountViaAccountNameHash(string accountNameHash)
+        {
+            var p = new DynamicParameters();
+            p.Add("@AccountNameHash", accountNameHash);
+
+            string query = @"DELETE FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+        public void DeleteAccountViaEmailHash(string emailHash)
+        {
+            var p = new DynamicParameters();
+            p.Add("@EmailHash", emailHash);
+
+            string query = @"DELETE FROM Accounts WHERE EmailHash = @EmailHash;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                conn.Execute(query, p);
+            }
+        }
+
+        public AccountRecord GetAccountViaId(int id)
+        {
+            var p = new DynamicParameters();
+            p.Add("@Id", id);
+
+            string query = @"SELECT FROM Accounts WHERE Id = @Id;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                var result = conn.Query<AccountRecordEncrypted>(query);
+
+                foreach(var encryptedRecord in result)
+                {
+                    string pass = GetVariable();
+                    var accRec= MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
+                    ClearString(ref pass);
+                    return accRec;
+                }
+            }
+
+            return null;
+        }
+
+        public AccountRecord GetAccountViaAccountNameHash(string accountNameHash)
+        {
+            var p = new DynamicParameters();
+            p.Add("@AccountNameHash", accountNameHash);
+
+            string query = @"SELECT FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                var result = conn.Query<AccountRecordEncrypted>(query);
+
+                //return first
+                foreach (var encryptedRecord in result)
+                {
+                    string pass = GetVariable();
+                    var accRec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
+                    ClearString(ref pass);
+                    accRec.Id = encryptedRecord.Id;
+                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
+                    accRec.EmailHash = encryptedRecord.EmailHash;
+                    return accRec;
+                }
+            }
+
+            return null;
+        }
+
+        public AccountRecord GetAccountViaAccountEmailHash(string emailHash)
+        {
+            var p = new DynamicParameters();
+            p.Add("@EmailHash", emailHash);
+
+            string query = @"SELECT FROM Accounts WHERE EmailHash = @EmailHash;";
+
+            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
+            {
+                conn.Open();
+                var result = conn.Query<AccountRecordEncrypted>(query);
+
+                //return first
+                foreach (var encryptedRecord in result)
+                {
+                    string pass = GetVariable();
+                    var accRec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
+                    ClearString(ref pass);
+                    accRec.Id = encryptedRecord.Id;
+                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
+                    accRec.EmailHash = encryptedRecord.EmailHash;
+                    return accRec;
+                }
+            }
+
+            return null;
+        }
+
+
+        public IEnumerable<AccountRecord> GetAllAccounts()
+        {
+            List<AccountRecord> records = new List<AccountRecord>();
+            var query = @"SELECT * FROM Accounts";
 
             using (var conn = AccountsSqLiteDbConnection())
             {
                 conn.Open();
-                List<AccountRecord> accounts = conn.Query<AccountRecord>(query).AsList<AccountRecord>();
-                //TODO: multiple tasks and parallel for
+                var result = conn.Query<AccountRecordEncrypted>(query).AsList();
+
                 string pass = GetVariable();
-
-                Parallel.For(0, accounts.Count, (i) =>
+                Parallel.For(0, result.Count, (i) =>
                 {
-                    AccountRecord rec = accounts[i];
-
-                    rec.AccountName = EncryptionService.Decrypt(rec.AccountName, pass);
-                    rec.Email = EncryptionService.Decrypt(rec.Email, pass);
-                    rec.PasswordHash = EncryptionService.Decrypt(rec.PasswordHash, pass);
-                    rec.FirstName = EncryptionService.Decrypt(rec.FirstName, pass);
-                    rec.FamilyName = EncryptionService.Decrypt(rec.FamilyName, pass);
-                    rec.PhoneNumber = EncryptionService.Decrypt(rec.PhoneNumber, pass);
-                    rec.Address = EncryptionService.Decrypt(rec.Address, pass);
-                    rec.Zipcode = EncryptionService.Decrypt(rec.Zipcode, pass);
-                    rec.Country = EncryptionService.Decrypt(rec.Country, pass);
+                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(result[i].Data, pass));
+                    rec.Id = result[i].Id;
+                    rec.AccountNameHash = result[i].AccountNameHash;
+                    rec.EmailHash = result[i].EmailHash;
+                    records.Add(rec);
                 });
-
-                foreach (AccountRecord rec in accounts)
-                {
-                    rec.AccountName = EncryptionService.Decrypt(rec.AccountName, pass);
-                    rec.Email = EncryptionService.Decrypt(rec.Email, pass);
-                    rec.PasswordHash = EncryptionService.Decrypt(rec.PasswordHash, pass);
-                    rec.FirstName = EncryptionService.Decrypt(rec.FirstName, pass);
-                    rec.FamilyName = EncryptionService.Decrypt(rec.FamilyName, pass);
-                    rec.PhoneNumber = EncryptionService.Decrypt(rec.PhoneNumber, pass);
-                    rec.Address = EncryptionService.Decrypt(rec.Address, pass);
-                    rec.Zipcode = EncryptionService.Decrypt(rec.Zipcode, pass);
-                    rec.Country = EncryptionService.Decrypt(rec.Country, pass);
-                }
                 ClearString(ref pass);
 
-                return accounts;
+                return records;
+            }
+        }
+
+        public async Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
+        {
+            List<AccountRecord> records = new List<AccountRecord>();
+            string query = @"SELECT * FROM Accounts 
+                         LIMIT @PageSize OFFSET @PageOffset";
+
+            using (var conn = AccountsSqLiteDbConnection())
+            {
+                var p = new DynamicParameters();
+                p.Add("@PageSize", pageSize);
+                p.Add("@PageOffset", pageNumber);
+
+               
+                var result = await conn.QueryAsync<AccountRecordEncrypted>(query, p);
+                var list = result.AsList();
+
+                string pass = GetVariable();
+                Parallel.For(0, list.Count, (i) =>
+                {
+                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(list[i].Data, pass));
+                    rec.Id = list[i].Id;
+                    rec.AccountNameHash = list[i].AccountNameHash;
+                    rec.EmailHash = list[i].EmailHash;
+                    records.Add(rec);
+                });
+                ClearString(ref pass);
+
+                return records;
             }
         }
 

@@ -62,6 +62,53 @@ namespace DemoAppDatabase.Services
             }
         }
 
+        public static byte[] Encrypt(byte[] bytes, string password)
+        {
+            if (bytes == null ||
+                bytes.Length <= 0)
+                return null;
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException(nameof(password));
+
+            // Generate salt, IV, and HMAC key
+            var saltBytes = GenerateRandomEntropy(32); // 256 bits
+            var ivBytes = GenerateRandomEntropy(16); // 128 bits
+            var hmacKey = GenerateRandomEntropy(32); // 256 bits HMAC key
+
+            using (var aes = Aes.Create())
+            {
+                var keyBytes = DeriveKeyFromPassword(password, saltBytes);
+                aes.BlockSize = BlockSize;
+                aes.KeySize = Keysize;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                using (var encryptor = aes.CreateEncryptor(keyBytes, ivBytes))
+                using (var memoryStream = new MemoryStream())
+                using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                {
+                    cryptoStream.Write(bytes, 0, bytes.Length);
+                    cryptoStream.FlushFinalBlock();
+
+                    // Get encrypted data
+                    var cipherTextBytes = memoryStream.ToArray();
+
+                    // Compute HMAC
+                    var hmacBytes = ComputeHMAC(cipherTextBytes, hmacKey);
+
+                    // Combine salt, IV, HMAC key, HMAC, and ciphertext
+                    var finalBytes = saltBytes
+                        .Concat(ivBytes)
+                        .Concat(hmacKey)
+                        .Concat(hmacBytes)
+                        .Concat(cipherTextBytes)
+                        .ToArray();
+
+                    return finalBytes;
+                }
+            }
+        }
+
         public static string Decrypt(string cipherText, string password)
         {
             if (string.IsNullOrEmpty(cipherText))
@@ -101,6 +148,48 @@ namespace DemoAppDatabase.Services
             }
         }
 
+        public static byte[] Decrypt(byte[] cipherText, string password)
+        {
+            if (cipherText == null ||
+                cipherText.Length <= 0)
+                return null;
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException(nameof(password));
+
+            var cipherTextBytesWithSaltAndIvAndHmac = cipherText;
+
+            // Extract salt, IV, HMAC key, HMAC, and ciphertext
+            var saltBytes = cipherTextBytesWithSaltAndIvAndHmac.Take(32).ToArray();
+            var ivBytes = cipherTextBytesWithSaltAndIvAndHmac.Skip(32).Take(16).ToArray();
+            var hmacKey = cipherTextBytesWithSaltAndIvAndHmac.Skip(48).Take(32).ToArray();
+            var hmacBytes = cipherTextBytesWithSaltAndIvAndHmac.Skip(80).Take(32).ToArray();
+            var cipherTextBytes = cipherTextBytesWithSaltAndIvAndHmac.Skip(112).ToArray();
+
+            // Verify HMAC
+            var computedHmacBytes = ComputeHMAC(cipherTextBytes, hmacKey);
+            if (!computedHmacBytes.SequenceEqual(hmacBytes))
+                throw new CryptographicException("HMAC verification failed. The data may have been tampered with.");
+
+            using (var aes = Aes.Create())
+            {
+                var keyBytes = DeriveKeyFromPassword(password, saltBytes);
+                aes.BlockSize = BlockSize;
+                aes.KeySize = Keysize;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                using (var decryptor = aes.CreateDecryptor(keyBytes, ivBytes))
+                using (var memoryStream = new MemoryStream(cipherTextBytes))
+                using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                {
+                    using (var resultStream = new MemoryStream())
+                    {
+                        cryptoStream.CopyTo(resultStream);
+                        return resultStream.ToArray();
+                    }
+                }
+            }
+        }
         public static byte[] GenerateRandomEntropy(int length)
         {
             var randomBytes = new byte[length];
