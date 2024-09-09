@@ -1,6 +1,5 @@
 # WPF-DemoApplication
 
-Introduction
 This is a Windows Presentation Foundation (WPF) case study, a demo application that can be used as a base for many types of application. The features are listed below:
 
 1) Custom window (WindowStyle=None) with rounded corners, custom icons and all functionality written from scratch.
