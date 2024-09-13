@@ -1,6 +1,7 @@
 ﻿using MessagePack;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,10 @@ using System.Threading.Tasks;
 namespace DemoAppDatabase.Model
 {
     [MessagePackObject]
-    public class AccountRecord
+    public class AccountRecord : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         [IgnoreMember]
         public int Id { get; set; }
         [IgnoreMember]
@@ -35,5 +38,10 @@ namespace DemoAppDatabase.Model
         public string Zipcode { get; set; }
         [Key(8)]
         public string Country { get; set; }
+
+        public void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

@@ -45,6 +45,45 @@ namespace DemoApp.ViewModels
         //DelegateCommand is similar, but doesn't test command availabiltiy automatically.
         //Also easy usage of types with <T>
 
+        private ICommand _refreshCommand;
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                if (_refreshCommand == null)
+                {
+                    _refreshCommand = new DelegateCommand<int>(Refresh);
+                }
+                return _refreshCommand;
+            }
+        }
+
+        private ICommand _updateCommand;
+        public ICommand UpdateCommand
+        {
+            get
+            {
+                if (_updateCommand == null)
+                {
+                    _updateCommand = new DelegateCommand<int>(Update);
+                }
+                return _updateCommand;
+            }
+        }
+
+        private ICommand _deleteCommand;
+        public ICommand DeleteCommand
+        {
+            get
+            {
+                if (_deleteCommand == null)
+                {
+                    _deleteCommand = new DelegateCommand<int>(Delete);
+                }
+                return _deleteCommand;
+            }
+        }
+
         private ICommand _datagridLoadedCommand;
         public ICommand DatagridLoadedCommand
         {
@@ -202,6 +241,41 @@ namespace DemoApp.ViewModels
             _loadingAccounts = false;
 
             return moreAccounts != null && moreAccounts.Count > 0;
+        }
+
+        private void Refresh(int id)
+        {
+            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
+            int ind = VisibleAccounts.IndexOf(account);
+
+            if (account != null)
+            {
+                account = _databaseService.GetAccountViaId(id);
+                VisibleAccounts[ind] = account;
+
+                account.OnPropertyChanged(nameof(VisibleAccounts));
+            }
+        }
+
+        private async void Update(int id)
+        {
+            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
+            if (account != null)
+            {
+                await _databaseService.UpdateAccountSingleFast(account);
+            }
+        }
+
+        private void Delete(int id)
+        {
+            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
+
+            if (account != null)
+            {
+                VisibleAccounts.Remove(account);
+            }
+
+            //_databaseService.DeleteAccountViaId(id);
         }
 
         public override void OnEnter()

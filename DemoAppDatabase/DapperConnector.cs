@@ -433,11 +433,8 @@ namespace DemoAppDatabase
 
 
             // Define the query for updating the account
-            var query = @"
-                        UPDATE Accounts
-                        SET AccountNameHash = @AccountNameHash,
-                            EmailHash = @Emailhash,                            
-                            Data = @Data
+            var query = @"UPDATE Accounts
+                          SET AccountNameHash = @AccountNameHash, EmailHash = @EmailHash,  Data = @Data
                         WHERE Id = @Id";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
@@ -613,18 +610,21 @@ namespace DemoAppDatabase
             var p = new DynamicParameters();
             p.Add("@Id", id);
 
-            string query = @"SELECT FROM Accounts WHERE Id = @Id;";
+            string query = @"SELECT * FROM Accounts WHERE Id = @Id;";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
             {
                 conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query);
+                var result = conn.Query<AccountRecordEncrypted>(query, p);
 
                 foreach(var encryptedRecord in result)
                 {
                     string pass = GetVariable();
-                    var accRec= MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
+                    var accRec= MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));                   
                     ClearString(ref pass);
+                    accRec.Id = encryptedRecord.Id;
+                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
+                    accRec.EmailHash = encryptedRecord.EmailHash;
                     return accRec;
                 }
             }
@@ -637,12 +637,12 @@ namespace DemoAppDatabase
             var p = new DynamicParameters();
             p.Add("@AccountNameHash", accountNameHash);
 
-            string query = @"SELECT FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
+            string query = @"SELECT * FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
             {
                 conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query);
+                var result = conn.Query<AccountRecordEncrypted>(query, p);
 
                 //return first
                 foreach (var encryptedRecord in result)
@@ -665,12 +665,12 @@ namespace DemoAppDatabase
             var p = new DynamicParameters();
             p.Add("@EmailHash", emailHash);
 
-            string query = @"SELECT FROM Accounts WHERE EmailHash = @EmailHash;";
+            string query = @"SELECT * FROM Accounts WHERE EmailHash = @EmailHash;";
 
             using (SQLiteConnection conn = AccountsSqLiteDbConnection())
             {
                 conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query);
+                var result = conn.Query<AccountRecordEncrypted>(query, p);
 
                 //return first
                 foreach (var encryptedRecord in result)
