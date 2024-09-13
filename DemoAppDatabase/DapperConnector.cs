@@ -3,6 +3,7 @@ using DemoAppDatabase.Model;
 using DemoAppDatabase.Services;
 using MessagePack;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -715,7 +716,7 @@ namespace DemoAppDatabase
 
         public async Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
         {
-            List<AccountRecord> records = new List<AccountRecord>();
+            ConcurrentBag<AccountRecord> records = new ConcurrentBag<AccountRecord>();
             string query = @"SELECT * FROM Accounts 
                          LIMIT @PageSize OFFSET @PageOffset";
 
@@ -723,24 +724,26 @@ namespace DemoAppDatabase
             {
                 var p = new DynamicParameters();
                 p.Add("@PageSize", pageSize);
-                p.Add("@PageOffset", pageNumber);
+                p.Add("@PageOffset", pageNumber * pageSize);
 
                
                 var result = await conn.QueryAsync<AccountRecordEncrypted>(query, p);
-                var list = result.AsList();
+                var list = new ConcurrentBag<AccountRecordEncrypted>(result); // result.AsList()
 
                 string pass = GetVariable();
-                Parallel.For(0, list.Count, (i) =>
+                Parallel.ForEach(list, encryptedRecord =>
                 {
-                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(list[i].Data, pass));
-                    rec.Id = list[i].Id;
-                    rec.AccountNameHash = list[i].AccountNameHash;
-                    rec.EmailHash = list[i].EmailHash;
+                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
+                    rec.Id = encryptedRecord.Id;
+                    rec.AccountNameHash = encryptedRecord.AccountNameHash;
+                    rec.EmailHash = encryptedRecord.EmailHash;
                     records.Add(rec);
                 });
                 ClearString(ref pass);
 
-                return records;
+                var returnList = new List<AccountRecord>(records);
+                returnList.Sort((x, y) => x.Id.CompareTo(y.Id));
+                return returnList; //new List<AccountRecord>(records);
             }
         }
 

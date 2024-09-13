@@ -13,11 +13,11 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <DataGrid  Grid.Row="1"
+        <DataGrid  Grid.Row="1" 
                    AutoGenerateColumns="False"
                    VirtualizingPanel.IsVirtualizing="True"
                    VirtualizingPanel.VirtualizationMode="Recycling"
-                   CanUserAddRows="False"
+                   CanUserAddRows="False" 
                    CanUserDeleteRows="False"
                    CanUserReorderColumns="False" 
                    CanUserResizeRows="False"

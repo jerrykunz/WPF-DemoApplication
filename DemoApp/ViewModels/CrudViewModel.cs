@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DemoApp.ViewModels
 {    
@@ -25,11 +26,18 @@ namespace DemoApp.ViewModels
         IDatabaseService _databaseService;
         public ObservableCollection<AccountRecord> VisibleAccounts { get; set; }
 
+        private DataGrid _accountGrid;
         private ScrollViewer _scrollViewer;
         private bool _loadingAccounts;
         private int _pageSize;
         private int _currentPage;
+        private int _loadingData;
+        private double _prevExtentHeight;
+        private double _prevViewPortHeight;
+        private double _prevVerticalOffset;
 
+        private DispatcherTimer _backOffTimer;
+        bool _backOff;
 
         #region ICommand
 
@@ -60,8 +68,20 @@ namespace DemoApp.ViewModels
 
             _pageSize = 20;
             _currentPage = 0;
+            _loadingData = 0;
 
             VisibleAccounts = new ObservableCollection<AccountRecord>();
+
+            _backOffTimer = new DispatcherTimer();
+            _backOffTimer.Interval = TimeSpan.FromMilliseconds(50);
+            _backOffTimer.Tick += _backOffTimer_Tick;
+        }
+
+        private void _backOffTimer_Tick(object sender, EventArgs e)
+        {
+            _backOffTimer.Stop();
+            _backOff = false;
+            _loadingData = 0;
         }
 
         public void GenerateAndAddAccounts(int n)
@@ -107,35 +127,67 @@ namespace DemoApp.ViewModels
 
         private void DatagridLoaded(RoutedEventArgs e)
         {
+            _accountGrid = (DataGrid)e.Source;
             _scrollViewer = GetScrollViewer(e.Source as DependencyObject);
+            _prevExtentHeight = _scrollViewer.ExtentHeight;
+            _prevViewPortHeight = _scrollViewer.ViewportHeight;
+            _prevVerticalOffset = _scrollViewer.VerticalOffset;
+
             if (_scrollViewer != null)
             {
                 _scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             }
         }
 
-        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            // Check if vertical scroll is at the end
-            if (e.VerticalOffset == e.ExtentHeight - e.ViewportHeight)
+        private async void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {           
+            if (_backOff)
             {
-                //only load more data if there is more data to load... get the max number of accounts from db with a new func
-
-                var a = 3;
-                //LoadMoreData();
+                _scrollViewer.ScrollToVerticalOffset(_prevVerticalOffset);
             }
+
+            if ( e.VerticalOffset == e.ExtentHeight - e.ViewportHeight)
+            {
+                switch(_loadingData)
+                {
+                    case 0:
+                        _loadingData = 1;
+
+                        _prevExtentHeight = e.ExtentHeight;
+                        _prevViewPortHeight = e.ViewportHeight;
+                        _prevVerticalOffset = e.VerticalOffset;
+
+                        _scrollViewer.ScrollChanged -= ScrollViewer_ScrollChanged;
+                        await LoadMoreData();
+                        _scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
+
+
+                        break;
+                    case 1:
+                        _loadingData = 2;
+                        _scrollViewer.ScrollToVerticalOffset(_prevVerticalOffset);
+                        _backOff = true;
+                        _backOffTimer.Start();
+                        break;
+                }
+            }
+
+           
         }
 
-        private async void LoadMoreData()
+        private async Task<bool> LoadMoreData()
         {
             if (_loadingAccounts)
-                return;
+                return false;
 
             _loadingAccounts = true;
+            List<AccountRecord> moreAccounts = null;
 
             try
             {
-                var moreAccounts = await _databaseService.GetAccountsAsync(_currentPage, _pageSize);
+                moreAccounts = await _databaseService.GetAccountsAsync(_currentPage, _pageSize);
+
+
                 foreach (var account in moreAccounts)
                 {
                     VisibleAccounts.Add(account);
@@ -148,6 +200,8 @@ namespace DemoApp.ViewModels
 
             _currentPage++;
             _loadingAccounts = false;
+
+            return moreAccounts != null && moreAccounts.Count > 0;
         }
 
         public override void OnEnter()
@@ -177,7 +231,10 @@ namespace DemoApp.ViewModels
             //}
             //OnPropertyChanged(nameof(VisibleAccounts));
 
-            LoadMoreData();
+            if (VisibleAccounts.Count <= 0)
+            {
+                LoadMoreData();
+            }
 
             base.OnEnter();
         }
