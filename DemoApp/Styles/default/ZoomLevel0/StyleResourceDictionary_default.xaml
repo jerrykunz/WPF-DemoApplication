@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:country="clr-namespace:CountryFlag;assembly=CountryFlag"
-                    xmlns:custom="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI">
+                    xmlns:custom="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI"
+                    xmlns:components="clr-namespace:DemoAppUI.Components;assembly=DemoAppUI">
     <sys:String x:Key="ResourceDictionaryName">Style-default</sys:String>
     <!--<FontFamily x:Key="DefaultFontFamily">Trebuchet MS</FontFamily>-->
     <FontFamily x:Key="DefaultFontFamily">Segoe UI</FontFamily>
@@ -1002,5 +1003,9 @@
     <Color x:Key="SpinnerFilledColor" A="255" B="155"  R="155" G="155" />
     <Color x:Key="SpinnerUnfilledColor" A="0" B="155" R="155" G="155" />
     <SolidColorBrush x:Key="SpinnerEllipseFill" Color="#009B9B9B" />
+
+    <Style x:Key="SpinnerSmall" TargetType="components:Spinner">
+        
+    </Style>
 
 </ResourceDictionary>    

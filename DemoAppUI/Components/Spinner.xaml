@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DemoAppUI.Components"
              DataContext=""
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" >
     <UserControl.Resources>
         <Color x:Key="FilledColor" A="255" B="155" R="155" G="155"/>
         <Color x:Key="UnfilledColor" A="0" B="155" R="155" G="155"/>
@@ -122,7 +121,7 @@
                                     <Ellipse x:Name="ellipse7" Canvas.Left="{Binding Ellipse7Left}" Canvas.Top="{Binding Ellipse7Top}"  />
                                     <Ellipse Width="{Binding EllipseHiddenWidth}" Height="{Binding EllipseHiddenHeight}" Canvas.Left="{Binding EllipseHiddenLeft}" Canvas.Top="{Binding EllipseHiddenTop}" Visibility="Hidden"/>
                                 </Canvas>
-                                <Label Content="{Binding Path=Text}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <!--<Label Content="{Binding Path=Text}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
                             </Grid>
                         </Border>
                     </ControlTemplate>

@@ -30,5 +30,6 @@ namespace DemoApp.Services
         AccountRecord GetAccountViaAccountEmailHash(string emailHash);
         IEnumerable<AccountRecord> GetAllAccounts();
         Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
+        Task<int> GetAccountsCountAsync();
     }
 }

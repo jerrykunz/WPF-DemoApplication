@@ -6,13 +6,16 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -24,21 +27,102 @@ namespace DemoApp.ViewModels
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         IDatabaseService _databaseService;
-        public ObservableCollection<AccountRecord> VisibleAccounts { get; set; }
+        public ObservableCollection<AccountRecord> Accounts { get; set; }
+        public ICollectionView VisibleAccounts { get; set; }
 
         private DataGrid _accountGrid;
         private ScrollViewer _scrollViewer;
         private bool _loadingAccounts;
         private int _pageSize;
         private int _currentPage;
-        private int _loadingData;
-        private double _prevExtentHeight;
-        private double _prevViewPortHeight;
-        private double _prevVerticalOffset;
 
-        private DispatcherTimer _backOffTimer;
-        bool _backOff;
-        bool _backOff2;
+        private bool _loadingData;
+        public bool LoadingData
+        {
+            get { return _loadingData; }
+            set { _loadingData = value; OnPropertyChanged(nameof(LoadingData)); }
+        }
+
+        private string _idFilter;
+        public string IdFilter
+        {
+            get { return _idFilter; }
+            set { _idFilter = value; UpdateFilter(); }
+        }
+
+
+        private string _accountNameFilter;
+        public string AccountNameFilter
+        {
+            get { return _accountNameFilter; }
+            set { _accountNameFilter = value; UpdateFilter(); OnPropertyChanged(nameof(AccountNameFilter)); }
+        }
+
+        private string _emailFilter;
+        public string EmailFilter
+        {
+            get { return _emailFilter; }
+            set { _emailFilter = value; UpdateFilter(); }
+        }
+
+        private string _firstNameFilter;
+        public string FirstNameFilter
+        {
+            get { return _firstNameFilter; }
+            set { _firstNameFilter = value; UpdateFilter(); }
+        }
+
+        private string _familyNameFilter;
+        public string FamilyNameFilter
+        {
+            get { return _familyNameFilter; }
+            set { _familyNameFilter = value; UpdateFilter(); }
+        }
+
+        private string _phoneNumberFilter;
+        public string PhoneNumberFilter
+        {
+            get { return _phoneNumberFilter; }
+            set { _phoneNumberFilter = value; UpdateFilter(); }
+        }
+
+        private string _addressFilter;
+        public string AddressFilter
+        {
+            get { return _addressFilter; }
+            set { _addressFilter = value; UpdateFilter(); }
+        }
+
+        private string _zipcodeFilter;
+        public string ZipcodeFilter
+        {
+            get { return _zipcodeFilter; }
+            set { _zipcodeFilter = value; UpdateFilter(); }
+        }
+
+        private string _countryFilter;
+        public string CountryFilter
+        {
+            get { return _countryFilter; }
+            set { _countryFilter = value; UpdateFilter(); }
+        }
+
+        public bool FilteringData
+        {
+            get 
+            {
+                return !string.IsNullOrWhiteSpace(IdFilter) ||
+                       !string.IsNullOrWhiteSpace(AccountNameFilter) ||
+                       !string.IsNullOrWhiteSpace(EmailFilter) ||
+                       !string.IsNullOrWhiteSpace(FirstNameFilter) ||
+                       !string.IsNullOrWhiteSpace(FamilyNameFilter) ||
+                       !string.IsNullOrWhiteSpace(PhoneNumberFilter) ||
+                       !string.IsNullOrWhiteSpace(AddressFilter) ||
+                       !string.IsNullOrWhiteSpace(ZipcodeFilter) ||
+                       !string.IsNullOrWhiteSpace(CountryFilter);
+            }
+        }
+
 
         #region ICommand
 
@@ -136,20 +220,82 @@ namespace DemoApp.ViewModels
 
             _pageSize = 20;
             _currentPage = 0;
-            _loadingData = 0;
+            LoadingData = false;
 
-            VisibleAccounts = new ObservableCollection<AccountRecord>();
-
-            _backOffTimer = new DispatcherTimer();
-            _backOffTimer.Interval = TimeSpan.FromMilliseconds(50);
-            _backOffTimer.Tick += _backOffTimer_Tick;
+            Accounts = new ObservableCollection<AccountRecord>();
+            VisibleAccounts = CollectionViewSource.GetDefaultView(Accounts);
         }
 
-        private void _backOffTimer_Tick(object sender, EventArgs e)
+        private void UpdateFilter()
         {
-            _backOffTimer.Stop();
-            _backOff = false;
-            _loadingData = 0;
+            VisibleAccounts.Filter = FilterAccounts;
+        }
+
+        private bool FilterAccounts(object item)
+        {
+            if (item is AccountRecord account)
+            {                
+
+                if (!string.IsNullOrWhiteSpace(IdFilter) && !MatchesWildcardOrExact(account.AccountName, IdFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(AccountNameFilter) && !MatchesWildcardOrExact(account.AccountName, AccountNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(EmailFilter) && !MatchesWildcardOrExact(account.Email, EmailFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(FirstNameFilter) && !MatchesWildcardOrExact(account.FirstName, FirstNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(FamilyNameFilter) && !MatchesWildcardOrExact(account.FamilyName, FamilyNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(PhoneNumberFilter) && !MatchesWildcardOrExact(account.FamilyName, FamilyNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(AddressFilter) && !MatchesWildcardOrExact(account.FamilyName, FamilyNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(ZipcodeFilter) && !MatchesWildcardOrExact(account.FamilyName, FamilyNameFilter))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(CountryFilter) && !MatchesWildcardOrExact(account.FamilyName, FamilyNameFilter))
+                {
+                    return false;
+                }
+
+            }
+            return true;
+        }
+
+        private bool MatchesWildcardOrExact(string input, string pattern)
+        {
+            if (pattern.Contains('*'))
+            {
+                string regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*") + "$";
+                return Regex.IsMatch(input, regexPattern, RegexOptions.IgnoreCase);
+            }
+            else
+            {
+                return string.Equals(input, pattern, StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         public void GenerateAndAddAccounts(int n)
@@ -197,9 +343,6 @@ namespace DemoApp.ViewModels
         {
             _accountGrid = (DataGrid)e.Source;
             _scrollViewer = GetScrollViewer(e.Source as DependencyObject);
-            _prevExtentHeight = _scrollViewer.ExtentHeight;
-            _prevViewPortHeight = _scrollViewer.ViewportHeight;
-            _prevVerticalOffset = _scrollViewer.VerticalOffset;
 
             if (_scrollViewer != null)
             {
@@ -211,37 +354,24 @@ namespace DemoApp.ViewModels
 
         private async void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (_backOff2)
+            //don't load data while filtering
+            if (FilteringData)
                 return;
 
-            if (_backOff)
-            {
-                _scrollViewer.ScrollToVerticalOffset(_prevVerticalOffset);
-            }
 
-            if ( e.VerticalOffset == e.ExtentHeight - e.ViewportHeight)
+            if (e.VerticalOffset == e.ExtentHeight - e.ViewportHeight)
             {
-                switch(_loadingData)
+                switch(LoadingData)
                 {
-                    case 0:
-                        _loadingData = 1;
+                    case false:
 
-                        _prevExtentHeight = e.ExtentHeight;
-                        _prevViewPortHeight = e.ViewportHeight;
-                        _prevVerticalOffset = e.VerticalOffset;
+                        int count = await _databaseService.GetAccountsCountAsync();
+                        if (Accounts.Count >= count)
+                            return;
 
-                        _backOff2 = true;
-                        //_scrollViewer.ScrollChanged -= ScrollViewer_ScrollChanged;
+                        LoadingData = true;
                         await LoadMoreData();
-                        //_scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
-                        _backOff2 = false;
-
-                        break;
-                    case 1:
-                        _loadingData = 2;
-                        _scrollViewer.ScrollToVerticalOffset(_prevVerticalOffset);
-                        _backOff = true;
-                        _backOffTimer.Start();
+                        LoadingData = false;
                         break;
                 }
             }
@@ -264,7 +394,7 @@ namespace DemoApp.ViewModels
 
                 foreach (var account in moreAccounts)
                 {
-                    VisibleAccounts.Add(account);
+                    Accounts.Add(account);
                 }
             }
             catch (Exception ex)
@@ -280,21 +410,21 @@ namespace DemoApp.ViewModels
 
         private void Refresh(int id)
         {
-            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
-            int ind = VisibleAccounts.IndexOf(account);
+            var account = Accounts.FirstOrDefault(a => a.Id == id);
+            int ind = Accounts.IndexOf(account);
 
             if (account != null)
             {
                 account = _databaseService.GetAccountViaId(id);
-                VisibleAccounts[ind] = account;
+                Accounts[ind] = account;
 
-                account.OnPropertyChanged(nameof(VisibleAccounts));
+                account.OnPropertyChanged(nameof(Accounts));
             }
         }
 
         private async void Update(int id)
         {
-            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
+            var account = Accounts.FirstOrDefault(a => a.Id == id);
             if (account != null)
             {
                 await _databaseService.UpdateAccountSingleFast(account);
@@ -303,11 +433,11 @@ namespace DemoApp.ViewModels
 
         private void Delete(int id)
         {
-            var account = VisibleAccounts.FirstOrDefault(a => a.Id == id);
+            var account = Accounts.FirstOrDefault(a => a.Id == id);
 
             if (account != null)
             {
-                VisibleAccounts.Remove(account);
+                Accounts.Remove(account);
             }
 
             //_databaseService.DeleteAccountViaId(id);
@@ -325,15 +455,19 @@ namespace DemoApp.ViewModels
             
             foreach (var col in ((DataGrid)o).Columns)
             {
-                if (col.Header as string == "Controls") //TODO: use translation string instead, x:name/uid instead perhaps?
-                    continue;
+                //if (col.Header as string == "Account")
+                //{
+                //    col.Width = DataGridLength.SizeToHeader;
+                //    col.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+                //    continue;
+                //}
 
                 col.Width = DataGridLength.SizeToHeader;
                 col.Width = DataGridLength.Auto;
             }
         }
 
-        public override void OnEnter()
+        public async override void OnEnter()
         {
             //GenerateAndAddAccounts(100);
             //var t = Task.Run(() =>
@@ -360,9 +494,11 @@ namespace DemoApp.ViewModels
             //}
             //OnPropertyChanged(nameof(VisibleAccounts));
 
-            if (VisibleAccounts.Count <= 0)
+            if (Accounts.Count <= 0)
             {
-                LoadMoreData();
+                LoadingData = true;
+                await LoadMoreData();
+                LoadingData = false;
             }
 
             base.OnEnter();

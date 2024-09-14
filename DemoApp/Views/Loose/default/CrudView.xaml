@@ -15,8 +15,301 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <components:Spinner />
+        <Grid Grid.Row="0"
+              Margin="50 10 0 25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0"        
+              Grid.IsSharedSizeScope="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Id"/>
+
+                    <TextBox Grid.Column="1"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Bottom"
+                         Text="{Binding IdFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Width="200"
+                         Height="22"
+                         Margin="3 0 0 0"/>
+
+                    <!--<Button Grid.Column="2"
+                    Margin="3 0 0 0"
+                    Padding="2 0"
+                    Height="22"
+                    Content="Search Cache"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"/>-->
+
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="AccountName"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                         Text="{Binding AccountNameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Email"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                         Text="{Binding EmailFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="First Name"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                       Text="{Binding FirstNameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Family Name"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                         Text="{Binding FamilyNameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+            </Grid>
+
+            <Grid Grid.Column="1"    
+                  Margin="25 0 0 0"
+                  Grid.IsSharedSizeScope="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Phone Number"/>
+
+                    <TextBox Grid.Column="1"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Bottom"
+                         Text="{Binding PhoneNumberFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Width="200"
+                         Height="22"
+                         Margin="3 0 0 0"/>
+
+                    <!--<Button Grid.Column="2"
+                    Margin="3 0 0 0"
+                    Padding="2 0"
+                    Height="22"
+                    Content="Search Cache"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"/>-->
+
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Address"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                         Text="{Binding AddressFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Zipcode"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                         Text="{Binding ZipcodeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Country"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                       Text="{Binding CountryFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+                <Grid Grid.Row="4" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchName"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="SearchBox"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                       FontSize="18"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Bottom"
+                       Text="Family Name"/>
+
+                    <TextBox Grid.Column="1"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                     Width="200"
+                     Height="22"
+                     Margin="3 0 0 0"/>
+
+                </Grid>
+
+            </Grid>
+
+        </Grid>
+        
+        
+       
+        
+
+        
+
+        <!--Loading bar-->
+        <Grid Grid.Row="0"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Bottom"
+              Visibility="{Binding LoadingData, 
+                           Converter={StaticResource BoolVisibleHiddenConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <components:Spinner Grid.Column="0"
+                                Margin="5 0 5 5"
+                                HorizontalAlignment="Right"
+                                SpinnerSize="0.25"
+                                CanvasWidth="10"
+                                CanvasHeight="10"/>
+            <TextBlock Grid.Column="1"
+                       Margin="5"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left"
+                       Text="Loading Accounts..."/>
         </Grid>
 
         <DataGrid  Grid.Row="1" 
@@ -47,7 +340,7 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Account" Binding="{Binding AccountName}" />
+                <DataGridTextColumn Header="Account" Binding="{Binding AccountName}"/>
                 <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
                 <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" />
                 <DataGridTextColumn Header="Family Name" Binding="{Binding FamilyName}" />
@@ -55,7 +348,7 @@
                 <DataGridTextColumn Header="Address" Binding="{Binding Address}" />
                 <DataGridTextColumn Header="Zipcode" Binding="{Binding Zipcode}" />
                 <DataGridTextColumn Header="Country" Binding="{Binding Country}" />
-                <DataGridTemplateColumn x:Uid="123" Header="Controls" Width="*">
+                <DataGridTemplateColumn x:Uid="123" Header="Controls">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>

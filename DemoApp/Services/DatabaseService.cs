@@ -230,5 +230,15 @@ namespace DemoApp.Services
 
             return new List<AccountRecord>();
         }
+
+        public async Task<int> GetAccountsCountAsync()
+        {
+            if (Databases.ContainsKey(DatabaseNames.SQLite))
+            {
+                return await Databases[DatabaseNames.SQLite].GetAccountsCountAsync();
+            }
+
+            return -1;
+        }
     }
 }

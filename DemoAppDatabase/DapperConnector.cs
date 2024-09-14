@@ -747,6 +747,20 @@ namespace DemoAppDatabase
             }
         }
 
+        public async Task<int> GetAccountsCountAsync()
+        {
+            var query = @"SELECT COUNT(*) FROM Accounts";
+
+            using (var conn = AccountsSqLiteDbConnection())
+            {
+                await conn.OpenAsync();
+
+                var result = await conn.ExecuteScalarAsync<int>(query);
+
+                return result;
+            }
+        }
+
 
         #endregion
     }

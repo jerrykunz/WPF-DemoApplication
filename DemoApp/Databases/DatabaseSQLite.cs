@@ -405,5 +405,27 @@ namespace DemoApp.Databases
             }
             return records;
         }
+
+        public async Task<int> GetAccountsCountAsync()
+        {
+            _mutex.WaitOne();
+
+            var db = new DapperConnector();
+
+            int count = -1;
+            try
+            {
+                count = await db.GetAccountsCountAsync();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Couldn't get Accounts count", ex);
+            }
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
+            return count;
+        }
     }
 }

@@ -32,5 +32,6 @@ namespace DemoApp.Databases
 
         IEnumerable<AccountRecord> GetAllAccounts();
         Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
+        Task<int> GetAccountsCountAsync();
     }
 }
