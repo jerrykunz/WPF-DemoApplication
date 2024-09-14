@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DemoApp.Views.Loose.default"
+             xmlns:local="clr-namespace:DemoApp.Views.Loose.default"             
+             xmlns:controls="clr-namespace:DemoAppUI.Controls;assembly=DemoAppUI"
+             xmlns:components="clr-namespace:DemoAppUI.Components;assembly=DemoAppUI"
               xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -12,6 +14,10 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <components:Spinner />
+        </Grid>
 
         <DataGrid  Grid.Row="1" 
                    Margin="50 0"
@@ -30,6 +36,12 @@
                     <i:InvokeCommandAction Command="{Binding DatagridLoadedCommand}"  
                                            PassEventArgsToCommand="True"/>
                 </i:EventTrigger>
+                <i:EventTrigger EventName="ManipulationBoundaryFeedback">
+                    <i:InvokeCommandAction Command="{Binding WindowDragBlockCommand}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding GridColumnsUpdateCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                </i:EventTrigger>
             </i:Interaction.Triggers>
 
 
@@ -43,7 +55,7 @@
                 <DataGridTextColumn Header="Address" Binding="{Binding Address}" />
                 <DataGridTextColumn Header="Zipcode" Binding="{Binding Zipcode}" />
                 <DataGridTextColumn Header="Country" Binding="{Binding Country}" />
-                <DataGridTemplateColumn Header="Controls">
+                <DataGridTemplateColumn x:Uid="123" Header="Controls" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>

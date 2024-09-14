@@ -38,6 +38,7 @@ namespace DemoApp.ViewModels
 
         private DispatcherTimer _backOffTimer;
         bool _backOff;
+        bool _backOff2;
 
         #region ICommand
 
@@ -94,6 +95,34 @@ namespace DemoApp.ViewModels
                     _datagridLoadedCommand = new DelegateCommand<RoutedEventArgs>(DatagridLoaded);
                 }
                 return _datagridLoadedCommand;
+            }
+        }
+
+        private ICommand _windowDragBlockCommand;
+        public ICommand WindowDragBlockCommand
+        {
+            get
+            {
+                if (_windowDragBlockCommand == null)
+                {
+                    _windowDragBlockCommand = new RelayCommand(param => WindowDragBlock(param as ManipulationBoundaryFeedbackEventArgs),
+                                                            param => (true));
+                }
+                return _windowDragBlockCommand;
+            }
+        }
+
+        private ICommand _gridColumnsUpdateCommand;
+        public ICommand GridColumnsUpdateCommand
+        {
+            get
+            {
+                if (_gridColumnsUpdateCommand == null)
+                {
+                    _gridColumnsUpdateCommand = new RelayCommand(param => UpdateGridColumns(param),
+                                                            param => (true));
+                }
+                return _gridColumnsUpdateCommand;
             }
         }
 
@@ -176,10 +205,15 @@ namespace DemoApp.ViewModels
             {
                 _scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             }
+
+            UpdateGridColumns(e.Source);
         }
 
         private async void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {           
+        {
+            if (_backOff2)
+                return;
+
             if (_backOff)
             {
                 _scrollViewer.ScrollToVerticalOffset(_prevVerticalOffset);
@@ -196,10 +230,11 @@ namespace DemoApp.ViewModels
                         _prevViewPortHeight = e.ViewportHeight;
                         _prevVerticalOffset = e.VerticalOffset;
 
-                        _scrollViewer.ScrollChanged -= ScrollViewer_ScrollChanged;
+                        _backOff2 = true;
+                        //_scrollViewer.ScrollChanged -= ScrollViewer_ScrollChanged;
                         await LoadMoreData();
-                        _scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
-
+                        //_scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
+                        _backOff2 = false;
 
                         break;
                     case 1:
@@ -224,7 +259,7 @@ namespace DemoApp.ViewModels
 
             try
             {
-                moreAccounts = await _databaseService.GetAccountsAsync(_currentPage, _pageSize);
+                moreAccounts = await  Task.Run(() => _databaseService.GetAccountsAsync(_currentPage, _pageSize));
 
 
                 foreach (var account in moreAccounts)
@@ -276,6 +311,26 @@ namespace DemoApp.ViewModels
             }
 
             //_databaseService.DeleteAccountViaId(id);
+        }
+
+        private void WindowDragBlock(ManipulationBoundaryFeedbackEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        public void UpdateGridColumns(object o)
+        {
+            if (o == null)
+                return;
+            
+            foreach (var col in ((DataGrid)o).Columns)
+            {
+                if (col.Header as string == "Controls") //TODO: use translation string instead, x:name/uid instead perhaps?
+                    continue;
+
+                col.Width = DataGridLength.SizeToHeader;
+                col.Width = DataGridLength.Auto;
+            }
         }
 
         public override void OnEnter()

@@ -56,6 +56,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Spinner.xaml.cs">
+      <DependentUpon>Spinner.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Modal.cs" />
     <Compile Include="Controls\NavigationPanel.cs" />
     <Compile Include="Controls\NavigationPanelItem.cs" />
@@ -82,10 +85,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Components\" />
     <Folder Include="Converters\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Components\Spinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
