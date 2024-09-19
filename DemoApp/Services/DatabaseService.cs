@@ -55,11 +55,11 @@ namespace DemoApp.Services
             }
         }
 
-        public IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end)
+        public async Task<IEnumerable<EnergyMinAvgRecord>> GetEnergyMinAvg(DateTime start, DateTime end)
         {
             if (Databases.ContainsKey(DatabaseNames.SQLite))
             {
-                return Databases[DatabaseNames.SQLite].GetEnergyMinAvg(start, end);
+                return await Databases[DatabaseNames.SQLite].GetEnergyMinAvg(start, end);
             }
 
             return new List<EnergyMinAvgRecord>();
@@ -83,19 +83,6 @@ namespace DemoApp.Services
             }
         }
 
-        public async Task AddAccountSingleFast(AccountRecord account)
-        {
-            try
-            {
-                var tasks = _databases.Values.Select(db => db.AddAccountSingleFast(account));
-                await Task.WhenAll(tasks);
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error adding account:", ex);
-            }
-        }
-
         public void DeleteAccountViaId(int id)
         {
             try
@@ -114,41 +101,7 @@ namespace DemoApp.Services
             }
         }
 
-        public void DeleteAccountViaAccountNameHash(string accountNameHash)
-        {
-            try
-            {
-                foreach (IDatabase db in _databases.Values)
-                {
-                    Task.Run(() =>
-                    {
-                        db.DeleteAccountViaAccountNameHash(accountNameHash);
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
-
-        public void DeleteAccountViaEmailHash(string emailHash)
-        {
-            try
-            {
-                foreach (IDatabase db in _databases.Values)
-                {
-                    Task.Run(() =>
-                    {
-                        db.DeleteAccountViaEmailHash(emailHash);
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
+       
 
         public void UpdateAccount(AccountRecord account)
         {
@@ -168,60 +121,28 @@ namespace DemoApp.Services
             }
         }
 
-        public async Task UpdateAccountSingleFast(AccountRecord account)
-        {
-            try
-            {
-                var tasks = _databases.Values.Select(db => db.UpdateAccountSingleFast(account));
-                await Task.WhenAll(tasks);
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error adding account:", ex);
-            }
-        }
-
-        public IEnumerable<AccountRecord> GetAllAccounts()
+        public async Task<IEnumerable<AccountRecord>> GetAllAccounts()
         {
             if (Databases.ContainsKey(DatabaseNames.SQLite))
             {
-                return Databases[DatabaseNames.SQLite].GetAllAccounts();
+                return await Databases[DatabaseNames.SQLite].GetAllAccounts();
             }
 
             return new List<AccountRecord>();
         }
 
-        public AccountRecord GetAccountViaId(int id)
+        public async Task<AccountRecord> GetAccountViaId(int id)
         {
             if (Databases.ContainsKey(DatabaseNames.SQLite))
             {
-                return Databases[DatabaseNames.SQLite].GetAccountViaId(id);
+                return await Databases[DatabaseNames.SQLite].GetAccountViaId(id);
             }
 
             return null;
         }
 
-        public AccountRecord GetAccountViaAccountNameHash(string accountNameHash)
-        {
-            if (Databases.ContainsKey(DatabaseNames.SQLite))
-            {
-                return Databases[DatabaseNames.SQLite].GetAccountViaAccountNameHash(accountNameHash);
-            }
-
-            return null;
-        }
-
-        public AccountRecord GetAccountViaAccountEmailHash(string emailHash)
-        {
-            if (Databases.ContainsKey(DatabaseNames.SQLite))
-            {
-                return Databases[DatabaseNames.SQLite].GetAccountViaAccountEmailHash(emailHash);
-            }
-
-            return null;
-        }
-
-        public async Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
+        
+        public async Task<IEnumerable<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
         {
             if (Databases.ContainsKey(DatabaseNames.SQLite))
             {

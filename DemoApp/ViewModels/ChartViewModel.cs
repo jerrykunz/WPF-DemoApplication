@@ -139,9 +139,13 @@ namespace DemoApp.ViewModels
 
 
             InitEnergyLiveChart();
-            InitMinAvgChart();
-            
+            InitializeAsync();
+            //InitMinAvgChart().GetAwaiter().GetResult();
+        }
 
+        private async void InitializeAsync()
+        {
+            await InitMinAvgChart();
         }
 
         #region Live chart
@@ -303,10 +307,9 @@ namespace DemoApp.ViewModels
 
 
         #region Minute Average chart
-        public void InitMinAvgChart()
+        public async Task InitMinAvgChart()
         {
-            DateTime now = DateTime.Now;
-            IEnumerable<EnergyMinAvgRecord> minAvgs = _databaseService.GetEnergyMinAvg(now.AddMinutes(-10), now);
+            DateTime now = DateTime.Now;            
 
             MinAvgSeries = new SeriesCollection
             {
@@ -328,6 +331,7 @@ namespace DemoApp.ViewModels
                 }
             };
 
+            IEnumerable<EnergyMinAvgRecord> minAvgs = await _databaseService.GetEnergyMinAvg(now.AddMinutes(-10), now);
 
             foreach (var record in minAvgs)
             {

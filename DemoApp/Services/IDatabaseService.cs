@@ -13,23 +13,15 @@ namespace DemoApp.Services
         string Name { get; }
         T GetDatabase<T>();
         void AddOrUpdateEnergyMinAvg(DateTime timestamp, double average);
-        IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end);
+        Task<IEnumerable<EnergyMinAvgRecord>> GetEnergyMinAvg(DateTime start, DateTime end);
         void AddAccount(AccountRecord account);
-        Task AddAccountSingleFast(AccountRecord account);
 
         void UpdateAccount(AccountRecord account);
-        Task UpdateAccountSingleFast(AccountRecord account);
-
 
         void DeleteAccountViaId(int id);
-        void DeleteAccountViaAccountNameHash(string accountNameHash);
-        void DeleteAccountViaEmailHash(string emailHash);
-
-        AccountRecord GetAccountViaId(int id);
-        AccountRecord GetAccountViaAccountNameHash(string accountNameHash);
-        AccountRecord GetAccountViaAccountEmailHash(string emailHash);
-        IEnumerable<AccountRecord> GetAllAccounts();
-        Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
+        Task<AccountRecord> GetAccountViaId(int id);
+        Task<IEnumerable<AccountRecord>> GetAllAccounts();
+        Task<IEnumerable<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
         Task<int> GetAccountsCountAsync();
     }
 }

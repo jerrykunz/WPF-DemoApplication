@@ -255,6 +255,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AsyncCommand.cs" />
+    <Compile Include="AsyncHelper.cs" />
     <Compile Include="Config\Enum.cs" />
     <Compile Include="Converters\BooleanConverter.cs" />
     <Compile Include="Converters\PopupModeToVisibilityConverter.cs" />

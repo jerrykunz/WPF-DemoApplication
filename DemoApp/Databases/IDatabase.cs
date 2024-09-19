@@ -10,28 +10,22 @@ namespace DemoApp.Databases
     public interface IDatabase
     {
         string Name { get; }
-        bool AddOrUpdateEnergyMinAvg(DateTime timestamp, double average);
-        IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end);
+        Task<bool> AddOrUpdateEnergyMinAvg(DateTime timestamp, double average);
+        Task<IEnumerable<EnergyMinAvgRecord>> GetEnergyMinAvg(DateTime start, DateTime end);
 
 
 
-        bool AddAccount(AccountRecord account);
-        Task<bool> AddAccountSingleFast(AccountRecord account);
+        Task<bool> AddAccount(AccountRecord account);
 
-        bool UpdateAccount(AccountRecord account);
-        Task<bool> UpdateAccountSingleFast(AccountRecord account);
+        Task<bool>UpdateAccount(AccountRecord account);
 
 
-        bool DeleteAccountViaId(int id);
-        bool DeleteAccountViaAccountNameHash(string accountNameHash);
-        bool DeleteAccountViaEmailHash(string emailHash);
+        Task<bool> DeleteAccountViaId(int id);
 
-        AccountRecord GetAccountViaId(int id);
-        AccountRecord GetAccountViaAccountNameHash(string accountNameHash);
-        AccountRecord GetAccountViaAccountEmailHash(string emailHash);
+        Task<AccountRecord> GetAccountViaId(int id);
 
-        IEnumerable<AccountRecord> GetAllAccounts();
-        Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<AccountRecord>> GetAllAccounts();
+        Task<IEnumerable<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize);
         Task<int> GetAccountsCountAsync();
     }
 }

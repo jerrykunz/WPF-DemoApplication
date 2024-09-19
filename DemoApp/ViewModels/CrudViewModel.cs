@@ -137,7 +137,7 @@ namespace DemoApp.ViewModels
             {
                 if (_refreshCommand == null)
                 {
-                    _refreshCommand = new DelegateCommand<int>(Refresh);
+                    _refreshCommand = new AsyncCommand<int>(Refresh);
                 }
                 return _refreshCommand;
             }
@@ -385,11 +385,11 @@ namespace DemoApp.ViewModels
                 return false;
 
             _loadingAccounts = true;
-            List<AccountRecord> moreAccounts = null;
+            IEnumerable<AccountRecord> moreAccounts = null;
 
             try
             {
-                moreAccounts = await  Task.Run(() => _databaseService.GetAccountsAsync(_currentPage, _pageSize));
+                moreAccounts = await Task.Run(() => _databaseService.GetAccountsAsync(_currentPage, _pageSize));
 
 
                 foreach (var account in moreAccounts)
@@ -405,29 +405,29 @@ namespace DemoApp.ViewModels
             _currentPage++;
             _loadingAccounts = false;
 
-            return moreAccounts != null && moreAccounts.Count > 0;
+            return moreAccounts != null && moreAccounts.Count() > 0;
         }
 
-        private void Refresh(int id)
+        private async Task Refresh(int id)
         {
             var account = Accounts.FirstOrDefault(a => a.Id == id);
             int ind = Accounts.IndexOf(account);
 
             if (account != null)
             {
-                account = _databaseService.GetAccountViaId(id);
+                account = await _databaseService.GetAccountViaId(id);
                 Accounts[ind] = account;
 
                 account.OnPropertyChanged(nameof(Accounts));
             }
         }
 
-        private async void Update(int id)
+        private void Update(int id)
         {
             var account = Accounts.FirstOrDefault(a => a.Id == id);
             if (account != null)
             {
-                await _databaseService.UpdateAccountSingleFast(account);
+                _databaseService.UpdateAccount(account);
             }
         }
 
@@ -440,7 +440,7 @@ namespace DemoApp.ViewModels
                 Accounts.Remove(account);
             }
 
-            //_databaseService.DeleteAccountViaId(id);
+            _databaseService.DeleteAccountViaId(id);
         }
 
         private void WindowDragBlock(ManipulationBoundaryFeedbackEventArgs e)

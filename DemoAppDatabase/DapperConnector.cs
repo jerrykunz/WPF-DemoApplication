@@ -1,13 +1,15 @@
 ﻿using Dapper;
 using DemoAppDatabase.Model;
 using DemoAppDatabase.Services;
-using MessagePack;
+using SQLite;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -76,10 +78,131 @@ namespace DemoAppDatabase
         public static void CreateDatabase()
         {
             SetVariable("password123");
+            CreateOrFixDatabase(typeof(EnergyMinAvgRecord), StatsSqLiteDbConnection());
+            CreateOrFixDatabase(typeof(AccountRecord), AccountsSqLiteDbConnection());
+        }
 
-            CheckStatsDatabase();
 
-            CheckAccountssDatabase();
+        public static void CreateOrFixDatabase(Type type, SQLiteAsyncConnection conn)
+        {
+            try
+            {
+                //var conn = AccountsSqLiteDbConnection();
+                string tableName = type.Name;
+
+                bool found = false;
+                bool correct = true;
+                string missingColumns = string.Empty;
+                string missingAttributes = string.Empty;
+                foreach (var table in conn.TableMappings)
+                {
+                    if (table.TableName == type.Name)
+                    {
+                        tableName = table.TableName;
+                        found = true;
+
+                        var classProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                        var tableColumns = table.Columns.Select(c => c.Name).ToList();
+
+                        //check each class property
+                        foreach (var property in classProperties)
+                        {
+                            //class property is ignored, don't check this one
+                            if (Attribute.IsDefined(property, typeof(IgnoreAttribute)))
+                                continue;
+
+                            //column tags
+                            bool foundColumn = false;
+                            bool isPrimaryKey = false;
+                            bool isNullable = false;
+                            bool isUnique = false;
+
+                            //check table for column corresponding to class property
+                            foreach (var column in table.Columns)
+                            {
+                                //no correspondence
+                                if (property.Name != column.Name)
+                                    continue;
+
+                                foundColumn = true;
+
+                                //check column tags
+                                isPrimaryKey = column.IsPK;
+                                isNullable = column.IsNullable;
+                                isUnique = column.Indices != null && column.Indices.Any(index => index.Unique);
+                            }
+
+                            //column not found, check next class property
+                            if (!foundColumn)
+                            {
+                                correct = false;
+                                missingColumns += property.Name + ", ";
+                                continue;
+                            }
+
+                            //check if column tags match with class property
+                            bool propIsPrimaryKey = Attribute.IsDefined(property, typeof(PrimaryKeyAttribute));
+                            bool propIsUnique = Attribute.IsDefined(property, typeof(UniqueAttribute));
+                            bool propIsNotNull = Attribute.IsDefined(property, typeof(NotNullAttribute));
+
+                            if (isPrimaryKey != propIsPrimaryKey)
+                            {
+                                missingAttributes += table.TableName + " table column " + property.Name + " mismatching primary key attribute with value " + isPrimaryKey + "\n";
+                                correct = false;
+                            }
+
+                            if (isUnique != propIsUnique)
+                            {
+                                missingAttributes += table.TableName + " table column " + property.Name + " mismatching unique attribute with value " + isUnique + "\n";
+                                correct = false;
+                            }
+
+                            if (isNullable == propIsNotNull)
+                            {
+                                missingAttributes += table.TableName + " table column " + property.Name + " mismatching nullable attribute with value " + isNullable + "\n";
+                                correct = false;
+                            }
+                        }
+                    }
+
+                    //found table, exit loop
+                    if (found)
+                    {
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(missingColumns))
+                {
+                    string missingColumnsLogString = "Sqlite table '" + tableName + "' was missing columns: ";
+                    missingColumnsLogString += missingColumns.Substring(0, missingColumns.Length - 2);
+                    log.Error(missingColumnsLogString);
+                }
+                else if (!string.IsNullOrWhiteSpace(missingAttributes))
+                {
+                    var lines = missingAttributes.Split('\n');
+                    foreach (var line in lines)
+                    {
+                        log.Error(line);
+                    }
+                }
+
+                if (!found)
+                {
+                    conn.CreateTableAsync(type);
+                    log.Error("Sqlite table '" + tableName + "' did not exist in db, creating...");
+                }
+                else if (!correct)
+                {
+                    conn.CreateTableAsync(type);
+                    log.Error("Sqlite table '" + tableName + "' was incorrect, recreating...");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error checking or recreating stats database", ex);
+                throw new Exception("Stats database integrity check failed");
+            }
         }
 
         #region Stats
@@ -89,678 +212,126 @@ namespace DemoAppDatabase
             get { return Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Database\\stats.sqlite"; }
         }
 
-        public static SQLiteConnection StatsSqLiteDbConnection()
+        private static SQLiteAsyncConnection _statsSqliteDbConnection;
+        public static SQLiteAsyncConnection StatsSqLiteDbConnection()
         {
-            return new SQLiteConnection(string.Format("Data Source={0};Pooling=True;Max Pool Size=100;", StatsDbFile));
-        }
-
-        public static void CheckStatsDatabase()
-        {
-            if (!File.Exists(StatsDbFile))
+            if (_statsSqliteDbConnection == null)
             {
                 string dir = Path.GetDirectoryName(StatsDbFile);
-
                 if (!Directory.Exists(dir))
+                {
                     Directory.CreateDirectory(dir);
+                };
 
-                SQLiteConnection.CreateFile(StatsDbFile);
+                var options = new SQLiteConnectionString(StatsDbFile, true);
+                _statsSqliteDbConnection =  new SQLiteAsyncConnection(options);
             }
 
-            string success, failed;
-            bool? dbRecreateSuccess = CreateOrFixStatsDatabase(out success, out failed);
-
-            if (dbRecreateSuccess == true)
-            {
-                log.Error("Stats database integrity check failed, the following tables/indices were recreated: " + success);
-            }
-            else if (dbRecreateSuccess == false)
-            {
-                if (string.IsNullOrWhiteSpace(failed))
-                {
-                    log.Error("Stats database integrity check failed, couldn't recreate any tables/indices");
-                    throw new Exception("Stats database integrity check failed, couldn't recreate any tables/indices");
-                }
-                else
-                {
-                    log.Error("Stats database integrity check failed, couldn't recreate tables/indices: " + failed);
-                    throw new Exception("Stats database integrity check failed, couldn't recreate tables/indices: " + failed);
-                }
-            }
+            return _statsSqliteDbConnection;
         }
 
-        public static bool? CreateOrFixStatsDatabase(out string recreatedTables, out string recreatedTablesFailed)
+        public async Task AddOrUpdateEnergyMinAvg(DateTime timestamp, double average)
         {
-            bool? recreationSuccessful = null;
-
-            recreatedTables = string.Empty;
-            recreatedTablesFailed = string.Empty;
-
-            using (var conn = StatsSqLiteDbConnection())
+            var conn = StatsSqLiteDbConnection();
+            await conn.InsertAsync(new EnergyMinAvgRecord
             {
-                bool EnergyMinAvg_exists = false;
-
-                try
-                {
-                    string getString = @"SELECT name FROM sqlite_master WHERE type='table' AND name='EnergyMinAvg';";
-                    SQLiteDataAdapter sda = new SQLiteDataAdapter(getString, conn);
-                    DataSet ds = new DataSet();
-                    sda.Fill(ds);
-
-                    EnergyMinAvg_exists = ds.Tables[0].Rows.Count > 0;
-
-                    sda.Dispose();
-                    ds.Dispose();
-
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Couldn't check sqlite db integrity", ex);
-                    return false;
-                }
-
-
-                if (!EnergyMinAvg_exists)
-                {
-                    recreationSuccessful = true;
-
-                    try
-                    {
-                        conn.Open();
-                    }
-                    catch
-                    {
-                        recreationSuccessful = false;
-                    }
-
-                    if (!EnergyMinAvg_exists)
-                    {
-                        log.Error("Sqlite table 'EnergyMinAvg' did not exist in db, creating...");
-
-                        try
-                        {
-                            conn.Execute(@"CREATE TABLE EnergyMinAvg
-                                        (
-                                            Id INTEGER PRIMARY KEY,
-                                            Time DATETIME UNIQUE NOT NULL,
-                                            Value REAL NOT NULL
-                                        );"
-                                        );
-
-                            recreatedTables += "EnergyMinAvg, ";
-
-                        }
-                        catch (Exception ex)
-                        {
-                            recreationSuccessful = false;
-                            recreatedTablesFailed += "EnergyMinAvg, ";
-                            log.Error("Couldn't recreate 'EnergyMinAvg' table to db", ex);
-                        }
-                    }
-                }
-            }
-
-            return recreationSuccessful;
+                Time = timestamp,
+                Value = average
+            });
         }
 
-        public void AddOrUpdateEnergyMinAvg(DateTime timestamp, double average)
-        {
-            var p = new DynamicParameters();
-            p.Add("@Time", timestamp);
-            p.Add("@Value", average);
-
-            var query = @"INSERT INTO EnergyMinAvg
-                ( Time, Value ) VALUES
-                ( @Time, @Value )
-                ON CONFLICT (Time)
-                DO UPDATE SET Value = @Value";
-
-            using (SQLiteConnection conn = StatsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-
-        public IEnumerable<EnergyMinAvgRecord> GetEnergyMinAvg(DateTime start, DateTime end)
+        public async Task<IEnumerable<EnergyMinAvgRecord>> GetEnergyMinAvg(DateTime start, DateTime end)
         {
             var query = @"SELECT Time, Value
                         FROM EnergyMinAvg
-                        WHERE Time >= @Start
-                        AND TIME <= @End";
+                        WHERE Time >= ?
+                        AND TIME <= ?";
 
-            using (var conn = StatsSqLiteDbConnection())
-            {
-                conn.Open();
-                var parameters = new { Start = start, End = end };
-                var result = conn.Query<EnergyMinAvgRecord>(query, parameters);
-                return result;
-            }
+            return await StatsSqLiteDbConnection().QueryAsync<EnergyMinAvgRecord>(query, start, end);
         }
 
         #endregion
 
         #region Accounts
-        public static SQLiteConnection AccountsSqLiteDbConnection()
+
+        private static SQLiteAsyncConnection _accountsSqLiteDbConnection;
+        public static SQLiteAsyncConnection AccountsSqLiteDbConnection()
         {
-            return new SQLiteConnection(string.Format("Data Source={0};Pooling=True;Max Pool Size=100;", AccountsDbFile));
+            if (_accountsSqLiteDbConnection == null)
+            {
+                var options = new SQLiteConnectionString(AccountsDbFile, true,
+                            key: "password",
+                            preKeyAction: db => db.Execute("PRAGMA cipher_default_use_hmac = ON; PRAGMA page_size = 4096; PRAGMA cipher_page_size = 4096; PRAGMA cache_size = -2000;"),
+                            postKeyAction: db => db.Execute("PRAGMA kdf_iter = 128000; PRAGMA kdf_salt = 'your_salt_here';"));
+                _accountsSqLiteDbConnection = new SQLiteAsyncConnection(options);
+            }
+
+            return _accountsSqLiteDbConnection;
         }
 
         public static string AccountsDbFile
         {
             get { return Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath) + "\\Database\\accounts.sqlite"; }
         }
-
-        public static void CheckAccountssDatabase()
+        public async Task AddAccount(AccountRecord account)
         {
-            if (!File.Exists(StatsDbFile))
-            {
-                string dir = Path.GetDirectoryName(AccountsDbFile);
-
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-
-                SQLiteConnection.CreateFile(AccountsDbFile);
-            }
-
-            string success, failed;
-            bool? dbRecreateSuccess = CreateOrFixAccountsDatabase(out success, out failed);
-
-            if (dbRecreateSuccess == true)
-            {
-                log.Error("Accounts database integrity check failed, the following tables/indices were recreated: " + success);
-            }
-            else if (dbRecreateSuccess == false)
-            {
-                if (string.IsNullOrWhiteSpace(failed))
-                {
-                    log.Error("Accounts database integrity check failed, couldn't recreate any tables/indices");
-                    throw new Exception("Accounts database integrity check failed, couldn't recreate any tables/indices");
-                }
-                else
-                {
-                    log.Error("Accounts database integrity check failed, couldn't recreate tables/indices: " + failed);
-                    throw new Exception("Accounts database integrity check failed, couldn't recreate tables/indices: " + failed);
-                }
-            }
+            var conn = AccountsSqLiteDbConnection();
+            await conn.InsertAsync(account);
         }
 
-        public static bool? CreateOrFixAccountsDatabase(out string recreatedTables, out string recreatedTablesFailed)
+        public async Task UpdateAccount(AccountRecord account)
         {
-            bool? recreationSuccessful = null;
-
-            recreatedTables = string.Empty;
-            recreatedTablesFailed = string.Empty;
-
-            using (var conn = AccountsSqLiteDbConnection())
-            {
-                bool Accounts_exists = false;
-
-                try
-                {
-                    string getString = @"SELECT name FROM sqlite_master WHERE type='table' AND name='Accounts';";
-                    SQLiteDataAdapter sda = new SQLiteDataAdapter(getString, conn);
-                    DataSet ds = new DataSet();
-                    sda.Fill(ds);
-
-                    Accounts_exists = ds.Tables[0].Rows.Count > 0;
-
-                    sda.Dispose();
-                    ds.Dispose();
-
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Couldn't check sqlite db integrity", ex);
-                    return false;
-                }
-
-
-                if (!Accounts_exists)
-                {
-                    recreationSuccessful = true;
-
-                    try
-                    {
-                        conn.Open();
-                    }
-                    catch
-                    {
-                        recreationSuccessful = false;
-                    }
-
-                    if (!Accounts_exists)
-                    {
-                        log.Error("Sqlite table 'Accounts' did not exist in db, creating...");
-
-                        try
-                        {
-                            //conn.Execute(@"CREATE TABLE Accounts
-                            //            (
-                            //                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            //                AccountNameHash VARCHAR(1) UNIQUE NOT NULL,
-                            //                AccountName VARCHAR(1) NOT NULL,
-                            //                FirstName VARCHAR(1),
-                            //                FamilyName VARCHAR(1),
-                            //                EmailHash VARCHAR(1) UNIQUE NOT NULL,
-                            //                Email VARCHAR(1) NOT NULL,
-                            //                PhoneNumber VARCHAR(1),
-                            //                Address VARCHAR(1),
-                            //                Zipcode VARCHAR(1),
-                            //                Country VARCHAR(1),
-                            //                PasswordHash VARCHAR(1) NOT NULL
-                            //            );"
-
-                            conn.Execute(@"CREATE TABLE Accounts
-                                        (
-                                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            AccountNameHash VARCHAR(1) UNIQUE NOT NULL,
-                                            EmailHash VARCHAR(1) UNIQUE NOT NULL,
-                                            Data BLOB NOT NULL
-                                        );"
-
-                                        );
-
-                            recreatedTables += "Accounts, ";
-
-                        }
-                        catch (Exception ex)
-                        {
-                            recreationSuccessful = false;
-                            recreatedTablesFailed += "Accounts, ";
-                            log.Error("Couldn't recreate 'Accounts' table to db", ex);
-                        }
-                    }
-                }
-            }
-
-            return recreationSuccessful;
+            var conn = AccountsSqLiteDbConnection();
+            await conn.UpdateAsync(account);
         }
 
-
-        public async Task AddAccountSingleFast(AccountRecord account)        {
-            var messagePackAccountTask = Task.Run(() => MessagePackSerializer.Serialize(account));
-
-            string pass = GetVariable();
-
-            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true)); 
-            var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
-
-            await Task.WhenAll(messagePackAccountTask);
-
-            var dataTask = Task.Run(() => EncryptionService.Encrypt(messagePackAccountTask.Result, pass));
-
-            await Task.WhenAll(accountNameHashTask, emailHashTask, dataTask);
-
-            var p = new DynamicParameters();
-            p.Add("@AccountNameHash", accountNameHashTask.Result);
-            p.Add("@EmailHash", emailHashTask.Result);
-            p.Add("@Data", dataTask.Result);
-            ClearString(ref pass);
-
-            var query = @"INSERT INTO Accounts
-                ( AccountNameHash, EmailHash, Data ) VALUES
-                ( @AccountNameHash, @EmailHash, @Data )";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-        public async Task UpdateAccountSingleFast(AccountRecord account)
+        public async Task DeleteAccountViaId(int id)
         {
-            var messagePackAccountTask = Task.Run(() => MessagePackSerializer.Serialize(account));
-
-            string pass = GetVariable();
-
-            var accountNameHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.AccountName, true));
-            var emailHashTask = Task.Run(() => EncryptionService.ComputeSha256Hash(account.Email, true));
-
-            await Task.WhenAll(messagePackAccountTask);
-
-            var dataTask = Task.Run(() => EncryptionService.Encrypt(messagePackAccountTask.Result, pass));
-
-            await Task.WhenAll(accountNameHashTask, emailHashTask, dataTask);
-
-            var p = new DynamicParameters();
-            p.Add("@Id", account.Id);
-            p.Add("@AccountNameHash", accountNameHashTask.Result);
-            p.Add("@EmailHash", emailHashTask.Result);
-            p.Add("@Data", dataTask.Result);
-            ClearString(ref pass);
-
-
-
-
-            // Define the query for updating the account
-            var query = @"UPDATE Accounts
-                          SET AccountNameHash = @AccountNameHash, EmailHash = @EmailHash,  Data = @Data
-                        WHERE Id = @Id";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-
-                int rowsAffected = conn.Execute(query, p);
-
-                if (rowsAffected == 0)
-                {
-                    throw new Exception("Account to be updated not found");
-                }
-            }
-        }
-        public void AddAccount(AccountRecord account)
-        {
-            var messagePackAccount = MessagePackSerializer.Serialize(account);
-
-            string pass = GetVariable();
-
-            var accountNameHash = EncryptionService.ComputeSha256Hash(account.AccountName, true);
-            var emailHash =  EncryptionService.ComputeSha256Hash(account.Email, true);
-            var data = EncryptionService.Encrypt(messagePackAccount, pass);
-
-            var p = new DynamicParameters();
-            p.Add("@AccountNameHash", accountNameHash);
-            p.Add("@EmailHash", emailHash);
-            p.Add("@Data", data);
-            ClearString(ref pass);
-
-            var query = @"INSERT INTO Accounts
-                ( AccountNameHash, EmailHash, Data ) VALUES
-                ( @AccountNameHash, @EmailHash, @Data )";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
+            var conn = AccountsSqLiteDbConnection();
+            await conn.DeleteAsync<AccountRecord>(id);
         }
 
-        public void AddAccount(AccountRecordEncrypted account)
+        public async Task DeleteAccount(AccountRecord record)
         {
-            var p = new DynamicParameters();
-            p.Add("@AccountNameHash", account.AccountNameHash);
-            p.Add("@EmailHash", account.EmailHash);
-            p.Add("@Data", account.Data);
-
-            var query = @"INSERT INTO Accounts
-                ( AccountNameHash, EmailHash, Data ) VALUES
-                ( @AccountNameHash, @EmailHash, @Data )";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
+            var conn = AccountsSqLiteDbConnection();
+            await conn.DeleteAsync<AccountRecord>(record);
         }
 
-        public void UpdateAccount(AccountRecord account)
+        public async Task<AccountRecord> GetAccountViaId(int id)
         {
-            var messagePackAccount = MessagePackSerializer.Serialize(account);
-
-            string pass = GetVariable();
-
-            var accountNameHash = EncryptionService.ComputeSha256Hash(account.AccountName, true);
-            var emailHash = EncryptionService.ComputeSha256Hash(account.Email, true);
-            var dataTask = EncryptionService.Encrypt(messagePackAccount, pass);
-
-
-            var p = new DynamicParameters();
-            p.Add("@Id", account.Id);
-            p.Add("@AccountNameHash", accountNameHash);
-            p.Add("@EmailHash", emailHash);
-            p.Add("@Data", dataTask);
-            ClearString(ref pass);
-
-
-
-
-            // Define the query for updating the account
-            var query = @"
-                        UPDATE Accounts
-                        SET AccountNameHash = @AccountNameHash,                          
-                            EmailHash = @Emailhash,
-                            Data = @Data
-                        WHERE Id = @Id";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-
-                int rowsAffected = conn.Execute(query, p);
-
-                if (rowsAffected == 0)
-                {
-                    throw new Exception("Account to be updated not found");
-                }
-            }
+            var conn = AccountsSqLiteDbConnection();
+            return await conn.GetAsync<AccountRecord>(id);
         }
 
-        public void UpdateAccount(AccountRecordEncrypted account)
+        public async Task<AccountRecord> GetAccount(AccountRecord record)
         {
-            var p = new DynamicParameters();
-            p.Add("@Id", account.Id);
-            p.Add("@AccountNameHash", account.AccountNameHash);
-            p.Add("@EmailHash", account.EmailHash);
-            p.Add("@Data", account.Data);
-
-            // Define the query for updating the account
-            var query = @"
-                        UPDATE Accounts
-                        SET AccountNameHash = @AccountNameHash,                          
-                            EmailHash = @Emailhash,
-                            Data = @Data
-                        WHERE Id = @Id";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-
-                int rowsAffected = conn.Execute(query, p);
-
-                if (rowsAffected == 0)
-                {
-                    throw new Exception("Account to be updated not found");
-                }
-            }
+            var conn = AccountsSqLiteDbConnection();
+            return await conn.GetAsync<AccountRecord>(record);
         }
 
-        public void DeleteAccountViaId(int id)
+        public async Task<IEnumerable<AccountRecord>> GetAllAccounts()
         {
-            var p = new DynamicParameters();
-            p.Add("@Id", id);
-
-            string query = @"DELETE FROM Accounts WHERE Id = @Id;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-        public void DeleteAccountViaAccountNameHash(string accountNameHash)
-        {
-            var p = new DynamicParameters();
-            p.Add("@AccountNameHash", accountNameHash);
-
-            string query = @"DELETE FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
-        }
-        public void DeleteAccountViaEmailHash(string emailHash)
-        {
-            var p = new DynamicParameters();
-            p.Add("@EmailHash", emailHash);
-
-            string query = @"DELETE FROM Accounts WHERE EmailHash = @EmailHash;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                conn.Execute(query, p);
-            }
+            var conn = AccountsSqLiteDbConnection();
+            return await conn.Table<AccountRecord>().ToListAsync();
         }
 
-        public AccountRecord GetAccountViaId(int id)
+        public async Task<IEnumerable<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
         {
-            var p = new DynamicParameters();
-            p.Add("@Id", id);
+            var conn = AccountsSqLiteDbConnection();
 
-            string query = @"SELECT * FROM Accounts WHERE Id = @Id;";
+            var query = @"SELECT * FROM Accounts 
+                  LIMIT ? OFFSET ?";
 
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query, p);
-
-                foreach(var encryptedRecord in result)
-                {
-                    string pass = GetVariable();
-                    var accRec= MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));                   
-                    ClearString(ref pass);
-                    accRec.Id = encryptedRecord.Id;
-                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
-                    accRec.EmailHash = encryptedRecord.EmailHash;
-                    return accRec;
-                }
-            }
-
-            return null;
-        }
-
-        public AccountRecord GetAccountViaAccountNameHash(string accountNameHash)
-        {
-            var p = new DynamicParameters();
-            p.Add("@AccountNameHash", accountNameHash);
-
-            string query = @"SELECT * FROM Accounts WHERE AccountNameHash = @AccountNameHash;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query, p);
-
-                //return first
-                foreach (var encryptedRecord in result)
-                {
-                    string pass = GetVariable();
-                    var accRec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
-                    ClearString(ref pass);
-                    accRec.Id = encryptedRecord.Id;
-                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
-                    accRec.EmailHash = encryptedRecord.EmailHash;
-                    return accRec;
-                }
-            }
-
-            return null;
-        }
-
-        public AccountRecord GetAccountViaAccountEmailHash(string emailHash)
-        {
-            var p = new DynamicParameters();
-            p.Add("@EmailHash", emailHash);
-
-            string query = @"SELECT * FROM Accounts WHERE EmailHash = @EmailHash;";
-
-            using (SQLiteConnection conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query, p);
-
-                //return first
-                foreach (var encryptedRecord in result)
-                {
-                    string pass = GetVariable();
-                    var accRec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
-                    ClearString(ref pass);
-                    accRec.Id = encryptedRecord.Id;
-                    accRec.AccountNameHash = encryptedRecord.AccountNameHash;
-                    accRec.EmailHash = encryptedRecord.EmailHash;
-                    return accRec;
-                }
-            }
-
-            return null;
-        }
-
-
-        public IEnumerable<AccountRecord> GetAllAccounts()
-        {
-            List<AccountRecord> records = new List<AccountRecord>();
-            var query = @"SELECT * FROM Accounts";
-
-            using (var conn = AccountsSqLiteDbConnection())
-            {
-                conn.Open();
-                var result = conn.Query<AccountRecordEncrypted>(query).AsList();
-
-                string pass = GetVariable();
-                Parallel.For(0, result.Count, (i) =>
-                {
-                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(result[i].Data, pass));
-                    rec.Id = result[i].Id;
-                    rec.AccountNameHash = result[i].AccountNameHash;
-                    rec.EmailHash = result[i].EmailHash;
-                    records.Add(rec);
-                });
-                ClearString(ref pass);
-
-                return records;
-            }
-        }
-
-        public async Task<List<AccountRecord>> GetAccountsAsync(int pageNumber, int pageSize)
-        {
-            ConcurrentBag<AccountRecord> records = new ConcurrentBag<AccountRecord>();
-            string query = @"SELECT * FROM Accounts 
-                         LIMIT @PageSize OFFSET @PageOffset";
-
-            using (var conn = AccountsSqLiteDbConnection())
-            {
-                var p = new DynamicParameters();
-                p.Add("@PageSize", pageSize);
-                p.Add("@PageOffset", pageNumber * pageSize);
-
-               
-                var result = await conn.QueryAsync<AccountRecordEncrypted>(query, p);
-                var list = new ConcurrentBag<AccountRecordEncrypted>(result); // result.AsList()
-
-                string pass = GetVariable();
-                Parallel.ForEach(list, encryptedRecord =>
-                {
-                    var rec = MessagePackSerializer.Deserialize<AccountRecord>(EncryptionService.Decrypt(encryptedRecord.Data, pass));
-                    rec.Id = encryptedRecord.Id;
-                    rec.AccountNameHash = encryptedRecord.AccountNameHash;
-                    rec.EmailHash = encryptedRecord.EmailHash;
-                    records.Add(rec);
-                });
-                ClearString(ref pass);
-
-                var returnList = new List<AccountRecord>(records);
-                returnList.Sort((x, y) => x.Id.CompareTo(y.Id));
-                return returnList; //new List<AccountRecord>(records);
-            }
+            int pageOffset = pageNumber * pageSize;
+            return await conn.QueryAsync<AccountRecord>(query, pageSize, pageOffset);
         }
 
         public async Task<int> GetAccountsCountAsync()
         {
+            var conn = AccountsSqLiteDbConnection();
             var query = @"SELECT COUNT(*) FROM Accounts";
-
-            using (var conn = AccountsSqLiteDbConnection())
-            {
-                await conn.OpenAsync();
-
-                var result = await conn.ExecuteScalarAsync<int>(query);
-
-                return result;
-            }
+            return await conn.ExecuteScalarAsync<int>(query);
         }
-
 
         #endregion
     }

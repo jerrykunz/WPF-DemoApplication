@@ -1,4 +1,4 @@
-﻿using MessagePack;
+﻿using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,35 +8,27 @@ using System.Threading.Tasks;
 
 namespace DemoAppDatabase.Model
 {
-    [MessagePackObject]
+    [Table("Accounts")]
     public class AccountRecord : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [IgnoreMember]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        [IgnoreMember]
-        public string AccountNameHash { get; set; }
-        [IgnoreMember]
-        public string EmailHash { get; set; }
 
-        [Key(0)]
+        [Unique]
+        [NotNull]
         public string AccountName { get; set; }
-        [Key(1)]
+        [Unique]
+        [NotNull]
         public string Email { get; set; }
-        [Key(2)]
+        [NotNull]
         public string PasswordHash { get; set; }
-        [Key(3)]
         public string FirstName { get; set; }
-        [Key(4)]
         public string FamilyName { get; set; }
-        [Key(5)]
         public string PhoneNumber { get; set; }
-        [Key(6)]
         public string Address { get; set; }
-        [Key(7)]
         public string Zipcode { get; set; }
-        [Key(8)]
         public string Country { get; set; }
 
         public void OnPropertyChanged(string propertyName)
