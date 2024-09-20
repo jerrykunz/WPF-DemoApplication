@@ -332,8 +332,9 @@
                        Text="Loading Accounts..."/>
         </Grid>
 
-        <DataGrid  Grid.Row="1" 
+        <DataGrid  Grid.Row="1"
                    HorizontalAlignment="Center"
+                   HeadersVisibility="Column"
                    Margin="50 0"
                    AutoGenerateColumns="False"
                    VirtualizingPanel.IsVirtualizing="True"
@@ -360,7 +361,7 @@
 
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"/>
                 <DataGridTextColumn Header="Account" Binding="{Binding AccountName}"/>
                 <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
                 <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" />
