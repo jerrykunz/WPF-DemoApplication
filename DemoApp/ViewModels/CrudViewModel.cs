@@ -369,8 +369,10 @@ namespace DemoApp.ViewModels
                         if (Accounts.Count >= count)
                             return;
 
+                        double prevOffset = e.VerticalOffset;
                         LoadingData = true;
                         await LoadMoreData();
+                        _scrollViewer.ScrollToVerticalOffset(prevOffset);
                         LoadingData = false;
                         break;
                 }
