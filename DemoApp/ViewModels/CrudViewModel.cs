@@ -123,6 +123,21 @@ namespace DemoApp.ViewModels
             }
         }
 
+        private StringComparison _caseSensitivity;
+        private RegexOptions _caseSensitivityRegex;
+        public bool CaseSensitive
+        {
+            get { return _caseSensitivity == StringComparison.Ordinal && _caseSensitivityRegex == RegexOptions.None; }
+            set
+            {
+                _caseSensitivity = value ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                _caseSensitivityRegex = value ? RegexOptions.None : RegexOptions.IgnoreCase;
+                UpdateFilter();
+                OnPropertyChanged(nameof(CaseSensitive));
+            }
+        }
+
+
 
         #region ICommand
 
@@ -224,6 +239,9 @@ namespace DemoApp.ViewModels
 
             Accounts = new ObservableCollection<AccountRecord>();
             VisibleAccounts = CollectionViewSource.GetDefaultView(Accounts);
+
+            _caseSensitivity = StringComparison.OrdinalIgnoreCase;
+            _caseSensitivityRegex = RegexOptions.IgnoreCase;
         }
 
         private void UpdateFilter()
@@ -287,14 +305,18 @@ namespace DemoApp.ViewModels
 
         private bool MatchesWildcardOrExact(string input, string pattern)
         {
+            string testValue = input;
+            if (testValue == null)
+                testValue = string.Empty;
+
             if (pattern.Contains('*'))
             {
                 string regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*") + "$";
-                return Regex.IsMatch(input, regexPattern, RegexOptions.IgnoreCase);
+                return Regex.IsMatch(testValue, regexPattern, _caseSensitivityRegex /*RegexOptions.IgnoreCase*/);
             }
             else
             {
-                return string.Equals(input, pattern, StringComparison.OrdinalIgnoreCase);
+                return string.Equals(testValue, pattern, _caseSensitivity /*StringComparison.OrdinalIgnoreCase*/);
             }
         }
 
