@@ -333,6 +333,7 @@
         </Grid>
 
         <DataGrid  Grid.Row="1" 
+                   HorizontalAlignment="Center"
                    Margin="50 0"
                    AutoGenerateColumns="False"
                    VirtualizingPanel.IsVirtualizing="True"
